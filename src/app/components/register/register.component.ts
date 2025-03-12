@@ -16,43 +16,27 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   errorMessage: string | null = null;
   showPassword = false;
+  showConfirmPassword = false;
 
   constructor(private fb: FormBuilder, private router: Router, private authService: AuthService) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, this.localEmailValidator], [this.existingEmailValidator]],
       username: ['',[Validators.required, this.localUsernameValidator, this.existingUsernameValidator],],
       password: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
-      confirmPassword: ['', Validators.required],
-      phoneNumbers: this.fb.array([this.createPhoneNumber()]),
-    });
+      confirmPassword: ['', [Validators.required]],
+    }, { validators: this.confirmPasswordValidator });
+
   }
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       if (user) {
-        this.router.navigate(['/todo']);
+        this.router.navigate(['/register']);
+        // this.router.navigate(['/chatbot']); // Redirect to chatbot page if user is already logged in
       }
     });
     // const registeredUsers = JSON.parse(localStorage.getItem('registerData') || '[]');
     // console.log('Registered Users:', registeredUsers);
-  }
-
-  get phoneNumbers(): FormArray {
-    return this.registerForm.get('phoneNumbers') as FormArray;
-  }
-
-  createPhoneNumber(): FormGroup {
-    return this.fb.group({
-      number: ['', [Validators.required, this.phoneNumberValidator]],
-    });
-  }
-
-  addPhoneNumber() {
-    this.phoneNumbers.push(this.createPhoneNumber());
-  }
-
-  removePhoneNumber(index: number) {
-    this.phoneNumbers.removeAt(index);
   }
 
   // Existing synchronous validation for username
@@ -106,30 +90,19 @@ export class RegisterComponent implements OnInit {
     return null;
   }
 
-  confirmPasswordValidator() {
-    return (control: any) => {
-      if (control.value !== this.registerForm.get('password')?.value) {
-        return { passwordMismatch: true };
-      }
-      return null;
-    };
-  }
+  confirmPasswordValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.parent) return null; // Ensures the form is available
 
-  phoneNumberValidator(control: any) {
-    const phoneNumber = control.value;
-    const valid = /^[6-9]\d{9}$/.test(phoneNumber);
+    const password = control.parent.get('password')?.value;
+    const confirmPassword = control.value;
 
-    if (!valid) {
-      return { invalidPhoneNumber: true };
+    if (!password || !confirmPassword) {
+      return null; // Let the "required" validator handle empty fields
     }
-    return null;
+
+    return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  onPhoneNumberInput(event: any, index: number) {
-    const input = event.target.value;
-    const cleanedInput = input.replace(/[^0-9]/g, '');
-    this.phoneNumbers.at(index).get('number')?.setValue(cleanedInput);
-  }
 
   localEmailValidator(control: AbstractControl): ValidationErrors | null {
     const email = control.value;
@@ -151,6 +124,10 @@ export class RegisterComponent implements OnInit {
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   onRegister() {
@@ -179,12 +156,10 @@ export class RegisterComponent implements OnInit {
     });
 
     this.registerForm.reset();
-    this.phoneNumbers.clear();
-    this.phoneNumbers.push(this.createPhoneNumber());
     console.log('User registered');
   }
 
   onLogin() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 }

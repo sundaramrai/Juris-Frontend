@@ -1,5 +1,5 @@
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: "https://my-todo-backend-zcj9.onrender.com/api"
+  apiUrl: "https://juris-backend-eirw.onrender.com"
 };

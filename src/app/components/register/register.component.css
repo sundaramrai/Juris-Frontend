@@ -1,0 +1,5 @@
+.body-img {
+  background-image: url(../../../../public/login-bg-dots.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+}

@@ -1,0 +1,6 @@
+.body-img {
+  background-image: url(../../../../public/login-bg-dots.png);
+  background-size: cover;
+  background-repeat: repeat-x; /* Ensure the background repeats horizontally */
+  animation: moveBackground 10s linear infinite;
+}

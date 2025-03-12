@@ -1,0 +1,105 @@
+<div class="card border-0 shadow">
+  <!-- Header -->
+  <div class="card-header bg-white py-3 border-0">
+    <div class="d-flex align-items-center">
+      <!-- AI Assistant Logo -->
+      <!-- <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center me-3" (click) = 'startNewChat()' style="width: 48px; height: 48px;"> -->
+      <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 48px; height: 48px;">
+        <mat-icon class="text-white">chat</mat-icon>
+      </div>
+
+      <!-- Assistant Name & Status -->
+      <div>
+        <h5 class="mb-0 fw-bold text-primary">AI Assistant</h5>
+        <p class="text-muted small mb-0">{{ isLoading ? 'Thinking...' : 'Ready to help' }}</p>
+      </div>
+
+      <div class="ms-auto d-flex align-items-center">
+        <mat-icon aria-label="Start New Chat" class="text-primary d-flex justify-content-center align-items-center me-3" style="cursor: pointer;">add</mat-icon>
+        <button class="btn btn-outline-primary d-flex align-items-center" [matMenuTriggerFor]="menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" xPosition="before" class="bg-white">
+          <div class="px-3 py-2 border-primary" *ngIf="username">
+            <div class="d-flex align-items-center">
+              <mat-icon class="text-primary me-2">person</mat-icon>
+              <span class="fw-medium text-primary">{{ username }}</span>
+            </div>
+          </div>
+          <button mat-menu-item class="d-flex align-items-center px-3 py-2" (click)="clearChat()">
+            <mat-icon class="text-primary me-2">delete</mat-icon>
+            <span class="text-primary fw-medium">Clear Chat</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Messages -->
+  <!-- Inside your card-body -->
+<div class="card-body p-0">
+  <div class="chat-container">
+    <!-- Messages area with proper reference -->
+    <div #messagesArea class="messages-area p-3 d-flex flex-column">
+      <!-- No messages state -->
+      <div *ngIf="messages.length === 0" class="text-center p-5 text-muted">
+        <div class="my-5">
+          <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="text-primary">sentiment_satisfied</mat-icon>
+          <p class="mt-3">No messages yet. Start a conversation!</p>
+        </div>
+      </div>
+
+      <!-- Message items -->
+      <div class="message" *ngFor="let message of messages"
+           [ngClass]="{'bot-message': message.type === 'bot', 'user-message': message.type === 'user'}">
+        <p class="mb-0">{{ message.text }}</p>
+        <small [ngClass]="{'text-muted': message.type === 'bot', 'text-white-50 text-end d-block': message.type === 'user'}">
+          {{ message.time | date:'shortTime' }}
+        </small>
+      </div>
+
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading && messages.length > 0" class="bot-message typing-indicator">
+        <div class="dot-flashing"></div>
+      </div>
+    </div>
+
+    <!-- Message Input - with class added -->
+    <div class="p-3 border-top input-container">
+      <div class="input-group">
+        <!-- Voice Input Button -->
+        <button class="btn"
+                [ngClass]="{'btn-outline-primary': !isListening, 'btn-danger': isListening}"
+                type="button"
+                [disabled]="isLoading"
+                (click)="toggleSpeechRecognition()"
+                title="Click to speak">
+          <mat-icon class="d-flex align-items-center">{{ isListening ? 'mic' : 'mic_none' }}</mat-icon>
+        </button>
+
+        <!-- User Input (Textarea with fixed event handler) -->
+        <textarea #messageInput
+                class="form-control auto-resize-textarea"
+                [placeholder]="isListening ? 'Speak clearly...' : 'Type your message here...'"
+                [(ngModel)]="userInput"
+                (input)="autoResizeTextarea(messageInput)"
+                (keydown)="handleKeyDown($event)"
+                [disabled]="isLoading"
+                rows="1"
+                autofocus></textarea>
+
+        <!-- Send Button -->
+        <button class="btn btn-primary" type="button" (click)="sendMessage()"
+                [disabled]="!userInput.trim() || isLoading">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+      <div class="text-center mt-2">
+        <small [ngClass]="{'text-muted': !isListening, 'text-danger': isListening}">
+          {{ isListening ? 'Speak clearly for best accuracy' : 'We typically reply within seconds' }}
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

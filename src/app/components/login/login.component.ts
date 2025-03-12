@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private router: Router, private authService: AuthService) {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, this.usernameValidator]],
+      username: ['', [Validators.required, Validators.minLength(3), this.usernameValidator]],
       password: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
     });
   }
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
     // ✅ Check if user is already logged in
     if (this.authService.isLoggedIn()) {
       console.log("🔄 User already logged in, redirecting...");
-      this.router.navigate(['/todo']);
+      this.router.navigate(['/chatbot']);
     }
   }
 
@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('loginTimestamp', Date.now().toString());
 
         this.isLoading = false;
-        this.router.navigate(['/todo']);
+        this.router.navigate(['/chatbot']);
       },
       error: (error) => {
         console.error("❌ Login failed:", error);
@@ -105,5 +105,9 @@ export class LoginComponent implements OnInit {
 
   onRegister() {
     this.router.navigate(['/register']);
+  }
+
+  onHome(){
+    this.router.navigate(['/home']);
   }
 }

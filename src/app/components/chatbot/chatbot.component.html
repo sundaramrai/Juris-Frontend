@@ -1,0 +1,16 @@
+<div class="container mt-4">
+  <div class="row">
+    <!-- Sidebar with Chat Options and Recent Chats -->
+    <div class="col-md-3 d-none d-md-block">
+      <!-- Send selectedTab and listen for tab changes -->
+      <app-chat-options [selectedTab]="selectedTab" (tabChanged)="onTabChange($event)"></app-chat-options>
+      <app-recent-chats></app-recent-chats>
+    </div>
+
+    <!-- Main Chat Window -->
+    <div class="col-md-9 mb-3">
+      <app-ai-assistant *ngIf="selectedTab === 'general'"></app-ai-assistant>
+      <app-feedback *ngIf="selectedTab === 'feedback'"></app-feedback>
+    </div>
+  </div>
+</div>

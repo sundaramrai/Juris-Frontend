@@ -10,7 +10,7 @@ import { AuthService } from './services/auth.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  title = 'TascMaster';
+  title = 'Juris AI';
   isLoginPage = false;
   isRegisterPage = false;
   isLoggedIn = false;
@@ -18,39 +18,29 @@ export class AppComponent implements OnInit {
   constructor(private router: Router, private authService: AuthService) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.isLoginPage = event.url === '/login';
-        this.isRegisterPage = event.url === '/register';
-        this.isLoggedIn = this.authService.isLoggedIn();
-
-        // ✅ Prevent unnecessary redirects
-        if (this.isLoggedIn && (this.isLoginPage || this.isRegisterPage)) {
-          if (this.router.url !== '/todo') {
-            console.log("🔄 Redirecting to /todo (already logged in)");
-            this.router.navigate(['/todo']);
-          }
-        }
-
-        if (!this.isLoggedIn && event.url === '/todo') {
-          if (this.router.url !== '/login') {
-            console.log("🔄 Redirecting to /login (user not logged in)");
-            this.router.navigate(['/login']);
-          }
-        }
+        this.updateRouteState(event.url);
       }
     });
   }
 
   ngOnInit() {
     this.isLoggedIn = !!localStorage.getItem('token');
-
-    // ✅ Prevent redundant navigation loops
-    if (!this.isLoggedIn && this.router.url !== '/login') {
-      console.log("🔄 Redirecting to login page (user not logged in)");
-      this.router.navigate(['/login']);
-    }
-
-    // ✅ Check if auto-logout should be triggered
+    // Removed the redirection logic for invalid URLs here so that the wildcard route can take over.
     this.checkLoginTimestamp();
+  }
+
+  private updateRouteState(currentUrl: string) {
+    this.isLoginPage = currentUrl === '/login';
+    this.isRegisterPage = currentUrl === '/register';
+    this.isLoggedIn = this.authService.isLoggedIn();
+
+    // Redirect logged-in users away from login or register pages.
+    if (this.isLoggedIn && (this.isLoginPage || this.isRegisterPage)) {
+      console.log("🔄 Redirecting to /chatbot (already logged in)");
+      this.router.navigate(['/chatbot']);
+    }
+    // No additional redirect here: if the URL does not match any valid route,
+    // Angular's routing module will display the NotFoundComponent.
   }
 
   checkLoginTimestamp() {
@@ -79,25 +69,43 @@ export class AppComponent implements OnInit {
 
   logout() {
     console.log("🔴 Logging out user...");
-
     localStorage.removeItem('loggedInUser');
     localStorage.removeItem('loginTimestamp');
     localStorage.removeItem('token');
-
     this.isLoggedIn = false;
 
-    // ✅ Prevent multiple redirections
-    if (this.router.url !== '/login') {
-      console.log("🔄 Redirecting to login page...");
-      this.router.navigate(['/login']);
+    // On logout, redirect to home page.
+    if (this.router.url !== '/home') {
+      console.log("🔄 Redirecting to home page after logout...");
+      this.router.navigate(['/home']);
     }
   }
 
   onLogout() {
-    this.logout(); // ✅ Ensure logout works correctly
+    this.logout();
   }
 
   get loggedInUser(): string | null {
     return this.authService.loggedInUser;
+  }
+
+  onHome() {
+    this.router.navigate(['/home']);
+  }
+
+  onGetStarted() {
+    this.router.navigate(['/login']);
+  }
+
+  onLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  isChatbotPage(): boolean {
+    return this.router.url === '/chatbot';
+  }
+
+  isLoginOrRegisterPage(): boolean {
+    return this.router.url === '/login' || this.router.url === '/register';
   }
 }

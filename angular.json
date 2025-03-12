@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "my-todo-crud": {
+    "juris-ai": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/my-todo-crud",
+            "outputPath": "dist/juris-ai",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -86,10 +86,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "my-todo-crud:build:production"
+              "buildTarget": "juris-ai:build:production"
             },
             "development": {
-              "buildTarget": "my-todo-crud:build:development"
+              "buildTarget": "juris-ai:build:development"
             }
           },
           "defaultConfiguration": "development"

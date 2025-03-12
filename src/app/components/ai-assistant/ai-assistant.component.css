@@ -1,0 +1,187 @@
+.chat-container {
+  height: 78dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* Add position relative */
+  overflow: hidden; /* Prevent outer container from scrolling */
+}
+
+.messages-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  border-radius: 0.25rem;
+  background-color: white;
+  scroll-behavior: smooth; /* Add smooth scrolling */
+  -webkit-overflow-scrolling: touch; /* Improve scrolling on iOS */
+  position: relative; /* Add position relative */
+  padding-bottom: 16px; /* Add some padding at the bottom for better UX */
+}
+
+/* Force hardware acceleration to improve scroll performance */
+.messages-area {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Make sure messages don't cause horizontal overflow */
+.message {
+  max-width: 75%;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  border-radius: 18px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Fix the input container at the bottom */
+.input-container {
+  position: relative;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: white;
+  z-index: 10; /* Ensure it stays above message content */
+}
+
+/* Prevent scrolling issues when focusing on textarea */
+.auto-resize-textarea {
+  min-height: 38px;
+  max-height: 150px;
+  resize: none;
+  overflow-y: hidden;
+  line-height: 1.1;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  transition: height 0.1s ease;
+  box-sizing: border-box;
+}
+
+.bot-message {
+  background-color: #e9ecef;
+  align-self: flex-start;
+}
+
+.user-message {
+  background-color: #0d6efd;
+  color: white;
+  align-self: flex-end;
+}
+
+/* Style the icon button */
+.profile-btn {
+  background: var(--bs-light);
+  border-radius: 50%;
+  padding: 8px;
+  transition: background 0.3s ease-in-out;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  background-color: #e9ecef;
+  align-self: flex-start;
+  padding: 12px 20px;
+}
+
+.dot-flashing {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #6c757d;
+  color: #6c757d;
+  animation: dot-flashing 1s infinite linear alternate;
+  animation-delay: 0.5s;
+}
+
+.dot-flashing::before,
+.dot-flashing::after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+
+.dot-flashing::before {
+  left: -12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #6c757d;
+  color: #6c757d;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+
+.dot-flashing::after {
+  left: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #6c757d;
+  color: #6c757d;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dot-flashing {
+  0% {
+    background-color: #6c757d;
+  }
+  50%, 100% {
+    background-color: rgba(108, 117, 125, 0.2);
+  }
+}
+
+/* Speech Recognition related styles */
+/* Mic button styles */
+button.btn-danger mat-icon {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Listening status indicator */
+.listening-indicator {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+/* Microphone hover effect */
+button[title="Click to speak"]:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+button[title="Click to speak"]:hover mat-icon {
+  color: #0d6efd !important; /* Bootstrap's text-primary color */
+}
+
+/* Active mic state */
+button.btn-danger {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+
+/* Keep the input group aligned when textarea grows */
+.input-group {
+  align-items: flex-start;
+}
+
+/* Align the send and mic buttons with the textarea */
+.input-group button {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

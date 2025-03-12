@@ -1,12 +1,14 @@
-/* You can add global styles to this file, and also import other style files */
-/* Apply the Google Font to the entire application */
-
 .quicksand-unique {
-  font-family: "Quicksand", serif;
+  font-family: "Open Sans", sans-serif;
   font-optical-sizing: auto;
   font-weight: normal;
   font-style: normal;
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: "Open Sans", sans-serif; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}

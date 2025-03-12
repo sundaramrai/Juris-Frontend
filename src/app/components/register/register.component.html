@@ -1,125 +1,150 @@
 <!-- src/app/components/register/register.component.html -->
-<div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 70px);">
-  <div class="card shadow-lg p-4" style="max-width: 500px; width: 100%">
-    <div class="container mt-4" style="width: 100%">
-      <h2 class="mb-4 text-center fw-bold">Register</h2>
-
-      <!-- Error Alert -->
-      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ errorMessage }}
-        <button type="button" class="btn-close" (click)="errorMessage = null"></button>
-      </div>
-
-      <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-        <!-- Email Field -->
-        <div class="mb-3">
-          <label for="email" class="form-label fw-bold">Email</label>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            formControlName="email"
-            placeholder="Enter email"
-            [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
-            required
-          />
-          <div class="invalid-feedback" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
-            <div *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</div>
-            <div *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email address</div>
-          </div>
+<div class="body-img">
+  <div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 70px);">
+    <div class="card shadow-lg border-0 p-4" style="max-width: 500px; width: 100%;">
+      <div class="container mt-3">
+        <div class="text-center">
+          <h2 class="fw-bold text-primary">Create an Account</h2>
+          <p class="text-muted">Sign up to access all the features</p>
         </div>
 
-        <!-- Username Field -->
-        <div class="mb-3">
-          <label for="username" class="form-label fw-bold">Username</label>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            formControlName="username"
-            placeholder="Enter username"
-            [class.is-invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
-            required
-          />
-          <div class="invalid-feedback" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
-            <div *ngIf="registerForm.get('username')?.errors?.['required']">Username is required</div>
-            <div *ngIf="registerForm.get('username')?.errors?.['invalidUsername']">Invalid username format</div>
-          </div>
+        <!-- Overall Error Alert -->
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ errorMessage }}
+          <button type="button" class="btn-close" (click)="errorMessage = null"></button>
         </div>
 
-        <!-- Password Fields -->
-        <div class="mb-3">
-          <label for="password" class="form-label fw-bold">Password</label>
-          <div class="input-group">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              class="form-control"
-              id="password"
-              formControlName="password"
-              placeholder="Enter password"
-              [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
-              required
-            />
-            <span class="input-group-text" (click)="togglePasswordVisibility()" style="cursor: pointer;">
-              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </span>
-            <div class="invalid-feedback" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-              <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</div>
-              <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</div>
-              <div *ngIf="registerForm.get('password')?.errors?.['invalidPassword']">
-                Password must contain at least 2 numbers, 2 uppercase letters, 1 special character, and lowercase letters
-              </div>
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+          <!-- Email Field -->
+          <div class="mb-3">
+            <label for="email" class="form-label fw-bold">Email</label>
+            <div class="input-group">
+              <span class="input-group-text"><mat-icon>email</mat-icon></span>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                formControlName="email"
+                placeholder="Enter your email"
+                [class.is-invalid]="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)"
+                required
+              />
             </div>
+            <ng-container *ngIf="registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)">
+              <p class="text-danger mt-1" *ngIf="registerForm.get('email')?.errors?.['required']">
+                Email is required.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('email')?.errors?.['invalidEmailFormat']">
+                Please enter a valid email.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('email')?.errors?.['invalidEmailDomain']">
+                Email domain is invalid.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('email')?.errors?.['emailExists']">
+                Email already exists.
+              </p>
+            </ng-container>
           </div>
-        </div>
 
-
-        <!-- Phone Numbers -->
-        <div formArrayName="phoneNumbers" class="mb-3">
-          <label class="form-label fw-bold">Phone Numbers</label>
-
-          <div *ngFor="let phone of phoneNumbers.controls; let i = index" [formGroupName]="i" class="row align-items-center mb-2">
-            <div class="col-mb-12">
-              <div class="input-group">
-                <span class="input-group-text">
-                  <mat-icon>phone</mat-icon>
-                </span>
-                <input
-                  type="text"
-                  class="form-control"
-                  formControlName="number"
-                  [class.is-invalid]="phone.get('number')?.invalid && phone.get('number')?.touched"
-                  placeholder="Enter phone number"
-                />
-                <button type="button" class="btn btn-outline-danger" (click)="removePhoneNumber(i)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-              <div class="invalid-feedback" *ngIf="phone.get('number')?.invalid && phone.get('number')?.touched">
-                <div *ngIf="phone.get('number')?.errors?.['required']">Phone number is required</div>
-                <div *ngIf="phone.get('number')?.errors?.['invalidPhoneNumber']">Invalid phone number format</div>
-              </div>
+          <!-- Username Field -->
+          <div class="mb-3">
+            <label for="username" class="form-label fw-bold">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><mat-icon>person</mat-icon></span>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                formControlName="username"
+                placeholder="Choose a username"
+                [class.is-invalid]="registerForm.get('username')?.invalid && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)"
+                required
+              />
             </div>
+            <ng-container *ngIf="registerForm.get('username')?.errors && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)">
+              <p class="text-danger mt-1" *ngIf="registerForm.get('username')?.errors?.['required']">
+                Username is required.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('username')?.errors?.['invalidUsername']">
+                Invalid username format.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('username')?.errors?.['usernameExists']">
+                Username already exists.
+              </p>
+            </ng-container>
           </div>
 
-          <div class="mt-2">
-            <button type="button" class="btn btn-outline-primary d-flex align-items-center" (click)="addPhoneNumber()">
-              <mat-icon class="me-2">add</mat-icon> Add Phone Number
+          <!-- Password Field -->
+          <div class="mb-3">
+            <label for="password" class="form-label fw-bold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><mat-icon>lock</mat-icon></span>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                class="form-control"
+                id="password"
+                formControlName="password"
+                placeholder="Create a strong password"
+                [class.is-invalid]="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)"
+                required
+              />
+              <span class="input-group-text bg-light" (click)="togglePasswordVisibility()" style="cursor: pointer;">
+                <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </span>
+            </div>
+            <ng-container *ngIf="registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)">
+              <p class="text-danger mt-1" *ngIf="registerForm.get('password')?.errors?.['required']">
+                Password is required.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('password')?.errors?.['minlength']">
+                Minimum 8 characters required.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('password')?.errors?.['invalidPassword']">
+                Must contain 2 numbers, 2 uppercase letters, 1 special character, and lowercase letters.
+              </p>
+            </ng-container>
+          </div>
+
+          <!-- Confirm Password Field -->
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label fw-bold">Confirm Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><mat-icon>lock</mat-icon></span>
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                class="form-control"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                placeholder="Confirm your password"
+                [class.is-invalid]="registerForm.get('confirmPassword')?.invalid && (registerForm.get('confirmPassword')?.touched || registerForm.get('confirmPassword')?.dirty)"
+                required
+              />
+              <span class="input-group-text bg-light" (click)="toggleConfirmPasswordVisibility()" style="cursor: pointer;">
+                <mat-icon class="text-primary">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </span>
+            </div>
+            <ng-container *ngIf="registerForm.get('confirmPassword')?.errors && (registerForm.get('confirmPassword')?.touched || registerForm.get('confirmPassword')?.dirty)">
+              <p class="text-danger mt-1" *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">
+                Confirm Password is required.
+              </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">
+                Passwords do not match.
+              </p>
+            </ng-container>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+              {{ isLoading ? 'Registering...' : 'Register' }}
+            </button>
+            <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center" (click)="onLogin()" style="height: 40px">
+              <mat-icon class="me-2">login</mat-icon>Already have an account? Login
             </button>
           </div>
-        </div>
-
-
-        <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-success" [disabled]="registerForm.invalid || isLoading">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
-            {{ isLoading ? 'Registering...' : 'Register' }}
-          </button>
-          <button type="button" class="btn btn-primary" (click)="onLogin()">
-            Already have an account? Login
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 </div>
