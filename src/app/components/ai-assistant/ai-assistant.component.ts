@@ -1,7 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild, NgZone, AfterViewChecked, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, NgZone, AfterViewInit } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
 import { HttpClient } from '@angular/common/http';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ai-assistant',
@@ -9,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './ai-assistant.component.html',
   styleUrls: ['./ai-assistant.component.css']
 })
-export class AiAssistantComponent implements OnInit, AfterViewChecked, AfterViewInit {
+export class AiAssistantComponent implements OnInit, AfterViewInit {
   messages: Message[] = [];
   userInput: string = '';
   username: string | null = null;
@@ -29,6 +30,7 @@ export class AiAssistantComponent implements OnInit, AfterViewChecked, AfterView
     private responseService: ResponseService,
     private http: HttpClient,
     private ngZone: NgZone,
+    private sanitizer: DomSanitizer
   ) {
     // Initialize speech recognition
     this.initSpeechRecognition();
@@ -40,10 +42,6 @@ export class AiAssistantComponent implements OnInit, AfterViewChecked, AfterView
       this.username = JSON.parse(user).username;
       this.loadChatHistory();
     }
-  }
-
-  ngAfterViewChecked() {
-    // this.scrollToBottom();
   }
 
   ngAfterViewInit(): void {
@@ -184,6 +182,42 @@ export class AiAssistantComponent implements OnInit, AfterViewChecked, AfterView
 
   adjustConfidence(value: number): void {
     this.confidenceThreshold = Math.max(0, Math.min(1, value));
+  }
+
+  parseMessage(text: string): SafeHtml {
+    // Convert markdown bold syntax (**text**) into <strong> tags
+    let formatted = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+    // Split the message into individual lines
+    const lines = formatted.split('\n');
+    let result = '';
+    let listOpen = false;
+
+    // Process each line: if it starts with a bullet marker, wrap it in list tags; otherwise, wrap it in a paragraph
+    for (let line of lines) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith('- ')) {
+        if (!listOpen) {
+          result += '<ul>';
+          listOpen = true;
+        }
+        result += `<li>${trimmedLine.substring(2)}</li>`;
+      } else {
+        if (listOpen) {
+          result += '</ul>';
+          listOpen = false;
+        }
+        if (trimmedLine) {
+          result += `<p>${trimmedLine}</p>`;
+        }
+      }
+    }
+    if (listOpen) {
+      result += '</ul>';
+    }
+
+    // Return the formatted HTML after sanitization
+    return this.sanitizer.bypassSecurityTrustHtml(result);
   }
 
   loadChatHistory(): void {
