@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container mt-3">
   <div class="row">
     <!-- Sidebar with Chat Options and Recent Chats -->
     <div class="col-md-3 d-none d-md-block">
@@ -11,6 +11,9 @@
     <div class="col-md-9 mb-3">
       <app-ai-assistant *ngIf="selectedTab === 'general'"></app-ai-assistant>
       <app-feedback *ngIf="selectedTab === 'feedback'"></app-feedback>
+      <div *ngIf="selectedTab === 'general'" class="mt-1 text-danger small text-center">
+        Disclaimer: This AI legal assistance tool is for informational purposes only and does not constitute legal advice.
+      </div>
     </div>
   </div>
 </div>
