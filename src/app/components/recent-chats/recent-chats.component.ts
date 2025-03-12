@@ -57,6 +57,6 @@ export class RecentChatsComponent {
   refreshChatHistory(): void {
     this.messages = [];
     this.isMessages = false;
-    this.loadChatHistory();
+    this.ngOnInit();
   }
 }
