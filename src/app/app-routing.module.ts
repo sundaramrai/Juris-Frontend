@@ -8,9 +8,14 @@ import { ChatbotComponent } from './components/chatbot/chatbot.component';
 import { AiAssistantComponent } from './components/ai-assistant/ai-assistant.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
-  { path: 'chatbot', component: ChatbotComponent, children: [
+  {
+    path: 'chatbot',
+    component: ChatbotComponent,
+    canActivate: [AuthGuard],
+    children: [
       { path: 'assistant', component: AiAssistantComponent },
       { path: 'feedback', component: FeedbackComponent },
       { path: '', redirectTo: 'assistant', pathMatch: 'full' }
