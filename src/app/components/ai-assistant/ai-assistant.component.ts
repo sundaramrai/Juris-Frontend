@@ -3,6 +3,7 @@ import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-ai-assistant',
@@ -46,6 +47,8 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initScrollListener();
+    // Ensure the chat scrolls to bottom once the view is fully rendered.
+    this.scrollToBottom();
   }
 
   initSpeechRecognition(): void {
@@ -184,27 +187,124 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
     this.confidenceThreshold = Math.max(0, Math.min(1, value));
   }
 
-  parseMessage(text: string): SafeHtml {
-    // Convert markdown bold syntax (**text**) into <strong> tags
-    let formatted = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+ // Enhanced parseMessage method to handle structured legal responses.
+// It first removes any extraneous asterisks, then processes the text line by line.
+// If headers (Title, Summary, Relevant Legal Provisions, Analysis, Real life incidents, Conclusion, References) are found,
+// their content is wrapped in appropriate HTML tags. Otherwise, it falls back to markdown formatting.
+parseMessage(text: string): SafeHtml {
+  // Remove leading/trailing spaces and extraneous asterisks at the very start of lines (but we still need "*" markers for subpoints later).
+  const cleanedText = text
+    .split('\n')
+    .map(line => line.trim())
+    .join('\n');
 
-    // Split the message into individual lines
-    const lines = formatted.split('\n');
+  // Define the expected section headers.
+  const sectionNames = [
+    "Title",
+    "Summary",
+    "Relevant Legal Provisions",
+    "Analysis",
+    "Real life incidents",
+    "Conclusion",
+    "References"
+  ];
+
+  // Prepare an object to hold section content.
+  let sections: { [key: string]: string } = {};
+  let currentSection = "";
+
+  // Regular expression to detect a header line.
+  const headerRegex = new RegExp(`^(${sectionNames.join('|')})\\s*:\\s*(.*)$`, 'i');
+
+  // Process the text line by line to capture section content.
+  const lines = cleanedText.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const headerMatch = line.match(headerRegex);
+    if (headerMatch) {
+      currentSection = headerMatch[1].trim();
+      // Initialize this section with the rest of the line.
+      sections[currentSection] = headerMatch[2].trim();
+    } else if (currentSection) {
+      // Append non-header lines to the current section, preserving newlines.
+      sections[currentSection] += "\n" + line;
+    }
+  }
+
+  // Helper function: Process a section's content to transform bullet points (*) into an alphabetical ordered list.
+  function processSectionContent(content: string): string {
+    const contentLines = content.split('\n').map(l => l.trim()).filter(l => l !== '');
+    // If any line starts with "*" then assume they are subpoints.
+    const hasAsterisk = contentLines.some(line => line.startsWith('*'));
+    if (hasAsterisk) {
+      let result = "<ol type='a'>";
+      for (let line of contentLines) {
+        if (line.startsWith('*')) {
+          // Remove the "*" and any following whitespace.
+          const listItem = line.replace(/^\*\s*/, '');
+          result += `<li>${listItem}</li>`;
+        } else {
+          // If a line does not start with "*", output it as a paragraph.
+          result += `<p>${line}</p>`;
+        }
+      }
+      result += "</ol>";
+      return result;
+    }
+    // If no asterisk lines, return content as is.
+    return content;
+  }
+
+  // If at least one section was captured, format them.
+  if (Object.keys(sections).length > 0) {
+    let html = "";
+    if (sections["Title"]) {
+      html += `<h4>${processSectionContent(sections["Title"])}</h4>`;
+    }
+    if (sections["Summary"]) {
+      html += `<p><strong>Summary:</strong> ${processSectionContent(sections["Summary"])}</p>`;
+    }
+    if (sections["Relevant Legal Provisions"]) {
+      html += `<p><strong>Relevant Legal Provisions:</strong> ${processSectionContent(sections["Relevant Legal Provisions"])}</p>`;
+    }
+    if (sections["Analysis"]) {
+      html += `<p><strong>Analysis:</strong> ${processSectionContent(sections["Analysis"])}</p>`;
+    }
+    if (sections["Real life incidents"]) {
+      html += `<p><strong>Real life incidents:</strong> ${processSectionContent(sections["Real life incidents"])}</p>`;
+    }
+    if (sections["Conclusion"]) {
+      html += `<p><strong>Conclusion:</strong> ${processSectionContent(sections["Conclusion"])}</p>`;
+    }
+    if (sections["References"]) {
+      html += `<p><strong>References:</strong> ${processSectionContent(sections["References"])}</p>`;
+    }
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  } else {
+    // Fallback: Apply basic markdown formatting.
+    let formatted = text;
+    // Bold syntax: **text**
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // Italic syntax: *text* (avoid interfering with bullet markers by using a regex that only catches lines that are not bullet points)
+    formatted = formatted.replace(/(?<!^)\*(.+?)\*/g, '<em>$1</em>');
+    // Convert URLs to clickable links.
+    formatted = formatted.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+    // Process lines: if a line starts with "*" convert to alphabetical ordered list.
+    const fallbackLines = formatted.split('\n');
     let result = '';
     let listOpen = false;
-
-    // Process each line: if it starts with a bullet marker, wrap it in list tags; otherwise, wrap it in a paragraph
-    for (let line of lines) {
+    for (let line of fallbackLines) {
       const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('- ')) {
+      if (trimmedLine.startsWith('*')) {
         if (!listOpen) {
-          result += '<ul>';
+          result += "<ol type='a'>";
           listOpen = true;
         }
-        result += `<li>${trimmedLine.substring(2)}</li>`;
+        result += `<li>${trimmedLine.replace(/^\*\s*/, '')}</li>`;
       } else {
         if (listOpen) {
-          result += '</ul>';
+          result += "</ol>";
           listOpen = false;
         }
         if (trimmedLine) {
@@ -213,12 +313,11 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
       }
     }
     if (listOpen) {
-      result += '</ul>';
+      result += "</ol>";
     }
-
-    // Return the formatted HTML after sanitization
     return this.sanitizer.bypassSecurityTrustHtml(result);
   }
+}
 
   loadChatHistory(): void {
     this.isLoading = true;
@@ -321,13 +420,10 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
     requestAnimationFrame(() => {
       if (this.messagesArea) {
         const element = this.messagesArea.nativeElement;
-        const wasAtBottom = element.scrollHeight - element.clientHeight <= element.scrollTop + 1;
-        if (wasAtBottom || this.messages.length <= 1 ||
-            this.messages[this.messages.length - 1]?.type === 'user') {
-          setTimeout(() => {
-            element.scrollTop = element.scrollHeight;
-          }, 10);
-        }
+        // Always scroll to bottom when component is loaded or a new message is added.
+        setTimeout(() => {
+          element.scrollTop = element.scrollHeight;
+        }, 10);
       }
     });
   }
@@ -336,8 +432,56 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
     if (this.messagesArea) {
       const element = this.messagesArea.nativeElement;
       element.addEventListener('scroll', () => {
-        // Let the user control scrolling; auto-scroll only when appropriate.
+        // Allow the user to control scrolling; auto-scroll only when appropriate.
       });
     }
+  }
+
+  exportChatAsPDF(): void {
+    // 1) Create a new jsPDF instance (A4 size)
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    // Define margins
+    const margin = 10; // 10mm margin on all sides
+    let yOffset = margin; // start from the top margin
+    const lineHeight = 7; // line spacing
+    const maxTextWidth = pageWidth - 2 * margin; // text wraps within left/right margins
+
+    pdf.setFontSize(12);
+
+    // 3) Add a title
+    pdf.setFont('helvetica', 'bold'); // Use a valid font name and style
+    pdf.text('Chat History', margin, yOffset);
+    yOffset += lineHeight + 3;
+
+    // 4) Iterate over each message
+    for (const msg of this.messages) {
+      // Format the label, e.g. "User (time):" or "Bot (time):"
+      const who = msg.type === 'user' ? 'User' : 'Bot';
+      const timeStr = new Date(msg.time).toLocaleString();  // adjust as needed
+      const label = `${who} (${timeStr}):`;
+
+      // Print the label in bold
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(label, margin, yOffset);
+      yOffset += lineHeight;
+
+      // Print the message text in normal font, wrapped if necessary
+      pdf.setFont('helvetica', 'normal');
+      const wrappedText = pdf.splitTextToSize(msg.text, maxTextWidth);
+      pdf.text(wrappedText, margin, yOffset);
+      yOffset += wrappedText.length * lineHeight + 5;
+
+      // If near bottom, add a new page and reset yOffset
+      if (yOffset > pageHeight - margin) {
+        pdf.addPage();
+        yOffset = margin;
+      }
+    }
+
+    // 5) Finally, save the PDF
+    pdf.save('chat.pdf');
   }
 }

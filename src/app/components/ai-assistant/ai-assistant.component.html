@@ -14,7 +14,7 @@
       </div>
 
       <div class="ms-auto d-flex align-items-center">
-        <mat-icon aria-label="Start New Chat" class="text-primary d-flex justify-content-center align-items-center me-3" style="cursor: pointer;">add</mat-icon>
+        <mat-icon aria-label="Share you chat" (click)="exportChatAsPDF()" class="text-primary d-flex justify-content-center align-items-center me-3" style="cursor: pointer;">share</mat-icon>
         <button class="btn btn-outline-primary d-flex align-items-center" [matMenuTriggerFor]="menu">
           <mat-icon>more_vert</mat-icon>
         </button>
@@ -37,8 +37,8 @@
   <!-- Chat Messages -->
   <div class="card-body p-0">
     <div class="chat-container">
-      <!-- Messages area with proper reference -->
-      <div #messagesArea class="messages-area p-3 d-flex flex-column">
+      <!-- Messages area with proper reference and auto-scroll support -->
+      <div #messagesArea class="messages-area p-3 d-flex flex-column" [style.overflowY]="messages.length > 0 ? 'auto' : 'hidden'">
         <!-- No messages state -->
         <div *ngIf="messages.length === 0" class="text-center p-5 text-muted">
           <div class="my-5">
@@ -50,7 +50,7 @@
         <!-- Message items -->
         <div class="message" *ngFor="let message of messages"
              [ngClass]="{'bot-message': message.type === 'bot', 'user-message': message.type === 'user'}">
-          <!-- Use innerHTML binding to render formatted content -->
+          <!-- Render formatted content using the enhanced parseMessage method -->
           <div class="mb-0" [innerHTML]="parseMessage(message.text)"></div>
           <small [ngClass]="{'text-muted': message.type === 'bot', 'text-white-50 text-end d-block': message.type === 'user'}">
             {{ message.time | date:'shortTime' }}
