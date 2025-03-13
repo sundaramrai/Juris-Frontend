@@ -2,14 +2,16 @@
   <div class="card-body">
     <h5 class="card-title fw-bold text-primary">Chat Options</h5>
     <div class="nav flex-column nav-pills mt-3">
-      <a class="nav-link" style="cursor: pointer;"
-         [class.active]="selectedTab === 'general'"
-         (click)="changeTab('general')">
+      <a class="nav-link"
+         routerLink="/chatbot/assistant"
+         routerLinkActive="active"
+         style="cursor: pointer;">
         General Assistance
       </a>
-      <a class="nav-link" style="cursor: pointer;"
-         [class.active]="selectedTab === 'feedback'"
-         (click)="changeTab('feedback')">
+      <a class="nav-link"
+         routerLink="/chatbot/feedback"
+         routerLinkActive="active"
+         style="cursor: pointer;">
         Feedback
       </a>
     </div>

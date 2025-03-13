@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-chatbot',
@@ -7,10 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './chatbot.component.css'
 })
 export class ChatbotComponent {
-  selectedTab: string = 'general'; // Default selected tab
+  constructor(private router: Router) {}
 
-  // Function to update tab when emitted from child
-  onTabChange(tab: string) {
-    this.selectedTab = tab;
+  isAssistantRoute(): boolean {
+    return this.router.url === '/chatbot/assistant';
   }
 }

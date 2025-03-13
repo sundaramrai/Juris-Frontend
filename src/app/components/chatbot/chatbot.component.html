@@ -2,16 +2,14 @@
   <div class="row">
     <!-- Sidebar with Chat Options and Recent Chats -->
     <div class="col-md-3 d-none d-md-block">
-      <!-- Send selectedTab and listen for tab changes -->
-      <app-chat-options [selectedTab]="selectedTab" (tabChanged)="onTabChange($event)"></app-chat-options>
+      <app-chat-options></app-chat-options>
       <app-recent-chats></app-recent-chats>
     </div>
 
     <!-- Main Chat Window -->
     <div class="col-md-9 mb-3">
-      <app-ai-assistant *ngIf="selectedTab === 'general'"></app-ai-assistant>
-      <app-feedback *ngIf="selectedTab === 'feedback'"></app-feedback>
-      <div *ngIf="selectedTab === 'general'" class="mt-1 text-danger small text-center">
+      <router-outlet></router-outlet>
+      <div *ngIf="isAssistantRoute()" class="mt-1 text-danger small text-center">
         Disclaimer: This AI legal assistance tool is for informational purposes only and does not constitute legal advice.
       </div>
     </div>
