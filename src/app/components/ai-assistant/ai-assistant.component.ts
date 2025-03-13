@@ -47,7 +47,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initScrollListener();
-    // Ensure the chat scrolls to bottom once the view is fully rendered.
     this.scrollToBottom();
   }
 
@@ -187,10 +186,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
     this.confidenceThreshold = Math.max(0, Math.min(1, value));
   }
 
- // Enhanced parseMessage method to handle structured legal responses.
-// It first removes any extraneous asterisks, then processes the text line by line.
-// If headers (Title, Summary, Relevant Legal Provisions, Analysis, Real life incidents, Conclusion, References) are found,
-// their content is wrapped in appropriate HTML tags. Otherwise, it falls back to markdown formatting.
 parseMessage(text: string): SafeHtml {
   // Remove leading/trailing spaces and extraneous asterisks at the very start of lines (but we still need "*" markers for subpoints later).
   const cleanedText = text
