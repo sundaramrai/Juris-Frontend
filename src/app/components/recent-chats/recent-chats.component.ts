@@ -27,7 +27,6 @@ export class RecentChatsComponent {
       next: (messages) => {
         this.messages = messages;
         if (this.messages.length > 0) this.isMessages = true;
-        console.log('Chat history loaded', this.messages);
       },
       error: (error) => {
         console.error('Error loading chat history:', error);
@@ -43,7 +42,6 @@ export class RecentChatsComponent {
     this.responseService.getChatSummary().subscribe({
       next: (chatSummary) => {
         this.chatSummary = chatSummary;
-        console.log('Chat summary loaded', this.chatSummary);
       },
       error: (error) => {
         console.error('Error loading chat summary:', error);
