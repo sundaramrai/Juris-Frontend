@@ -1,3 +1,4 @@
+<!-- src/app/components/ai-assistant/ai-assistant.component.html -->
 <div class="card border-0 shadow">
   <!-- Header -->
   <div class="card-header bg-white py-3 border-0">
@@ -18,7 +19,7 @@
         <button class="btn btn-outline-primary d-flex align-items-center" [matMenuTriggerFor]="menu">
           <mat-icon>more_vert</mat-icon>
         </button>
-        <mat-menu #menu="matMenu" xPosition="before" class="bg-white">
+        <mat-menu #menu="matMenu" xPosition="before">
           <div class="px-3 py-2 border-primary" *ngIf="username">
             <div class="d-flex align-items-center">
               <mat-icon class="text-primary me-2">person</mat-icon>
@@ -64,7 +65,7 @@
       </div>
 
       <!-- Message Input -->
-      <div class="p-3 border-top input-container">
+      <div class="p-3 border-0 input-container">
         <div class="input-group">
           <!-- Voice Input Button -->
           <button class="btn"

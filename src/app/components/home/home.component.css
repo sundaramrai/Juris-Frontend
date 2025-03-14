@@ -5,7 +5,7 @@
   --light-bg: #f8f9fa;
 }
 
-.body-img {
+/* .body-img {
   background-image: url(../../../../public/login-bg-dots.png);
   background-size: cover;
   background-repeat: repeat-x;
@@ -31,7 +31,7 @@
 @keyframes moveBackground {
   0% { background-position: 0 0; }
   100% { background-position: 100% 0; }
-}
+} */
 
 .hero-section {
   padding: 100px 0;
@@ -187,4 +187,136 @@
   0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
   40% { transform: translateY(-30px) translateX(-50%); }
   60% { transform: translateY(-15px) translateX(-50%); }
+}
+
+:host-context(.dark-theme) .body-img::before {
+  /* Use a darker gradient overlay for better contrast */
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(18, 18, 18, 0.8) 100%);
+}
+
+/* Feature Cards */
+/* Dark theme overrides for all feature cards */
+:host-context(.dark-theme) .feature-card {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: none;
+}
+:host-context(.dark-theme) .feature-card:hover {
+  box-shadow: 0 15px 35px rgba(13, 110, 253, 0.2);
+}
+
+/* Feature Icons */
+:host-context(.dark-theme) .feature-icon {
+  background-color: rgba(13, 110, 253, 0.2);
+}
+:host-context(.dark-theme) .feature-icon svg {
+  fill: #64b5f6 !important;
+}
+:host-context(.dark-theme) #features .text-muted {
+  color: #adb5bd !important;
+}
+:host-context(.dark-theme) #features .text-primary {
+  color: #64b5f6 !important;
+}
+:host-context(.dark-theme) #features h2 {
+  color: #fff !important;
+}
+
+:host-context(.dark-theme) #how-it-works {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5;
+}
+
+/* Override the light background class inside this section */
+:host-context(.dark-theme) #how-it-works .bg-light {
+  background-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Headings and primary text colors */
+:host-context(.dark-theme) #how-it-works .text-primary {
+  color: #64b5f6 !important;
+}
+:host-context(.dark-theme) #how-it-works h6,
+:host-context(.dark-theme) #how-it-works h2,
+:host-context(.dark-theme) #how-it-works h4,
+:host-context(.dark-theme) #how-it-works p {
+  color: #f5f5f5 !important;
+}
+
+/* Muted text for descriptions */
+:host-context(.dark-theme) #how-it-works .text-muted {
+  color: #adb5bd !important;
+}
+
+/* Step circles (bg-primary) */
+:host-context(.dark-theme) #how-it-works .bg-primary {
+  background-color: #1976d2 !important;
+  color: #ffffff !important;
+}
+
+/* Primary Buttons */
+:host-context(.dark-theme) .btn-primary {
+  background-color: #1976d2;
+  border-color: #1976d2;
+}
+:host-context(.dark-theme) .btn-primary:hover {
+  box-shadow: 0 10px 20px rgba(13, 110, 253, 0.3);
+}
+
+/* Outline Buttons */
+:host-context(.dark-theme) .btn-outline-primary {
+  border-color: #64b5f6;
+  color: white;
+}
+:host-context(.dark-theme) .btn-outline-primary:hover {
+  color: #64b5f6;
+}
+
+/* Chat Demo Container (in hero section) */
+:host-context(.dark-theme) .chat-demo-container {
+  background-color: #1e1e1e;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* Blobs (animated background elements) */
+:host-context(.dark-theme) .blob-1,
+:host-context(.dark-theme) .blob-2 {
+  background-color: rgba(13, 110, 253, 0.2);
+}
+
+/* Scroll Down SVG */
+:host-context(.dark-theme) .scroll-down svg {
+  fill: #64b5f6;
+}
+:host-context(.dark-theme) .chat-demo-container {
+  background-color: #1e1e1e !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  color: #f5f5f5;
+}
+
+:host-context(.dark-theme) .chat-demo-container .bg-light {
+  background-color: #333 !important;
+  color: #f5f5f5;
+}
+
+:host-context(.dark-theme) .chat-demo-container .bg-primary {
+  background-color: #0d6efd !important;
+  color: #fff;
+}
+
+/* Adjust muted text for better readability */
+:host-context(.dark-theme) .chat-demo-container .text-muted {
+  color: #adb5bd !important;
+}
+
+/* Headings and paragraphs */
+:host-context(.dark-theme) .chat-demo-container h5 {
+  color: #64b5f6 !important;
+}
+
+:host-context(.dark-theme) .chat-demo-container p,
+:host-context(.dark-theme) .chat-demo-container ol,
+:host-context(.dark-theme) .chat-demo-container li {
+  color: #f5f5f5 !important;
 }

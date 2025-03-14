@@ -1,6 +1,5 @@
-<!-- src/app/components/login/login.component.html -->
-<div class="body-img">
-  <div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 70px);">
+<div class="full-screen-wrapper">
+  <div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100dvh - 70px);">
     <div class="card shadow-lg p-4 border-0" style="max-width: 450px; width: 100%">
       <div class="text-center">
         <h2 class="fw-bold text-primary">Login</h2>
@@ -16,7 +15,7 @@
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <!-- Username Field -->
         <div class="mb-3">
-          <label for="username" class="form-label fw-semibold text-dark">Username</label>
+          <label for="username" class="form-label fw-bold">Username</label>
           <div class="input-group">
             <span class="input-group-text"><mat-icon>person</mat-icon></span>
             <input
@@ -88,4 +87,3 @@
     </div>
   </div>
 </div>
-

@@ -1,6 +1,77 @@
-.body-img {
-  background-image: url(../../../../public/login-bg-dots.png);
-  background-size: cover;
-  background-repeat: repeat-x; /* Ensure the background repeats horizontally */
-  animation: moveBackground 10s linear infinite;
+.full-screen-wrapper{
+  background: rgb(255,255,255);
+  background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(229,246,250,1) 0%, rgba(25,177,208,1) 100%);
+}
+:host-context(.dark-theme) .full-screen-wrapper {
+  background: rgb(2,0,36);
+  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(10,10,69,1) 50%, rgba(25,177,208,1) 100%);
+}
+:host-context(.dark-theme) .card {
+  background-color: #1e1e1e;
+  color: #f5f5f5;
+  border: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+:host-context(.dark-theme) .card-body {
+  color: #f5f5f5;
+}
+
+:host-context(.dark-theme) .card-title {
+  color: #64b5f6;
+}
+
+:host-context(.dark-theme) .text-muted {
+  color: #adb5bd;
+}
+
+:host-context(.dark-theme) .alert {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #f5f5f5;
+}
+
+:host-context(.dark-theme) .form-control {
+  background-color: #333;
+  border-color: #444;
+  color: #f5f5f5;
+}
+
+:host-context(.dark-theme) .form-control::placeholder {
+  color: #aaa;
+}
+
+:host-context(.dark-theme) .input-group-text {
+  background-color: #333;
+  border-color: #444;
+  color: #f5f5f5;
+}
+
+:host-context(.dark-theme) .btn-primary {
+  background-color: #1976d2;
+  border-color: #1976d2;
+}
+
+:host-context(.dark-theme) .btn-outline-primary {
+  color: #64b5f6;
+  border-color: #64b5f6;
+}
+
+:host-context(.dark-theme) .btn-close {
+  filter: invert(1);
+}
+
+:host-context(.dark-theme) .input-group-text.bg-light {
+  background-color: #333 !important;
+  border-color: #444 !important;
+  color: #f5f5f5;
+}
+
+:host-context(.dark-theme) .btn-outline-primary:hover,
+:host-context(.dark-theme) .btn-outline-primary:hover mat-icon {
+  color: #fff !important;
+}
+
+:host-context(.dark-theme) .text-muted {
+  color: #adb5bd !important;
 }

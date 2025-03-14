@@ -1,9 +1,13 @@
+.card {
+  border-radius: 8px;
+  overflow: hidden;
+}
 .chat-container {
   height: 78dvh;
   display: flex;
   flex-direction: column;
-  position: relative; /* Add position relative */
-  overflow: hidden; /* Prevent outer container from scrolling */
+  position: relative;
+  overflow: hidden;
 }
 
 .messages-area {
@@ -11,38 +15,27 @@
   overflow-y: auto;
   border-radius: 0.25rem;
   background-color: white;
-  scroll-behavior: smooth; /* Add smooth scrolling */
-  -webkit-overflow-scrolling: touch; /* Improve scrolling on iOS */
-  position: relative; /* Add position relative */
-  padding-bottom: 16px; /* Add some padding at the bottom for better UX */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  padding-bottom: 16px;
 }
 
-/* Force hardware acceleration to improve scroll performance */
-.messages-area {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-/* Make sure messages don't cause horizontal overflow */
 .message {
   max-width: 75%;
   margin-bottom: 10px;
   padding: 10px 15px;
   border-radius: 18px;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
-/* Fix the input container at the bottom */
 .input-container {
   position: relative;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   background-color: white;
-  z-index: 10; /* Ensure it stays above message content */
+  z-index: 10;
 }
 
-/* Prevent scrolling issues when focusing on textarea */
 .auto-resize-textarea {
   min-height: 38px;
   max-height: 150px;
@@ -58,6 +51,7 @@
 .bot-message {
   background-color: #e9ecef;
   align-self: flex-start;
+  color: #212529;
 }
 
 .user-message {
@@ -66,15 +60,6 @@
   align-self: flex-end;
 }
 
-/* Style the icon button */
-.profile-btn {
-  background: var(--bs-light);
-  border-radius: 50%;
-  padding: 8px;
-  transition: background 0.3s ease-in-out;
-}
-
-/* Typing indicator */
 .typing-indicator {
   background-color: #e9ecef;
   align-self: flex-start;
@@ -122,66 +107,159 @@
   animation-delay: 1s;
 }
 
-@keyframes dot-flashing {
-  0% {
-    background-color: #6c757d;
-  }
-  50%, 100% {
-    background-color: rgba(108, 117, 125, 0.2);
-  }
-}
-
-/* Speech Recognition related styles */
-/* Mic button styles */
-button.btn-danger mat-icon {
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Listening status indicator */
-.listening-indicator {
-  color: #dc3545;
-  font-weight: 500;
-}
-
-/* Microphone hover effect */
-button[title="Click to speak"]:hover {
-  background-color: rgba(13, 110, 253, 0.1);
-}
-
-button[title="Click to speak"]:hover mat-icon {
-  color: #0d6efd !important; /* Bootstrap's text-primary color */
-}
-
-/* Active mic state */
-button.btn-danger {
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-}
-
-
-/* Keep the input group aligned when textarea grows */
 .input-group {
   align-items: flex-start;
 }
 
-/* Align the send and mic buttons with the textarea */
 .input-group button {
   height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+button.btn-danger {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+button[title="Click to speak"]:hover mat-icon {
+  color: #0d6efd !important;
+}
+
+button[title="Click to speak"]:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+/* Navbar */
+:host-context(.dark-theme) .navbar {
+  background-color: #1e1e1e !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+:host-context(.dark-theme) .navbar-brand span {
+  color: #64b5f6 !important;
+}
+
+/* Buttons */
+:host-context(.dark-theme) .btn-outline-primary {
+  color: #64b5f6;
+  border-color: #64b5f6;
+}
+:host-context(.dark-theme) .btn-primary {
+  background-color: #1976d2;
+  border-color: #1976d2;
+}
+:host-context(.dark-theme) .text-primary {
+  color: #64b5f6 !important;
+}
+
+/* Cards */
+:host-context(.dark-theme) .card {
+  background-color: #1e1e1e;
+  border: none;
+}
+:host-context(.dark-theme) .card-header {
+  background-color: #1e1e1e !important;
+  border-bottom: 1px solid #333;
+}
+
+/* Inputs & Textareas */
+:host-context(.dark-theme) input,
+:host-context(.dark-theme) textarea,
+:host-context(.dark-theme) select {
+  background-color: #333;
+  border-color: #444;
+  color: #f5f5f5;
+}
+:host-context(.dark-theme) input::placeholder,
+:host-context(.dark-theme) textarea::placeholder {
+  color: #aaa;
+}
+:host-context(.dark-theme) .auto-resize-textarea {
+  background-color: #333;
+  color: #f5f5f5;
+  border-color: #444;
+}
+:host-context(.dark-theme) .auto-resize-textarea::placeholder {
+  color: #aaa;
+}
+
+/* Chat Interface */
+:host-context(.dark-theme) .chat-bubble {
+  background-color: #333;
+}
+:host-context(.dark-theme) .user-bubble {
+  background-color: #1976d2;
+}
+:host-context(.dark-theme) .messages-area {
+  background-color: #1e1e1e;
+}
+:host-context(.dark-theme) .input-container {
+  background-color: #1e1e1e;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+:host-context(.dark-theme) .bot-message {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+:host-context(.dark-theme) .user-message {
+  background-color: #1976d2;
+}
+
+/* Profile Button */
+:host-context(.dark-theme) .profile-btn {
+  background: #333;
+}
+
+/* Typing Indicator */
+:host-context(.dark-theme) .typing-indicator {
+  background-color: #2d2d2d;
+}
+
+/* Dot Flashing (including dark theme animation) */
+:host-context(.dark-theme) .dot-flashing,
+:host-context(.dark-theme) .dot-flashing::before,
+:host-context(.dark-theme) .dot-flashing::after {
+  background-color: #adb5bd;
+  color: #adb5bd;
+  animation-name: dot-flashing-dark;
+}
+
+@keyframes dot-flashing {
+  0% { background-color: #6c757d; }
+  50%, 100% { background-color: rgba(108, 117, 125, 0.2); }
+}
+
+@keyframes dot-flashing-dark {
+  0% { background-color: #adb5bd; }
+  50%, 100% { background-color: rgba(173, 181, 189, 0.2); }
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Mic Button Hover */
+:host-context(.dark-theme) button[title="Click to speak"]:hover {
+  background-color: rgba(25, 118, 210, 0.2);
+}
+:host-context(.dark-theme) button[title="Click to speak"]:hover mat-icon {
+  color: #64b5f6 !important;
+}
+
+/* No Messages State */
+:host-context(.dark-theme) .text-muted {
+  color: #adb5bd !important;
+}
+
+/* Menu Styles */
+:host-context(.dark-theme) .mat-menu-panel {
+  background-color: #1e1e1e;
+}
+:host-context(.dark-theme) .mat-menu-item {
+  color: #f5f5f5;
+}
+:host-context(.dark-theme) .mat-menu-item:hover {
+  background-color: #333;
 }

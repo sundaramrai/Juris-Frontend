@@ -14,6 +14,7 @@ export class AppComponent implements OnInit {
   isLoginPage = false;
   isRegisterPage = false;
   isLoggedIn = false;
+  isDarkTheme = false;
 
   constructor(private router: Router, private authService: AuthService) {
     this.router.events.subscribe((event) => {
@@ -25,8 +26,28 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.isLoggedIn = !!localStorage.getItem('token');
-    // Removed the redirection logic for invalid URLs here so that the wildcard route can take over.
+
+    // Load theme preference from localStorage
+    const savedTheme = localStorage.getItem('theme');
+    this.isDarkTheme = savedTheme === 'dark';
+    this.applyTheme();
+
     this.checkLoginTimestamp();
+  }
+
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    localStorage.setItem('theme', this.isDarkTheme ? 'dark' : 'light');
+
+    this.applyTheme();
+  }
+
+  private applyTheme(): void {
+    if (this.isDarkTheme) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
   }
 
   private updateRouteState(currentUrl: string) {
@@ -39,8 +60,6 @@ export class AppComponent implements OnInit {
       console.log("🔄 Redirecting to /chatbot (already logged in)");
       this.router.navigate(['/chatbot']);
     }
-    // No additional redirect here: if the URL does not match any valid route,
-    // Angular's routing module will display the NotFoundComponent.
   }
 
   checkLoginTimestamp() {
