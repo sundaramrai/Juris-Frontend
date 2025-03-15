@@ -1,1 +1,111 @@
-<p>templates works!</p>
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap py-2">
+    <!-- Left: Icon, Title & Subtitle -->
+    <div class="d-flex align-items-center mb-2">
+      <!-- Icon Circle (uses bg-primary to match AI Assistant) -->
+      <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+        style="width: 48px; height: 48px;">
+        <mat-icon class="text-white">description</mat-icon>
+      </div>
+      <div>
+        <h5 class="fw-bold text-primary mb-0">Legal Document Templates</h5>
+        <p class="text-muted small mb-0">Browse over 100+ Indian law‑specific templates</p>
+      </div>
+    </div>
+    <!-- Right: Search & Filter (kept compact) -->
+    <div class="d-flex align-items-center gap-2 flex-wrap mt-3 mt-md-0">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [formControl]="searchControl" placeholder="Search templates..." />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-icon matPrefix>filter_list</mat-icon>
+        <mat-select [(value)]="selectedType" (selectionChange)="filterTemplatesByType($event)">
+          <mat-option value="all">All Types</mat-option>
+          <mat-option *ngFor="let type of availableTypes" [value]="type">
+            {{ type | titlecase }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- mat spinner until templates are loaded -->
+  <div class="d-flex justify-content-center" *ngIf="!isLoaded">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Templates Grid (2 cards per row), only showing paginatedTemplates -->
+  <div class="row" *ngIf="paginatedTemplates.length > 0 && isLoaded">
+    <div class="col-md-6 mb-4" *ngFor="let template of paginatedTemplates">
+      <div class="template-card card border-0 shadow h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fw-bold text-primary mb-1">
+            {{ template.template_name }}
+          </h5>
+          <div class="type-pill fw-bold mb-2">
+            {{ template.type | titlecase }}
+          </div>
+          <p class="card-text text-muted" style="text-align: justify;">
+            {{ template.about }}
+          </p>
+        </div>
+        <div class="card-footer bg-white border-0 d-flex justify-content-end gap-2 flex-wrap">
+          <button class="btn-view" (click)="viewTemplate(template)">
+            <mat-icon class="me-1">visibility</mat-icon>
+            View
+          </button>
+          <button mat-flat-button [matMenuTriggerFor]="downloadMenu" class="btn-download">
+            <mat-icon class="me-1">download</mat-icon>
+            Download
+          </button>
+          <mat-menu #downloadMenu="matMenu">
+            <button mat-menu-item (click)="downloadFileOption(template, 'pdf')">
+              <mat-icon class="me-1">picture_as_pdf</mat-icon>
+              PDF
+            </button>
+            <button mat-menu-item (click)="downloadFileOption(template, 'docx')">
+              <mat-icon class="me-1">description</mat-icon>
+              Word
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Results Message -->
+  <div class="text-center text-muted py-5" *ngIf="paginatedTemplates.length === 0">
+    No templates found matching your criteria.
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-container d-flex justify-content-center align-items-center" *ngIf="totalPages > 1 && isLoaded">
+    <nav aria-label="Templates Pagination">
+      <ul class="pagination">
+        <!-- Previous Button -->
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="prevPage()">
+            Previous
+          </button>
+        </li>
+
+        <!-- Page Numbers -->
+        <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+          <button class="page-link" (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        </li>
+
+        <!-- Next Button -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link" (click)="nextPage()">
+            Next
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

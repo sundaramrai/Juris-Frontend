@@ -13,6 +13,12 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatOption } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { HomeComponent } from './components/home/home.component';
 import { ToolsComponent } from './components/tools/tools.component';
 import { RecentChatsComponent } from './components/recent-chats/recent-chats.component';
@@ -46,6 +52,12 @@ import { TemplatesComponent } from './components/templates/templates.component';
     BrowserAnimationsModule,
     MatIconModule,
     MatMenuModule,
+    MatCardModule,
+    MatProgressSpinner,
+    MatOption,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
