@@ -32,7 +32,6 @@ export class RegisterComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       if (user) {
         this.router.navigate(['/register']);
-        // this.router.navigate(['/chatbot']); // Redirect to chatbot page if user is already logged in
       }
     });
     // const registeredUsers = JSON.parse(localStorage.getItem('registerData') || '[]');

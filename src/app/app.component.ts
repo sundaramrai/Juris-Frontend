@@ -57,8 +57,8 @@ export class AppComponent implements OnInit {
 
     // Redirect logged-in users away from login or register pages.
     if (this.isLoggedIn && (this.isLoginPage || this.isRegisterPage)) {
-      console.log("🔄 Redirecting to /chatbot (already logged in)");
-      this.router.navigate(['/chatbot']);
+      console.log("🔄 Redirecting to /tools (already logged in)");
+      this.router.navigate(['/tools']);
     }
   }
 
@@ -121,7 +121,7 @@ export class AppComponent implements OnInit {
   }
 
   isChatbotPage(): boolean {
-    return this.router.url === '/chatbot';
+    return this.router.url === '/tools';
   }
 
   isLoginOrRegisterPage(): boolean {

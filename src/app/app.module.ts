@@ -14,12 +14,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { HomeComponent } from './components/home/home.component';
-import { ChatbotComponent } from './components/chatbot/chatbot.component';
+import { ToolsComponent } from './components/tools/tools.component';
 import { RecentChatsComponent } from './components/recent-chats/recent-chats.component';
-import { ChatOptionsComponent } from './components/chat-options/chat-options.component';
+import { OptionsComponent } from './components/options/options.component';
 import { AiAssistantComponent } from './components/ai-assistant/ai-assistant.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { TemplatesComponent } from './components/templates/templates.component';
 
 @NgModule({
   declarations: [
@@ -27,12 +28,13 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
     LoginComponent,
     RegisterComponent,
     HomeComponent,
-    ChatbotComponent,
+    ToolsComponent,
     RecentChatsComponent,
-    ChatOptionsComponent,
+    OptionsComponent,
     AiAssistantComponent,
     FeedbackComponent,
     NotFoundComponent,
+    TemplatesComponent,
   ],
   imports: [
     BrowserModule,

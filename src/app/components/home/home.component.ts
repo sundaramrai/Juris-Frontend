@@ -16,7 +16,7 @@ export class HomeComponent {
   }
   ontryNow() {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/chatbot']);
+      this.router.navigate(['/tools']);
     } else {
       this.router.navigate(['/login']);
     }

@@ -11,7 +11,7 @@ export class LoggedOutGuard implements CanActivate {
     if (!this.authService.isLoggedIn()) {
       return true;
     }
-    this.router.navigate(['/chatbot']);
+    this.router.navigate(['/tools']);
     return false;
   }
 }

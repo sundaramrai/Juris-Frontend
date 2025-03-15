@@ -4,20 +4,22 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
-import { ChatbotComponent } from './components/chatbot/chatbot.component';
+import { ToolsComponent } from './components/tools/tools.component';
 import { AiAssistantComponent } from './components/ai-assistant/ai-assistant.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { TemplatesComponent } from './components/templates/templates.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   {
-    path: 'chatbot',
-    component: ChatbotComponent,
+    path: 'tools',
+    component: ToolsComponent,
     canActivate: [AuthGuard],
     children: [
       { path: 'assistant', component: AiAssistantComponent },
       { path: 'feedback', component: FeedbackComponent },
+      { path: 'templates', component: TemplatesComponent },
       { path: '', redirectTo: 'assistant', pathMatch: 'full' }
     ]
   },

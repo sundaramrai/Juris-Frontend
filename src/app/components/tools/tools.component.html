@@ -2,8 +2,8 @@
   <div class="row">
     <!-- Sidebar with Chat Options and Recent Chats -->
     <div class="col-md-3 d-none d-md-block">
-      <app-chat-options></app-chat-options>
-      <app-recent-chats></app-recent-chats>
+      <app-options></app-options>
+      <app-recent-chats *ngIf="isAssistantRoute()"></app-recent-chats>
     </div>
 
     <!-- Main Chat Window -->

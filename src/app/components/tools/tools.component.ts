@@ -2,15 +2,15 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-chatbot',
+  selector: 'app-tools',
   standalone: false,
-  templateUrl: './chatbot.component.html',
-  styleUrl: './chatbot.component.css'
+  templateUrl: './tools.component.html',
+  styleUrl: './tools.component.css'
 })
-export class ChatbotComponent {
+export class ToolsComponent {
   constructor(private router: Router) {}
 
   isAssistantRoute(): boolean {
-    return this.router.url === '/chatbot/assistant';
+    return this.router.url === '/tools/assistant';
   }
 }
