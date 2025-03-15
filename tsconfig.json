@@ -23,8 +23,7 @@
     "strictTemplates": true
   },
   "files": [
-    "src/main.ts",
-    "src/polyfills.ts"  // Make sure this line exists
+    "src/main.ts"
   ],
   "include": [
     "src/**/*.d.ts"
