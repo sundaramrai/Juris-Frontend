@@ -21,5 +21,12 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"  // Make sure this line exists
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
 }
