@@ -42,6 +42,7 @@ export class AuthService {
     localStorage.removeItem('loggedInUser'); // Remove user info
     localStorage.removeItem('loginTimestamp'); // Remove timestamp
     localStorage.removeItem('token'); // Remove JWT token
+    this.currentUserSubject.next(null); // Set current user to null
     this.router.navigate(['/login']); // Redirect to login page
   }
 

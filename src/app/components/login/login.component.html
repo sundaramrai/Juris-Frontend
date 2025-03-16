@@ -33,12 +33,6 @@
             <p class="text-danger mt-1" *ngIf="loginForm.get('username')?.errors?.['required']">
               Username is required.
             </p>
-            <p class="text-danger mt-1" *ngIf="loginForm.get('username')?.errors?.['invalidUsername']">
-              Invalid username format.
-            </p>
-            <p class="text-danger mt-1" *ngIf="loginForm.get('username')?.errors?.['minlength']">
-              Minimum 3 characters required.
-            </p>
           </ng-container>
         </div>
 
@@ -63,12 +57,6 @@
           <ng-container *ngIf="loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)">
             <p class="text-danger mt-1" *ngIf="loginForm.get('password')?.errors?.['required']">
               Password is required.
-            </p>
-            <p class="text-danger mt-1" *ngIf="loginForm.get('password')?.errors?.['minlength']">
-              Minimum 8 characters required.
-            </p>
-            <p class="text-danger mt-1" *ngIf="loginForm.get('password')?.errors?.['invalidPassword']">
-              Must contain 2 numbers, 2 uppercase letters, 1 special character, and lowercase letters.
             </p>
           </ng-container>
         </div>

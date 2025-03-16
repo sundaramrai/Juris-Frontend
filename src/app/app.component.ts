@@ -91,6 +91,8 @@ export class AppComponent implements OnInit {
     localStorage.removeItem('loggedInUser');
     localStorage.removeItem('loginTimestamp');
     localStorage.removeItem('token');
+    // remove current user from auth service
+    this.authService.logout();
     this.isLoggedIn = false;
 
     // On logout, redirect to home page.

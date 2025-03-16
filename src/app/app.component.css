@@ -23,6 +23,25 @@
 :host-context(.dark-theme) .btn.text-primary mat-icon {
   color: #fff !important;
 }
+.nav-item .btn.btn-outline-primary {
+  color: #1976d2 !important;
+  border-color: #1976d2 !important;
+}
+.nav-item .btn.btn-outline-primary:hover {
+  background-color: #1976d2 !important;
+  color: #fff !important;
+  border-color: #1976d2 !important;
+}
+.nav-item .btn.btn-primary {
+  background-color: #1976d2 !important;
+  border-color: #1976d2 !important;
+  color: #fff !important;
+}
+.nav-item .btn.btn-primary:hover {
+  background-color: #fff !important;
+  color: #1976d2 !important;
+  border-color: #1565c0 !important;
+}
 :host-context(.dark-theme) .nav-item .btn.btn-outline-primary {
   color: #fff !important;
   border-color: #64b5f6 !important;

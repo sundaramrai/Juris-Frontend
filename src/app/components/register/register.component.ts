@@ -1,9 +1,8 @@
-// src/app/components/register/register.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-// import { of, map, delay } from 'rxjs';
+import { TldService } from '../../services/tld.service';
 
 @Component({
   selector: 'app-register',
@@ -16,51 +15,71 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   errorMessage: string | null = null;
   showPassword = false;
-  showConfirmPassword = false;
+  validTlds: string[] = [];
 
-  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService) {
+  // Username configuration
+  usernameMinLength = 2;
+  usernameMaxLength = 20;
+
+  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService, private tldService: TldService) {
     this.registerForm = this.fb.group({
-      email: ['', [Validators.required, this.localEmailValidator], [this.existingEmailValidator]],
-      username: ['',[Validators.required, this.localUsernameValidator, this.existingUsernameValidator],],
-      password: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
-      confirmPassword: ['', [Validators.required]],
-    }, { validators: this.confirmPasswordValidator });
-
+      email: [
+        '',
+        [Validators.required, this.enhancedEmailValidator.bind(this)],
+        [this.existingEmailValidator.bind(this)]
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(this.usernameMinLength),
+          Validators.maxLength(this.usernameMaxLength),
+          this.enhancedUsernameValidator
+        ],
+        [this.existingUsernameValidator]
+      ],
+      password: ['', [Validators.required, this.enhancedPasswordValidator]],
+    });
   }
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       if (user) {
-        this.router.navigate(['/register']);
+        this.router.navigate(['/tools']);
       }
     });
-    // const registeredUsers = JSON.parse(localStorage.getItem('registerData') || '[]');
-    // console.log('Registered Users:', registeredUsers);
+
+    this.tldService.getTlds().subscribe((tlds: string[]) => {
+      this.validTlds = tlds.map(tld => tld.toLowerCase());
+    });
   }
 
-  // Existing synchronous validation for username
-  localUsernameValidator(control: AbstractControl): ValidationErrors | null {
+  enhancedUsernameValidator(control: AbstractControl): ValidationErrors | null {
     const username = control.value;
-
     if (!username) return null;
 
+    // Check if username is only numbers
     const isNumeric = /^\d+$/.test(username);
-    if (isNumeric) return { invalidUsername: true };
+    if (isNumeric) return { numericOnly: true };
 
+    // Check for minimum alphabetic characters
     const alphabeticCount = (username.match(/[a-zA-Z]/g) || []).length;
-    if (alphabeticCount < 3) return { invalidUsername: true };
+    if (alphabeticCount < 2) return { insufficientLetters: true };
 
-    if (username === '_') return { invalidUsername: true };
+    // Ensure username isn't just an underscore
+    if (username === '_') return { invalidFormat: true };
 
+    // Check for valid characters (letters, numbers, underscore)
     const hasInvalidChars = /[^a-zA-Z0-9_]/.test(username);
-    if (hasInvalidChars) return { invalidUsername: true };
+    if (hasInvalidChars) return { invalidCharacters: true };
 
     return null;
   }
 
-  // This is used in the case when we want to check if username exists synchronously (without making HTTP requests)
   existingUsernameValidator(control: AbstractControl): ValidationErrors | null {
     const username = control.value;
+    if (!username) return null;
+
     const data = localStorage.getItem('registerData');
     const registeredUsers = JSON.parse(data || '[]');
     const exists = registeredUsers.some((user: any) => user.username === username);
@@ -73,51 +92,55 @@ export class RegisterComponent implements OnInit {
     input.value = input.value.toLowerCase();
   }
 
-  passwordValidator(control: any) {
+  enhancedPasswordValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.value;
-    if (!password) {
-      return null;
+    if (!password) return null;
+
+    const errors: ValidationErrors = {};
+    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d{2,})(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    if (!pattern.test(password)) {
+      errors['patternMismatch'] = true;
     }
-    const numberCount = (password.match(/\d/g) || []).length;
-    const upperCaseCount = (password.match(/[A-Z]/g) || []).length;
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const valid = numberCount >= 2 && upperCaseCount >= 2 && hasSpecialChar && hasLowerCase;
-    if (!valid) {
-      return { invalidPassword: true };
-    }
-    return null;
+
+    return Object.keys(errors).length ? errors : null;
   }
 
-  confirmPasswordValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.parent) return null; // Ensures the form is available
-
-    const password = control.parent.get('password')?.value;
-    const confirmPassword = control.value;
-
-    if (!password || !confirmPassword) {
-      return null; // Let the "required" validator handle empty fields
-    }
-
-    return password === confirmPassword ? null : { passwordMismatch: true };
-  }
-
-
-  localEmailValidator(control: AbstractControl): ValidationErrors | null {
+  enhancedEmailValidator = (control: AbstractControl): ValidationErrors | null => {
     const email = control.value;
     if (!email) return null;
+
+    const errors: ValidationErrors = {};
+
+    // Basic email format validation
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailPattern.test(email)) return { invalidEmailFormat: true };
+    if (!emailPattern.test(email)) {
+      errors['invalidFormat'] = true;
+      return errors;
+    }
     const [local, domain] = email.split('@');
-    if (domain && domain.indexOf('.') !== -1) return null;
-    return { invalidEmailDomain: true };
+
+    // Check if domain has at least one dot and valid TLD
+    if (!domain || domain.indexOf('.') === -1) {
+      errors['invalidDomain'] = true;
+    }
+
+    // Check dynamic TLDs
+    const domainTld = domain.split('.').pop()?.toLowerCase();
+    if (domainTld && !this.validTlds.includes(domainTld)) {
+      errors['invalidTLD'] = true;
+    }
+    return Object.keys(errors).length ? errors : null;
   }
+
 
   existingEmailValidator(control: AbstractControl): ValidationErrors | null {
     const email = control.value;
+    if (!email) return null;
+
     const data = localStorage.getItem('registerData');
     const registeredUsers = JSON.parse(data || '[]');
     const exists = registeredUsers.some((user: any) => user.email === email);
+
     return exists ? { emailExists: true } : null;
   }
 
@@ -125,17 +148,19 @@ export class RegisterComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  toggleConfirmPasswordVisibility() {
-    this.showConfirmPassword = !this.showConfirmPassword;
-  }
-
   onRegister() {
     if (this.registerForm.invalid) {
+      // Mark all fields as touched to show validation errors
+      Object.keys(this.registerForm.controls).forEach(key => {
+        const control = this.registerForm.get(key);
+        control?.markAsTouched();
+      });
       return;
     }
+
     this.isLoading = true;
     this.errorMessage = null;
-    // check if user already exists
+
     const userData = this.registerForm.value;
     this.authService.register(userData).subscribe({
       next: () => {
@@ -153,9 +178,6 @@ export class RegisterComponent implements OnInit {
         }
       }
     });
-
-    this.registerForm.reset();
-    console.log('User registered');
   }
 
   onLogin() {

@@ -18,8 +18,8 @@ export class LoginComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private router: Router, private authService: AuthService) {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3), this.usernameValidator]],
-      password: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
+      username: ['', Validators.required],
+      password: ['', Validators.required],
     });
   }
 
@@ -31,41 +31,41 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  usernameValidator(control: any) {
-    const username = control.value;
-    if (!username) return null;
+  // usernameValidator(control: any) {
+  //   const username = control.value;
+  //   if (!username) return null;
 
-    const isNumeric = /^\d+$/.test(username);
-    if (isNumeric) return { invalidUsername: true };
+  //   const isNumeric = /^\d+$/.test(username);
+  //   if (isNumeric) return { invalidUsername: true };
 
-    const alphabeticCount = (username.match(/[a-zA-Z]/g) || []).length;
-    if (alphabeticCount < 3) return { invalidUsername: true };
+  //   const alphabeticCount = (username.match(/[a-zA-Z]/g) || []).length;
+  //   if (alphabeticCount < 3) return { invalidUsername: true };
 
-    if (username === '_') return { invalidUsername: true };
+  //   if (username === '_') return { invalidUsername: true };
 
-    const hasInvalidChars = /[^a-zA-Z0-9_]/.test(username);
-    if (hasInvalidChars) return { invalidUsername: true };
+  //   const hasInvalidChars = /[^a-zA-Z0-9_]/.test(username);
+  //   if (hasInvalidChars) return { invalidUsername: true };
 
-    return null;
-  }
+  //   return null;
+  // }
 
   onUsernameInput(event: any) {
     event.target.value = event.target.value.toLowerCase();
   }
 
-  passwordValidator(control: any) {
-    const password = control.value;
-    if (!password) return null;
+  // passwordValidator(control: any) {
+  //   const password = control.value;
+  //   if (!password) return null;
 
-    const numberCount = (password.match(/\d/g) || []).length;
-    const upperCaseCount = (password.match(/[A-Z]/g) || []).length;
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
+  //   const numberCount = (password.match(/\d/g) || []).length;
+  //   const upperCaseCount = (password.match(/[A-Z]/g) || []).length;
+  //   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  //   const hasLowerCase = /[a-z]/.test(password);
 
-    return numberCount >= 2 && upperCaseCount >= 2 && hasSpecialChar && hasLowerCase
-      ? null
-      : { invalidPassword: true };
-  }
+  //   return numberCount >= 2 && upperCaseCount >= 2 && hasSpecialChar && hasLowerCase
+  //     ? null
+  //     : { invalidPassword: true };
+  // }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
