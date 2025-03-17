@@ -66,14 +66,13 @@
               {{ message.time | date:'shortTime' }}
             </small>
             <div class="d-flex align-items-center position-relative">
-              <button *ngIf="message.type === 'bot'" class="btn btn-sm btn-outline-primary copy-btn"
+              <button *ngIf="message.type === 'bot' && !showCopied" class="btn btn-sm btn-outline-primary copy-btn"
                 (click)="copyMessage(message.text)">
                 <mat-icon>content_copy</mat-icon>
+                </button>
+              <button *ngIf="showCopied" class="btn btn-sm btn-outline-primary copy-btn" style="animation: fadeIn 1s;">
+                <mat-icon>done</mat-icon>
               </button>
-              <div *ngIf="showCopied" class="copied-tooltip position-absolute bg-secondary text-white p-1 rounded"
-                style="bottom: -40px; right: 0; animation: fadeOut 1s;">
-                Copied!
-              </div>
             </div>
           </div>
         </div>
