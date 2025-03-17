@@ -23,6 +23,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
   confidenceThreshold: number = 0.7; // Confidence threshold for speech recognition
   pauseDelay: number = 2000; // Pause duration in milliseconds before auto-stopping
   pauseTimer: any; // Timer for detecting long pauses
+  showCopied: boolean = false;
 
   @ViewChild('messagesArea') messagesArea!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
@@ -389,6 +390,18 @@ parseMessage(text: string): SafeHtml {
     });
   }
 
+  copyMessage(text: string): void {
+    if (text) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.showCopied = true;
+        setTimeout(() => {
+          this.showCopied = false;
+        }, 1000);
+      }, (error) => {
+        console.error('Error copying message to clipboard:', error);
+      });
+    }
+  }
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
