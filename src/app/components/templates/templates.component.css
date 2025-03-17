@@ -11,19 +11,19 @@
 }
 :host-context(.dark-theme) .search-field mat-icon,
 :host-context(.dark-theme) .filter-field mat-icon {
-  color: #0d6efd;
+  color: #fff;
 }
 :host-context(.dark-theme) .search-field input::placeholder {
-  color: #0d6efd;
+  color: #fff;
 }
 :host-context(.dark-theme) .search-field input {
-  color: #0d6efd;
+  color: #fff;
 }
 .filter-field {
   width: 150px;
 }
 :host-context(.dark-theme) .filter-field mat-select {
-  color: #0d6efd;
+  color: #fff;
 }
 
 /* Template Card */
@@ -136,7 +136,7 @@
 }
 :host-context(.dark-theme) .type-pill {
   background-color: #444;
-  color: #fff;
+  color: #0d6efd;
 }
 :host-context(.dark-theme) .btn-view {
   border-color: #fff;

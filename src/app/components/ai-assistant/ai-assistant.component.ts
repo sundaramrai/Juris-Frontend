@@ -433,50 +433,176 @@ parseMessage(text: string): SafeHtml {
   }
 
   exportChatAsPDF(): void {
-    // 1) Create a new jsPDF instance (A4 size)
+    // Create a new jsPDF instance
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Define margins
-    const margin = 10; // 10mm margin on all sides
-    let yOffset = margin; // start from the top margin
-    const lineHeight = 7; // line spacing
-    const maxTextWidth = pageWidth - 2 * margin; // text wraps within left/right margins
+    // Define margins and styling parameters
+    const margin = 20;
+    const textWidth = pageWidth - 2 * margin;
+    const lineHeight = 7;
+    const messageSpacing = 10;
 
-    pdf.setFontSize(12);
+    // Starting position
+    let yOffset = margin;
+    let currentPage = 1;
 
-    // 3) Add a title
-    pdf.setFont('helvetica', 'bold'); // Use a valid font name and style
+    // Add document title on first page
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
     pdf.text('Chat History', margin, yOffset);
-    yOffset += lineHeight + 3;
+    yOffset += 10;
 
-    // 4) Iterate over each message
-    for (const msg of this.messages) {
-      // Format the label, e.g. "User (time):" or "Bot (time):"
-      const who = msg.type === 'user' ? 'User' : 'Bot';
-      const timeStr = new Date(msg.time).toLocaleString();  // adjust as needed
-      const label = `${who} (${timeStr}):`;
+    // Add export timestamp
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'italic');
+    const exportTime = new Date().toLocaleString();
+    pdf.text(`Exported on: ${exportTime}`, margin, yOffset);
+    yOffset += 15;
 
-      // Print the label in bold
+    // Process each message individually to maximize space usage
+    for (let i = 0; i < this.messages.length; i++) {
+      const msg = this.messages[i];
+      const sender = msg.type === 'user' ? 'User' : 'Bot';
+      const timeStr = new Date(msg.time).toLocaleString();
+      const header = `${i + 1}. ${sender} (${timeStr}):`;
+
+      // Set font for header
+      pdf.setFontSize(11);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(label, margin, yOffset);
-      yOffset += lineHeight;
 
-      // Print the message text in normal font, wrapped if necessary
+      // Calculate header height
+      const headerHeight = lineHeight + 2;
+
+      // Split message text to fit within page width
+      pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
-      const wrappedText = pdf.splitTextToSize(msg.text, maxTextWidth);
-      pdf.text(wrappedText, margin, yOffset);
-      yOffset += wrappedText.length * lineHeight + 5;
+      const textLines = pdf.splitTextToSize(msg.text, textWidth);
 
-      // If near bottom, add a new page and reset yOffset
-      if (yOffset > pageHeight - margin) {
+      // Calculate message content height
+      const contentHeight = textLines.length * lineHeight;
+
+      // Total message height including spacing
+      const totalMessageHeight = headerHeight + contentHeight + messageSpacing;
+
+      // Check if message can start on current page
+      const remainingSpace = pageHeight - margin - yOffset;
+
+      // Start a new page only if we can't fit the header and at least 2 lines of content
+      const minimumContentToShow = headerHeight + (lineHeight * 2);
+
+      if (remainingSpace < minimumContentToShow) {
+        // Not enough space for meaningful content, start new page
         pdf.addPage();
+        currentPage++;
         yOffset = margin;
+
+        // Add continuation header on new page
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'italic');
+        pdf.text('Chat History (continued)', margin, yOffset);
+        yOffset += 10;
+      }
+
+      // Draw message header
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+
+      // Set background color based on sender
+      if (msg.type === 'user') {
+        pdf.setFillColor(240, 240, 240); // Light gray for user
+      } else {
+        pdf.setFillColor(230, 240, 250); // Light blue for bot
+      }
+
+      // Draw header background
+      pdf.rect(margin - 2, yOffset - 5, textWidth + 4, headerHeight + 4, 'F');
+
+      // Add header text
+      pdf.text(header, margin, yOffset);
+      yOffset += headerHeight;
+
+      // Process message text with potential page breaks
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+
+      // Calculate how many lines we can fit on the current page
+      const maxLinesOnCurrentPage = Math.floor((pageHeight - margin - yOffset) / lineHeight);
+
+      if (textLines.length <= maxLinesOnCurrentPage) {
+        // All content fits on current page
+        pdf.text(textLines, margin, yOffset);
+        yOffset += contentHeight + messageSpacing;
+      } else {
+        // Content spans multiple pages - handle carefully
+        let linesProcessed = 0;
+
+        while (linesProcessed < textLines.length) {
+          // Calculate remaining lines on current page
+          const remainingLines = Math.min(
+            maxLinesOnCurrentPage,
+            textLines.length - linesProcessed
+          );
+
+          // Get the lines for this page
+          const currentPageLines = textLines.slice(
+            linesProcessed,
+            linesProcessed + remainingLines
+          );
+
+          // Add these lines to the current page
+          pdf.text(currentPageLines, margin, yOffset);
+
+          // Update processed count
+          linesProcessed += remainingLines;
+
+          // If we have more lines to process, add a new page
+          if (linesProcessed < textLines.length) {
+            // Add continuation note
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'italic');
+            pdf.text('(Continued on next page...)', margin, pageHeight - margin);
+
+            // Add new page
+            pdf.addPage();
+            currentPage++;
+            yOffset = margin;
+
+            // Add continuation header
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'italic');
+            pdf.text(`Chat History (continued) - Message ${i + 1}`, margin, yOffset);
+            yOffset += 10;
+
+            // Reset font for continuing content
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'normal');
+          } else {
+            // We've completed this message, add spacing for next message
+            yOffset += messageSpacing;
+          }
+        }
+      }
+
+      // Add subtle divider if not at the end
+      if (i < this.messages.length - 1) {
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, yOffset - messageSpacing/2, margin + textWidth, yOffset - messageSpacing/2);
       }
     }
 
-    // 5) Finally, save the PDF
-    pdf.save('chat.pdf');
+    // Add page numbers to all pages
+    const totalPages = pdf.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin - 25, pageHeight - margin);
+    }
+
+    // Save the PDF with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+    pdf.save(`chat_history_${timestamp}.pdf`);
   }
 }
