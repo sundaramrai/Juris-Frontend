@@ -68,10 +68,10 @@
             <div class="d-flex align-items-center position-relative">
               <button *ngIf="message.type === 'bot' && !showCopied" class="btn btn-sm btn-outline-primary copy-btn"
                 (click)="copyMessage(message.text)">
-                <mat-icon>content_copy</mat-icon>
+                <mat-icon class="d-flex align-items-center">content_copy</mat-icon>
                 </button>
               <button *ngIf="showCopied" class="btn btn-sm btn-outline-primary copy-btn" style="animation: fadeIn 1s;">
-                <mat-icon>done</mat-icon>
+                <mat-icon class="d-flex align-items-center">done</mat-icon>
               </button>
             </div>
           </div>
