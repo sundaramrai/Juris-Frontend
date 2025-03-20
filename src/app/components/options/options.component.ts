@@ -1,3 +1,4 @@
+// src/app/components/options/options.component.ts
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,4 +7,4 @@ import { Component } from '@angular/core';
   templateUrl: './options.component.html',
   styleUrl: './options.component.css'
 })
-export class OptionsComponent {}
+export class OptionsComponent { }

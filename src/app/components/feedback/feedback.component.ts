@@ -1,4 +1,5 @@
-import { Component, HostListener } from '@angular/core';
+// src/app/components/feedback/feedback.component.ts
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FeedbackService } from '../../services/feedback.service';
 
@@ -33,11 +34,10 @@ export class FeedbackComponent {
 
     this.feedbackService.sendFeedback(this.feedbackForm.value).subscribe(
       () => {
-        this.successPopup = true; // Show popup
+        this.successPopup = true;
         this.feedbackForm.reset();
         this.isSubmitting = false;
 
-        // Hide popup after 3 seconds
         setTimeout(() => {
           this.successPopup = false;
         }, 3000);
@@ -48,7 +48,6 @@ export class FeedbackComponent {
     );
   }
 
-  // Close popup when user clicks outside of the success message
   closePopup(event: Event) {
     if ((event.target as HTMLElement).classList.contains('popup-overlay')) {
       this.successPopup = false;

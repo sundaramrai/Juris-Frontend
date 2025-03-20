@@ -1,44 +1,47 @@
-/* Container spans full width, similar to AI Assistant component */
+/* src/app/components/templates/templates.component.css */
 .container-fluid {
   width: 100%;
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
-/* Search & Filter Fields */
 .search-field {
   width: 250px;
 }
+
 :host-context(.dark-theme) .search-field mat-icon,
 :host-context(.dark-theme) .filter-field mat-icon {
   color: #fff;
 }
+
 :host-context(.dark-theme) .search-field input::placeholder {
   color: #fff;
 }
+
 :host-context(.dark-theme) .search-field input {
   color: #fff;
 }
+
 .filter-field {
   width: 150px;
 }
+
 :host-context(.dark-theme) .filter-field mat-select {
   color: #fff;
 }
 
-/* Template Card */
 .template-card {
   border: none;
   border-radius: 12px;
   min-height: 220px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .template-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* Card Title */
 .card-title {
   font-size: 1rem;
 }
@@ -47,7 +50,6 @@
   padding: 1.5rem;
 }
 
-/* Type Pill */
 .type-pill {
   display: inline-block;
   background-color: #ebebeb;
@@ -58,7 +60,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Footer Buttons */
 .btn-view,
 .btn-download {
   min-width: 90px;
@@ -76,6 +77,7 @@
   background-color: #fff;
   color: #0d6efd;
 }
+
 .btn-view:hover {
   background-color: #0d6efd;
   color: #fff;
@@ -86,20 +88,19 @@
   color: #fff !important;
   border: none;
 }
+
 .btn-download:hover {
   background-color: #fff !important;
   color: #0d6efd !important;
   border: 1px solid #0d6efd;
 }
 
-/* Card Footer */
 .card-footer {
   background-color: #fff;
   border: none;
   padding: 0 1.5rem 1.5rem 1.5rem;
 }
 
-/* Responsive: 2 cards per row on md+ screens */
 @media (min-width: 768px) {
   .col-md-6 {
     flex: 0 0 50%;
@@ -107,79 +108,95 @@
   }
 }
 
-/* Pagination Container */
 .pagination-container {
   margin: 1rem 0 2rem 0;
 }
+
 .pagination {
   margin-bottom: 0;
   border-radius: 4px;
 }
+
 .page-item.active .page-link {
   background-color: #0d6efd;
   color: #fff;
 }
+
 .page-item.disabled .page-link {
   pointer-events: none;
   opacity: 1;
 }
 
-/* Dark Theme Support */
 :host-context(.dark-theme) .text-primary {
   color: #64b5f6 !important;
 }
+
 :host-context(.dark-theme) .template-card {
   background-color: #2d2d2d;
 }
+
 :host-context(.dark-theme) .card-footer {
   background-color: #2d2d2d !important;
 }
+
 :host-context(.dark-theme) .text-muted {
   color: #adb5bd !important;
 }
+
 :host-context(.dark-theme) .type-pill {
   background-color: #444;
   color: #fff;
 }
+
 :host-context(.dark-theme) .btn-view {
   border-color: #fff;
   color: #fff;
   background-color: transparent;
 }
+
 :host-context(.dark-theme) .btn-view:hover {
   background-color: #fff;
   color: #0d6efd;
 }
+
 :host-context(.dark-theme) .btn-download {
   background-color: #fff !important;
   border: none;
   color: #0d6efd !important;
 }
+
 :host-context(.dark-theme) .btn-download:hover {
   background-color: #2d2d2d !important;
   border: 1px solid #fff;
   color: #fff !important;
 }
+
 :host-context(.dark-theme) .card-title {
   color: #64b5f6;
 }
+
 :host-context(.dark-theme) .card-text {
   color: #e6e2e2;
 }
+
 :host-context(.dark-theme) .card-link {
   color: #64b5f6;
 }
+
 :host-context(.dark-theme) .card-link:hover {
   color: #0d6efd;
 }
+
 :host-context(.dark-theme) .page-link {
   color: #fff;
   background-color: #1f1f1f;
 }
+
 :host-context(.dark-theme) .page-item.active .page-link {
   background-color: #0d6efd;
   color: #fff;
 }
+
 :host-context(.dark-theme) .page-item.disabled .page-link {
   opacity: 0.5;
   color: #fff;

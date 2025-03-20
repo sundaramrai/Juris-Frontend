@@ -1,16 +1,16 @@
 <!-- src/app/components/feedback/feedback.component.html -->
-<!-- Success Popup (Shown for 3 Seconds or Click Outside to Close) -->
 <div *ngIf="successPopup" class="popup-overlay" (click)="closePopup($event)">
   <div class="popup-card" (click)="$event.stopPropagation()">
-    <!-- <mat-icon class="success text-success display-3"></mat-icon> -->
-     <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmUzemdla3U5emw5MHptbHdrajhvcGNieGRjNjhoajQ1NG9yYW0wNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/lwdArutvbQTeuBDEBZ/giphy.gif" alt="Success" class="img-fluid" style="max-width: 100px;">
+    <img
+      src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmUzemdla3U5emw5MHptbHdrajhvcGNieGRjNjhoajQ1NG9yYW0wNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/lwdArutvbQTeuBDEBZ/giphy.gif"
+      alt="Success" class="img-fluid" style="max-width: 100px;">
     <h3 class="fw-bold mt-3">Thank You!</h3>
     <p class="text-muted">Your feedback has been submitted successfully.</p>
   </div>
 </div>
 
-<!-- Feedback Form (Reappears after 3 seconds or on click outside) -->
-<div *ngIf="!successPopup" class="container d-flex justify-content-center align-items-center" style="min-height: 78dvh;">
+<div *ngIf="!successPopup" class="container d-flex justify-content-center align-items-center"
+  style="min-height: 78dvh;">
   <div class="card shadow-lg p-4 border-0" style="max-width: 500px; width: 100%;">
     <div class="text-center">
       <h2 class="fw-bold text-primary">Feedback</h2>
@@ -22,7 +22,8 @@
         <label class="form-label fw-bold">How satisfied are you?</label>
         <div class="d-flex gap-2">
           <ng-container *ngFor="let rating of ratings">
-            <button type="button" class="btn" [ngClass]="rating <= feedbackForm.get('satisfaction')?.value ? 'btn-primary' : 'btn-outline-primary'"
+            <button type="button" class="btn"
+              [ngClass]="rating <= feedbackForm.get('satisfaction')?.value ? 'btn-primary' : 'btn-outline-primary'"
               (click)="setSatisfaction(rating)">
               {{ rating }}
             </button>
@@ -35,12 +36,14 @@
 
       <div class="mb-3">
         <label class="form-label fw-bold">What issues did you face?</label>
-        <textarea class="form-control" rows="3" formControlName="issues" placeholder="Describe any problems you faced..."></textarea>
+        <textarea class="form-control" rows="3" formControlName="issues"
+          placeholder="Describe any problems you faced..."></textarea>
       </div>
 
       <div class="mb-3">
         <label class="form-label fw-bold">What can we improve?</label>
-        <textarea class="form-control" rows="3" formControlName="improvements" placeholder="Share your suggestions..."></textarea>
+        <textarea class="form-control" rows="3" formControlName="improvements"
+          placeholder="Share your suggestions..."></textarea>
       </div>
 
       <div class="d-grid">

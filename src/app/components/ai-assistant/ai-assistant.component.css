@@ -1,7 +1,9 @@
+/* src/app/components/ai-assistant/ai-assistant.component.css */
 .card {
   border-radius: 8px;
   overflow: hidden;
 }
+
 .chat-container {
   height: 78dvh;
   display: flex;
@@ -129,39 +131,40 @@ button[title="Click to speak"]:hover mat-icon {
 button[title="Click to speak"]:hover {
   background-color: rgba(13, 110, 253, 0.1);
 }
-/* Navbar */
+
 :host-context(.dark-theme) .navbar {
   background-color: #1e1e1e !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
+
 :host-context(.dark-theme) .navbar-brand span {
   color: #64b5f6 !important;
 }
 
-/* Buttons */
 :host-context(.dark-theme) .btn-outline-primary {
   color: #64b5f6;
   border-color: #64b5f6;
 }
+
 :host-context(.dark-theme) .btn-primary {
   background-color: #1976d2;
   border-color: #1976d2;
 }
+
 :host-context(.dark-theme) .text-primary {
   color: #64b5f6 !important;
 }
 
-/* Cards */
 :host-context(.dark-theme) .card {
   background-color: #1e1e1e;
   border: none;
 }
+
 :host-context(.dark-theme) .card-header {
   background-color: #1e1e1e !important;
   border-bottom: 1px solid #333;
 }
 
-/* Inputs & Textareas */
 :host-context(.dark-theme) input,
 :host-context(.dark-theme) textarea,
 :host-context(.dark-theme) select {
@@ -169,52 +172,56 @@ button[title="Click to speak"]:hover {
   border-color: #444;
   color: #f5f5f5;
 }
+
 :host-context(.dark-theme) input::placeholder,
 :host-context(.dark-theme) textarea::placeholder {
   color: #aaa;
 }
+
 :host-context(.dark-theme) .auto-resize-textarea {
   background-color: #333;
   color: #f5f5f5;
   border-color: #444;
 }
+
 :host-context(.dark-theme) .auto-resize-textarea::placeholder {
   color: #aaa;
 }
 
-/* Chat Interface */
 :host-context(.dark-theme) .chat-bubble {
   background-color: #333;
 }
+
 :host-context(.dark-theme) .user-bubble {
   background-color: #1976d2;
 }
+
 :host-context(.dark-theme) .messages-area {
   background-color: #1e1e1e;
 }
+
 :host-context(.dark-theme) .input-container {
   background-color: #1e1e1e;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 :host-context(.dark-theme) .bot-message {
   background-color: #2d2d2d;
   color: #e0e0e0;
 }
+
 :host-context(.dark-theme) .user-message {
   background-color: #1976d2;
 }
 
-/* Profile Button */
 :host-context(.dark-theme) .profile-btn {
   background: #333;
 }
 
-/* Typing Indicator */
 :host-context(.dark-theme) .typing-indicator {
   background-color: #2d2d2d;
 }
 
-/* Dot Flashing (including dark theme animation) */
 :host-context(.dark-theme) .dot-flashing,
 :host-context(.dark-theme) .dot-flashing::before,
 :host-context(.dark-theme) .dot-flashing::after {
@@ -224,42 +231,64 @@ button[title="Click to speak"]:hover {
 }
 
 @keyframes dot-flashing {
-  0% { background-color: #6c757d; }
-  50%, 100% { background-color: rgba(108, 117, 125, 0.2); }
+  0% {
+    background-color: #6c757d;
+  }
+
+  50%,
+  100% {
+    background-color: rgba(108, 117, 125, 0.2);
+  }
 }
 
 @keyframes dot-flashing-dark {
-  0% { background-color: #adb5bd; }
-  50%, 100% { background-color: rgba(173, 181, 189, 0.2); }
+  0% {
+    background-color: #adb5bd;
+  }
+
+  50%,
+  100% {
+    background-color: rgba(173, 181, 189, 0.2);
+  }
 }
 
-/* Pulse Animation */
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.9; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-/* Mic Button Hover */
 :host-context(.dark-theme) button[title="Click to speak"]:hover {
   background-color: rgba(25, 118, 210, 0.2);
 }
+
 :host-context(.dark-theme) button[title="Click to speak"]:hover mat-icon {
   color: #64b5f6 !important;
 }
 
-/* No Messages State */
 :host-context(.dark-theme) .text-muted {
   color: #adb5bd !important;
 }
 
-/* Menu Styles */
 :host-context(.dark-theme) .mat-menu-panel {
   background-color: #1e1e1e;
 }
+
 :host-context(.dark-theme) .mat-menu-item {
   color: #f5f5f5;
 }
+
 :host-context(.dark-theme) .mat-menu-item:hover {
   background-color: #333;
 }

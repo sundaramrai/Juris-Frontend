@@ -3,20 +3,20 @@ export interface Message {
   type: 'user' | 'bot';
   text: string;
   time: string;
-  userId?: string; // Added to match API
+  userId?: string;
 }
 
 export interface Feedback {
   satisfaction: number;
   issues: string;
   improvements: string;
-  userId?: string; // Added to match API
+  userId?: string;
 }
 
 export interface MessageResponse extends Omit<Message, 'id'> {
-  _id: string; // MongoDB ID
+  _id: string;
 }
 
 export interface FeedbackResponse extends Omit<Feedback, 'id'> {
-  _id: string; // MongoDB ID
+  _id: string;
 }

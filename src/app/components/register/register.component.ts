@@ -1,3 +1,4 @@
+// src/app/components/register/register.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -23,21 +24,9 @@ export class RegisterComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private router: Router, private authService: AuthService, private tldService: TldService) {
     this.registerForm = this.fb.group({
-      email: [
-        '',
-        [Validators.required, this.enhancedEmailValidator.bind(this)],
-        [this.existingEmailValidator.bind(this)]
-      ],
-      username: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(this.usernameMinLength),
-          Validators.maxLength(this.usernameMaxLength),
-          this.enhancedUsernameValidator
-        ],
-        [this.existingUsernameValidator]
-      ],
+      email: ['', [Validators.required, this.enhancedEmailValidator.bind(this)], [this.existingEmailValidator.bind(this)]],
+      username: ['', [Validators.required, Validators.minLength(this.usernameMinLength),Validators.maxLength(this.usernameMaxLength),
+          this.enhancedUsernameValidator], [this.existingUsernameValidator]],
       password: ['', [Validators.required, this.enhancedPasswordValidator]],
     });
   }
@@ -58,18 +47,14 @@ export class RegisterComponent implements OnInit {
     const username = control.value;
     if (!username) return null;
 
-    // Check if username is only numbers
     const isNumeric = /^\d+$/.test(username);
     if (isNumeric) return { numericOnly: true };
 
-    // Check for minimum alphabetic characters
     const alphabeticCount = (username.match(/[a-zA-Z]/g) || []).length;
     if (alphabeticCount < 2) return { insufficientLetters: true };
 
-    // Ensure username isn't just an underscore
     if (username === '_') return { invalidFormat: true };
 
-    // Check for valid characters (letters, numbers, underscore)
     const hasInvalidChars = /[^a-zA-Z0-9_]/.test(username);
     if (hasInvalidChars) return { invalidCharacters: true };
 
@@ -111,20 +96,15 @@ export class RegisterComponent implements OnInit {
 
     const errors: ValidationErrors = {};
 
-    // Basic email format validation
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(email)) {
       errors['invalidFormat'] = true;
       return errors;
     }
     const [local, domain] = email.split('@');
-
-    // Check if domain has at least one dot and valid TLD
     if (!domain || domain.indexOf('.') === -1) {
       errors['invalidDomain'] = true;
     }
-
-    // Check dynamic TLDs
     const domainTld = domain.split('.').pop()?.toLowerCase();
     if (domainTld && !this.validTlds.includes(domainTld)) {
       errors['invalidTLD'] = true;
@@ -150,7 +130,6 @@ export class RegisterComponent implements OnInit {
 
   onRegister() {
     if (this.registerForm.invalid) {
-      // Mark all fields as touched to show validation errors
       Object.keys(this.registerForm.controls).forEach(key => {
         const control = this.registerForm.get(key);
         control?.markAsTouched();

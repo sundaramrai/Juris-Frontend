@@ -1,11 +1,14 @@
-.full-screen-wrapper{
-  background: rgb(255,255,255);
-  background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(229,246,250,1) 0%, rgba(25,177,208,1) 100%);
+/* src/app/components/login/login.component.css */
+.full-screen-wrapper {
+  background: rgb(255, 255, 255);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 0%, rgba(229, 246, 250, 1) 0%, rgba(25, 177, 208, 1) 100%);
 }
+
 :host-context(.dark-theme) .full-screen-wrapper {
-  background: rgb(2,0,36);
-  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(10,10,69,1) 50%, rgba(25,177,208,1) 100%);
+  background: rgb(2, 0, 36);
+  background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(10, 10, 69, 1) 50%, rgba(25, 177, 208, 1) 100%);
 }
+
 :host-context(.dark-theme) .card {
   background-color: #1e1e1e;
   color: #f5f5f5;

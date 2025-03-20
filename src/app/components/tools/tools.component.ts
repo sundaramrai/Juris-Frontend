@@ -1,3 +1,4 @@
+// src/app/components/tools/tools.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -8,7 +9,7 @@ import { Router } from '@angular/router';
   styleUrl: './tools.component.css'
 })
 export class ToolsComponent {
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   isAssistantRoute(): boolean {
     return this.router.url === '/tools/assistant';

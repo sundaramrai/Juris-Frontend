@@ -1,3 +1,4 @@
+<!-- src/app/components/recent-chats/recent-chats.component.html -->
 <div class="card border-0 shadow">
   <div class="card-body">
     <div class="d-flex align-items-center justify-content-between">
@@ -9,7 +10,6 @@
 
     <div class="list-group list-group-flush mt-2" *ngIf="isMessages">
       <a class="list-group-item list-group-item-action">
-        <!-- Force items onto a single line and truncate summary if needed -->
         <div class="d-flex align-items-center justify-content-between" style="flex-wrap: nowrap; width: 100%;">
           <h6 class="mb-1 me-3 text-truncate"
             style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" [title]="chatSummary">

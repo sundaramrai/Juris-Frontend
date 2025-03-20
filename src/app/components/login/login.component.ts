@@ -24,7 +24,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    // ✅ Check if user is already logged in
     if (this.authService.isLoggedIn()) {
       console.log("🔄 User already logged in, redirecting...");
       this.router.navigate(['/tools']);
@@ -51,8 +50,6 @@ export class LoginComponent implements OnInit {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         console.log("✅ Login successful:", response);
-
-        // ✅ Store token and user details in localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('loggedInUser', response.user.username);
         localStorage.setItem('loginTimestamp', Date.now().toString());
@@ -74,7 +71,7 @@ export class LoginComponent implements OnInit {
     this.router.navigate(['/register']);
   }
 
-  onHome(){
+  onHome() {
     this.router.navigate(['/home']);
   }
 }

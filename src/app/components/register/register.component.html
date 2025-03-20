@@ -8,29 +8,22 @@
           <p class="text-muted">Sign up to access all the features</p>
         </div>
 
-        <!-- Overall Error Alert -->
         <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
           {{ errorMessage }}
           <button type="button" class="btn-close" (click)="errorMessage = null"></button>
         </div>
 
         <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-          <!-- Email Field -->
           <div class="mb-3">
             <label for="email" class="form-label fw-bold">Email</label>
             <div class="input-group">
               <span class="input-group-text"><mat-icon>email</mat-icon></span>
-              <input
-                type="email"
-                class="form-control"
-                id="email"
-                formControlName="email"
-                placeholder="Enter your email"
+              <input type="email" class="form-control" id="email" formControlName="email" placeholder="Enter your email"
                 [class.is-invalid]="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)"
-                required
-              />
+                required />
             </div>
-            <ng-container *ngIf="registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)">
+            <ng-container
+              *ngIf="registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)">
               <p class="text-danger mt-1" *ngIf="registerForm.get('email')?.errors?.['required']">
                 Email is required.
               </p>
@@ -50,23 +43,17 @@
             <small class="form-text text-muted">Example: username&#64;example.com</small>
           </div>
 
-          <!-- Username Field -->
           <div class="mb-3">
             <label for="username" class="form-label fw-bold">Username</label>
             <div class="input-group">
               <span class="input-group-text"><mat-icon>person</mat-icon></span>
-              <input
-                type="text"
-                class="form-control"
-                id="username"
-                formControlName="username"
+              <input type="text" class="form-control" id="username" formControlName="username"
                 placeholder="Choose a username"
                 [class.is-invalid]="registerForm.get('username')?.invalid && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)"
-                (input)="onUsernameInput($event)"
-                required
-              />
+                (input)="onUsernameInput($event)" required />
             </div>
-            <ng-container *ngIf="registerForm.get('username')?.errors && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)">
+            <ng-container
+              *ngIf="registerForm.get('username')?.errors && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)">
               <p class="text-danger mt-1" *ngIf="registerForm.get('username')?.errors?.['required']">
                 Username is required.
               </p>
@@ -86,45 +73,40 @@
                 This username is already taken.
               </p>
             </ng-container>
-            <small class="form-text text-muted">{{usernameMinLength}}-{{usernameMaxLength}} characters, letters, numbers, and underscores only</small>
+            <small class="form-text text-muted">{{usernameMinLength}}-{{usernameMaxLength}} characters, letters,
+              numbers, and underscores only</small>
           </div>
-
-          <!-- Password Field -->
           <div class="mb-3">
             <label for="password" class="form-label fw-bold">Password</label>
             <div class="input-group">
               <span class="input-group-text"><mat-icon>lock</mat-icon></span>
-              <input
-                [type]="showPassword ? 'text' : 'password'"
-                class="form-control"
-                id="password"
-                formControlName="password"
-                placeholder="Create a strong password"
+              <input [type]="showPassword ? 'text' : 'password'" class="form-control" id="password"
+                formControlName="password" placeholder="Create a strong password"
                 [class.is-invalid]="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)"
-                required
-              />
+                required />
               <span class="input-group-text bg-light" (click)="togglePasswordVisibility()" style="cursor: pointer;">
                 <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
               </span>
             </div>
-            <ng-container *ngIf="registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)">
+            <ng-container
+              *ngIf="registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)">
               <p class="text-danger mt-1" *ngIf="registerForm.get('password')?.errors?.['required']">
                 Password is required.
               </p>
-                <p class="text-danger mt-1" *ngIf="registerForm.get('password')?.errors?.['patternMismatch']">
-                  Password must contain 8+ chars, 2 digits, 1 uppercase, 1 special, lowercase.
-                </p>
+              <p class="text-danger mt-1" *ngIf="registerForm.get('password')?.errors?.['patternMismatch']">
+                Password must contain 8+ chars, 2 digits, 1 uppercase, 1 special, lowercase.
+              </p>
             </ng-container>
-            <small class="form-text text-muted">Min 8 chars with 2 numbers, 1 uppercase, 1 special character, and lowercase letters</small>
+            <small class="form-text text-muted">Min 8 chars with 2 numbers, 1 uppercase, 1 special character, and
+              lowercase letters</small>
           </div>
-
-          <!-- Action Buttons -->
           <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isLoading">
               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
               {{ isLoading ? 'Registering...' : 'Register' }}
             </button>
-            <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center" (click)="onLogin()" style="height: 40px">
+            <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center"
+              (click)="onLogin()" style="height: 40px">
               <mat-icon class="me-2">login</mat-icon>Already have an account? Login
             </button>
           </div>

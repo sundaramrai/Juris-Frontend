@@ -1,3 +1,4 @@
+// src/app/components/recent-chats/recent-chats.component.ts
 import { Component } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
@@ -9,7 +10,7 @@ import { Message } from '../../Interface';
   styleUrl: './recent-chats.component.css'
 })
 export class RecentChatsComponent {
-  constructor(private responseService: ResponseService) {}
+  constructor(private responseService: ResponseService) { }
 
   messages: Message[] = [];
   chatSummary: string = '';

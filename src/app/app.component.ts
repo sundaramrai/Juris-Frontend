@@ -27,7 +27,6 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.isLoggedIn = !!localStorage.getItem('token');
 
-    // Load theme preference from localStorage
     const savedTheme = localStorage.getItem('theme');
     this.isDarkTheme = savedTheme === 'dark';
     this.applyTheme();
@@ -55,7 +54,6 @@ export class AppComponent implements OnInit {
     this.isRegisterPage = currentUrl === '/register';
     this.isLoggedIn = this.authService.isLoggedIn();
 
-    // Redirect logged-in users away from login or register pages.
     if (this.isLoggedIn && (this.isLoginPage || this.isRegisterPage)) {
       console.log("🔄 Redirecting to /tools (already logged in)");
       this.router.navigate(['/tools']);
@@ -91,11 +89,10 @@ export class AppComponent implements OnInit {
     localStorage.removeItem('loggedInUser');
     localStorage.removeItem('loginTimestamp');
     localStorage.removeItem('token');
-    // remove current user from auth service
+
     this.authService.logout();
     this.isLoggedIn = false;
 
-    // On logout, redirect to home page.
     if (this.router.url !== '/home') {
       console.log("🔄 Redirecting to home page after logout...");
       this.router.navigate(['/home']);

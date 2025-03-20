@@ -2,7 +2,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // Import CommonModule
+import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
@@ -47,7 +47,7 @@ import { TemplatesComponent } from './components/templates/templates.component';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    CommonModule, // Add CommonModule to imports
+    CommonModule,
     HttpClientModule,
     BrowserAnimationsModule,
     MatIconModule,
@@ -65,4 +65,4 @@ import { TemplatesComponent } from './components/templates/templates.component';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

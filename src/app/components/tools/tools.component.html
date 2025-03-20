@@ -1,16 +1,16 @@
+<!-- src/app/components/tools/tools.component.html -->
 <div class="container mt-3">
   <div class="row">
-    <!-- Sidebar with Chat Options and Recent Chats -->
     <div class="col-md-3 d-none d-md-block">
       <app-options></app-options>
       <app-recent-chats *ngIf="isAssistantRoute()"></app-recent-chats>
     </div>
 
-    <!-- Main Chat Window -->
     <div class="col-md-9 mb-3">
       <router-outlet></router-outlet>
       <div *ngIf="isAssistantRoute()" class="mt-1 text-muted small text-center">
-        Disclaimer: This AI legal assistance tool is for informational purposes only and does not constitute legal advice.
+        Disclaimer: This AI legal assistance tool is for informational purposes only and does not constitute legal
+        advice.
       </div>
     </div>
   </div>

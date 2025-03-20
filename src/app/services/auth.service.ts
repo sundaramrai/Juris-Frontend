@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-// import { environment } from '../../environments/environment.prod';
 
 const API_URL = environment.apiUrl;;
 
@@ -39,25 +38,25 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('loggedInUser'); // Remove user info
-    localStorage.removeItem('loginTimestamp'); // Remove timestamp
-    localStorage.removeItem('token'); // Remove JWT token
-    this.currentUserSubject.next(null); // Set current user to null
-    this.router.navigate(['/login']); // Redirect to login page
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('loginTimestamp');
+    localStorage.removeItem('token');
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/login']);
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token'); // Check if token exists
+    return !!localStorage.getItem('token');
   }
 
   get loggedInUser(): string | null {
-    return localStorage.getItem('loggedInUser'); // Retrieve logged-in user
+    return localStorage.getItem('loggedInUser');
   }
 
   private setLogoutTimer() {
     setTimeout(() => {
       this.logout();
-    }, 12 * 60 * 60 * 1000); // 12 hours
+    }, 12 * 60 * 60 * 1000);
   }
 
   getToken(): string | null {

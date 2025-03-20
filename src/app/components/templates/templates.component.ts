@@ -1,3 +1,4 @@
+// src/app/components/templates/templates.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
@@ -50,7 +51,7 @@ export class TemplatesComponent implements OnInit {
         "template_name": "Service Agreement",
         "about": "A Service Agreement is a contract between a service provider and a client that outlines the terms of the service to be provided.",
         "key": "service_agreement",
-        "file":  ["../../../assets/docs/service_agreement.docx", "../../../assets/docs/service_agreement.pdf"],
+        "file": ["../../../assets/docs/service_agreement.docx", "../../../assets/docs/service_agreement.pdf"],
         "type": "business"
       },
       {
@@ -111,45 +112,39 @@ export class TemplatesComponent implements OnInit {
   searchControl = new FormControl('');
   isLoaded: boolean = false;
 
-  // Pagination variables
   currentPage: number = 1;
   templatesPerPage: number = 4;
 
   constructor() { }
 
   ngOnInit(): void {
-    // Collect unique types
     this.availableTypes = Array.from(
       new Set(this.templatesData.templates.map(t => t.type))
     );
 
-    // Initialize filteredTemplates
     this.filteredTemplates = this.templatesData.templates;
     this.loadSuccess();
 
-    // Subscribe to search input changes
     this.searchControl.valueChanges.subscribe(searchTerm => {
       this.filterTemplates(this.selectedType, searchTerm || '');
-      this.currentPage = 1; // reset to page 1 after search
+      this.currentPage = 1;
     });
   }
 
   filterTemplatesByType(event: MatSelectChange) {
     this.selectedType = event.value;
     this.filterTemplates(this.selectedType, this.searchControl.value || '');
-    this.currentPage = 1; // reset to page 1 after type change
+    this.currentPage = 1;
     this.loadSuccess();
   }
 
   private filterTemplates(type: string, searchTerm: string) {
     let filtered = this.templatesData.templates;
 
-    // Filter by type
     if (type !== 'all') {
       filtered = filtered.filter(template => template.type === type);
     }
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(template =>
         template.template_name
@@ -162,49 +157,40 @@ export class TemplatesComponent implements OnInit {
     this.loadSuccess();
   }
 
-  // Return only the templates for the current page
   get paginatedTemplates(): any[] {
     const startIndex = (this.currentPage - 1) * this.templatesPerPage;
     const endIndex = startIndex + this.templatesPerPage;
     return this.filteredTemplates.slice(startIndex, endIndex);
   }
 
-  // Compute total pages
   get totalPages(): number {
     return Math.ceil(this.filteredTemplates.length / this.templatesPerPage);
   }
 
-  // Generate array of page numbers [1..totalPages]
   get pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
-  // Go to previous page
   prevPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
     }
   }
 
-  // Go to next page
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
     }
   }
 
-  // Jump to a specific page
   goToPage(page: number): void {
     this.currentPage = page;
   }
 
-  // Example method: called when your data has finished loading
   loadSuccess() {
     this.isLoaded = true;
   }
-  // Opens the PDF version of the template for viewing in a new tab
   viewTemplate(template: any): void {
-    // Ensure the PDF file is available (assumed to be at index 1)
     if (template.file && template.file.length > 1) {
       window.open(template.file[1], '_blank');
     } else {
@@ -216,9 +202,9 @@ export class TemplatesComponent implements OnInit {
     let fileUrl = '';
     if (template.file && template.file.length > 0) {
       if (type === 'pdf' && template.file.length > 1) {
-        fileUrl = template.file[1]; // PDF version
+        fileUrl = template.file[1];
       } else if (type === 'docx') {
-        fileUrl = template.file[0]; // DOCX version
+        fileUrl = template.file[0];
       } else {
         console.error('Requested file type not available.');
         return;
