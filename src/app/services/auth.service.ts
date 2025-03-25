@@ -49,6 +49,14 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
+  requestOTP(userData: { email: string, username: string, password: string }): Observable<any> {
+    return this.http.post(`${API_URL}/register/request-otp`, userData);
+  }
+
+  verifyOTP(otpData: { email: string, otp: string }): Observable<any> {
+    return this.http.post(`${API_URL}/register/verify-otp`, otpData);
+  }
+
   get loggedInUser(): string | null {
     return localStorage.getItem('loggedInUser');
   }

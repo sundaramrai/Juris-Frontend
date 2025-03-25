@@ -4,8 +4,10 @@
     <div class="card shadow-lg border-0 p-4" style="max-width: 500px; width: 100%;">
       <div class="container mt-3">
         <div class="text-center">
-          <h2 class="fw-bold text-primary">Create an Account</h2>
-          <p class="text-muted">Sign up to access all the features</p>
+          <h2 class="fw-bold text-primary">{{ isOtpSent ? 'Verify Email' : 'Create an Account' }}</h2>
+          <p class="text-muted">
+            {{ isOtpSent ? 'Enter the OTP sent to ' + registrationEmail : 'Sign up to access all the features' }}
+          </p>
         </div>
 
         <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -13,7 +15,7 @@
           <button type="button" class="btn-close" (click)="errorMessage = null"></button>
         </div>
 
-        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+        <form *ngIf="!isOtpSent" [formGroup]="registerForm" (ngSubmit)="onRequestOTP()">
           <div class="mb-3">
             <label for="email" class="form-label fw-bold">Email</label>
             <div class="input-group">
@@ -103,11 +105,40 @@
           <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isLoading">
               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
-              {{ isLoading ? 'Registering...' : 'Register' }}
+              {{ isLoading ? 'Sending OTP...' : 'Send OTP' }}
             </button>
             <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center"
               (click)="onLogin()" style="height: 40px">
               <mat-icon class="me-2">login</mat-icon>Already have an account? Login
+            </button>
+          </div>
+        </form>
+        <form *ngIf="isOtpSent" [formGroup]="otpForm" (ngSubmit)="onVerifyOTP()">
+          <div class="mb-3">
+            <label for="otp" class="form-label fw-bold">Enter OTP</label>
+            <input
+              type="text"
+              class="form-control"
+              id="otp"
+              formControlName="otp"
+              placeholder="6-digit OTP"
+              maxlength="6"
+              (input)="onOtpInput($event)"
+            />
+            <div *ngIf="otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)" class="text-danger mt-1">
+              <small *ngIf="otpForm.get('otp')?.errors?.['required']">OTP is required</small>
+              <small *ngIf="otpForm.get('otp')?.errors?.['minlength'] || otpForm.get('otp')?.errors?.['maxlength']">
+                OTP must be 6 digits
+              </small>
+            </div>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="otpForm.invalid || isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+              {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="onChangeEmail()">
+              Change Email
             </button>
           </div>
         </form>

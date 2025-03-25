@@ -18,7 +18,10 @@ export class RegisterComponent implements OnInit {
   showPassword = false;
   validTlds: string[] = [];
 
-  // Username configuration
+  otpForm: FormGroup;
+  isOtpSent = false;
+  registrationEmail: string | null = null;
+
   usernameMinLength = 2;
   usernameMaxLength = 20;
 
@@ -28,6 +31,9 @@ export class RegisterComponent implements OnInit {
       username: ['', [Validators.required, Validators.minLength(this.usernameMinLength),Validators.maxLength(this.usernameMaxLength),
           this.enhancedUsernameValidator], [this.existingUsernameValidator]],
       password: ['', [Validators.required, this.enhancedPasswordValidator]],
+    });
+    this.otpForm = this.fb.group({
+      otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
     });
   }
 
@@ -161,5 +167,73 @@ export class RegisterComponent implements OnInit {
 
   onLogin() {
     this.router.navigate(['/login']);
+  }
+
+  onRequestOTP() {
+    if (this.registerForm.invalid) {
+      Object.keys(this.registerForm.controls).forEach(key => {
+        const control = this.registerForm.get(key);
+        control?.markAsTouched();
+      });
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    const userData = this.registerForm.value;
+    this.authService.requestOTP(userData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.isOtpSent = true;
+        this.registrationEmail = userData.email;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error.message || 'OTP request failed';
+      }
+    });
+  }
+
+  onVerifyOTP() {
+    if (this.otpForm.invalid) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    if (!this.registrationEmail) {
+      this.errorMessage = 'Email is required for OTP verification.';
+      this.isLoading = false;
+      return;
+    }
+
+    const otpData = {
+      email: this.registrationEmail,
+      otp: this.otpForm.get('otp')?.value as string
+    };
+
+    this.authService.verifyOTP(otpData).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error.message || 'OTP verification failed';
+      }
+    });
+  }
+
+  onOtpInput(event: Event): void {
+    const input = (event.target as HTMLInputElement).value.replace(/\D/g, '');
+    this.otpForm.get('otp')?.setValue(input);
+  }
+
+  onChangeEmail() {
+    this.isOtpSent = false;
+    this.registrationEmail = null;
+    this.errorMessage = null;
   }
 }
