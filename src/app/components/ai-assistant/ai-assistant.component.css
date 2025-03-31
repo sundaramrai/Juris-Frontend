@@ -1,7 +1,19 @@
 /* src/app/components/ai-assistant/ai-assistant.component.css */
 .card {
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease;
+}
+
+.assistant-icon {
+  width: 48px;
+  height: 48px;
+  transition: transform 0.3s ease;
+}
+
+.assistant-icon:hover {
+  transform: scale(1.05);
 }
 
 .chat-container {
@@ -15,57 +27,83 @@
 .messages-area {
   flex-grow: 1;
   overflow-y: auto;
-  border-radius: 0.25rem;
-  background-color: white;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   position: relative;
   padding-bottom: 16px;
 }
 
+.message-wrapper {
+  display: flex;
+  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.bot-wrapper {
+  justify-content: flex-start;
+}
+
+.user-wrapper {
+  justify-content: flex-end;
+}
+
 .message {
   max-width: 75%;
-  margin-bottom: 10px;
-  padding: 10px 15px;
+  padding: 12px 16px;
   border-radius: 18px;
   word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.message:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.message-actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
 }
 
 .input-container {
   position: relative;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
-  background-color: white;
   z-index: 10;
 }
 
 .auto-resize-textarea {
-  min-height: 38px;
+  min-height: 42px;
   max-height: 150px;
   resize: none;
   overflow-y: hidden;
-  line-height: 1.1;
-  padding-top: 9px;
-  padding-bottom: 9px;
-  transition: height 0.1s ease;
-  box-sizing: border-box;
+  overflow: auto;
+  line-height: 1.2;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: #1976d2 1px solid;
 }
 
 .bot-message {
-  background-color: #e9ecef;
-  align-self: flex-start;
+  background-color: #f0f2f5;
   color: #212529;
+  border-radius: 18px 18px 18px 4px;
 }
 
 .user-message {
   background-color: #0d6efd;
   color: white;
-  align-self: flex-end;
+  border-radius: 18px 18px 4px 18px;
 }
 
 .typing-indicator {
-  background-color: #e9ecef;
-  align-self: flex-start;
+  background-color: #f0f2f5;
   padding: 12px 20px;
+  min-width: 60px;
 }
 
 .dot-flashing {
@@ -109,27 +147,139 @@
   animation-delay: 1s;
 }
 
-.input-group {
-  align-items: flex-start;
+.mic-btn {
+  height: 42px;
+  border-radius: 20px 0 0 20px;
+  width: 48px;
 }
 
-.input-group button {
-  height: 38px;
+.send-btn {
+  height: 42px;
+  border-radius: 0 20px 20px 0;
+  width: 48px;
+}
+
+.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+.empty-icon-container {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgba(13, 110, 253, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 }
 
-button.btn-danger {
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+.empty-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
 }
 
-button[title="Click to speak"]:hover mat-icon {
-  color: #0d6efd !important;
+.copy-btn {
+  padding: 0.25rem;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  background-color: transparent;
+  border: none;
+  transition: all 0.2s ease;
 }
 
-button[title="Click to speak"]:hover {
+.copy-btn:hover {
   background-color: rgba(13, 110, 253, 0.1);
+}
+
+.copy-btn.copied {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.dot-pulse {
+  animation: dotPulse 1.5s infinite;
+  opacity: 0.5;
+  display: inline-block;
+}
+
+.dot-pulse:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot-pulse:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.status-indicator {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dot-flashing {
+  0% {
+    background-color: #6c757d;
+  }
+
+  50%,
+  100% {
+    background-color: rgba(108, 117, 125, 0.2);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+@keyframes dotPulse {
+  0% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
+}
+
+:host-context(.dark-theme) .card {
+  background-color: #1e1e1e;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+:host-context(.dark-theme) .card-header {
+  background-color: #1e1e1e !important;
+  border-bottom: 1px solid #333;
 }
 
 :host-context(.dark-theme) .navbar {
@@ -155,16 +305,6 @@ button[title="Click to speak"]:hover {
   color: #64b5f6 !important;
 }
 
-:host-context(.dark-theme) .card {
-  background-color: #1e1e1e;
-  border: none;
-}
-
-:host-context(.dark-theme) .card-header {
-  background-color: #1e1e1e !important;
-  border-bottom: 1px solid #333;
-}
-
 :host-context(.dark-theme) input,
 :host-context(.dark-theme) textarea,
 :host-context(.dark-theme) select {
@@ -181,23 +321,16 @@ button[title="Click to speak"]:hover {
 :host-context(.dark-theme) .auto-resize-textarea {
   background-color: #333;
   color: #f5f5f5;
-  border-color: #444;
-}
-
-:host-context(.dark-theme) .auto-resize-textarea::placeholder {
-  color: #aaa;
-}
-
-:host-context(.dark-theme) .chat-bubble {
-  background-color: #333;
-}
-
-:host-context(.dark-theme) .user-bubble {
-  background-color: #1976d2;
+  border: #64b5f6 1px solid;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 :host-context(.dark-theme) .messages-area {
   background-color: #1e1e1e;
+}
+
+:host-context(.dark-theme) .text-muted {
+  color: #fff !important;
 }
 
 :host-context(.dark-theme) .input-container {
@@ -208,87 +341,29 @@ button[title="Click to speak"]:hover {
 :host-context(.dark-theme) .bot-message {
   background-color: #2d2d2d;
   color: #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 :host-context(.dark-theme) .user-message {
   background-color: #1976d2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-:host-context(.dark-theme) .profile-btn {
-  background: #333;
+:host-context(.dark-theme) .empty-icon-container {
+  background-color: rgba(25, 118, 210, 0.2);
 }
 
 :host-context(.dark-theme) .typing-indicator {
   background-color: #2d2d2d;
 }
 
-:host-context(.dark-theme) .dot-flashing,
-:host-context(.dark-theme) .dot-flashing::before,
-:host-context(.dark-theme) .dot-flashing::after {
-  background-color: #adb5bd;
-  color: #adb5bd;
-  animation-name: dot-flashing-dark;
-}
-
-@keyframes dot-flashing {
-  0% {
-    background-color: #6c757d;
+@media (max-width: 576px) {
+  .message {
+    max-width: 85%;
   }
 
-  50%,
-  100% {
-    background-color: rgba(108, 117, 125, 0.2);
+  .assistant-icon {
+    width: 40px;
+    height: 40px;
   }
-}
-
-@keyframes dot-flashing-dark {
-  0% {
-    background-color: #adb5bd;
-  }
-
-  50%,
-  100% {
-    background-color: rgba(173, 181, 189, 0.2);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.1);
-    opacity: 0.9;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-:host-context(.dark-theme) button[title="Click to speak"]:hover {
-  background-color: rgba(25, 118, 210, 0.2);
-}
-
-:host-context(.dark-theme) button[title="Click to speak"]:hover mat-icon {
-  color: #64b5f6 !important;
-}
-
-:host-context(.dark-theme) .text-muted {
-  color: #adb5bd !important;
-}
-
-:host-context(.dark-theme) .mat-menu-panel {
-  background-color: #1e1e1e;
-}
-
-:host-context(.dark-theme) .mat-menu-item {
-  color: #f5f5f5;
-}
-
-:host-context(.dark-theme) .mat-menu-item:hover {
-  background-color: #333;
 }

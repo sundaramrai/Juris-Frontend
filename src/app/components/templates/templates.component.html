@@ -1,9 +1,9 @@
 <!-- src/app/components/templates/templates.component.html -->
 <div class="container-fluid">
-  <div class="d-flex align-items-center justify-content-between flex-wrap py-2">
+  <div class="d-flex align-items-center justify-content-between flex-wrap py-3">
     <div class="d-flex align-items-center mb-2">
       <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
-        style="width: 48px; height: 48px;">
+        style="width: 52px; height: 52px;">
         <mat-icon class="text-white">description</mat-icon>
       </div>
       <div>
@@ -11,48 +11,58 @@
         <p class="text-muted small mb-0">Browse over 100+ Indian law-specific templates</p>
       </div>
     </div>
-    <div class="d-flex align-items-center gap-2 flex-wrap mt-3 mt-md-0">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput [formControl]="searchControl" placeholder="Search templates..." />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="filter-field">
-        <mat-icon matPrefix>filter_list</mat-icon>
-        <mat-select [(value)]="selectedType" (selectionChange)="filterTemplatesByType($event)">
-          <mat-option value="all">All Types</mat-option>
-          <mat-option *ngFor="let type of availableTypes" [value]="type">
-            {{ type | titlecase }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+    <div class="d-flex align-items-center gap-3 flex-wrap mt-3 mt-md-0">
+      <div class="position-relative search-field mb-0">
+        <div class="input-group">
+          <span class="input-group-text border-end-0">
+            <mat-icon>search</mat-icon>
+          </span>
+          <input type="text" class="form-control border-start-0" [formControl]="searchControl"
+            placeholder="Search templates..." aria-label="Search templates" />
+        </div>
+      </div>
+      <div class="position-relative filter-field mb-0">
+        <div class="input-group">
+          <span class="input-group-text border-end-0">
+            <mat-icon>filter_list</mat-icon>
+          </span>
+          <select class="form-select border-start-0" [(ngModel)]="selectedType"
+            (change)="filterTemplatesByTypeBootstrap($event)" aria-label="Filter by type">
+            <option value="all">All Types</option>
+            <option *ngFor="let type of availableTypes" [value]="type">
+              {{ type | titlecase }}
+            </option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="d-flex justify-content-center" *ngIf="!isLoaded">
+  <div class="d-flex justify-content-center py-5" *ngIf="!isLoaded">
     <mat-spinner diameter="48"></mat-spinner>
   </div>
 
-  <div class="row" *ngIf="paginatedTemplates.length > 0 && isLoaded">
-    <div class="col-md-6 mb-4" *ngFor="let template of paginatedTemplates">
-      <div class="template-card card border-0 shadow h-100">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title fw-bold text-primary mb-1">
-            {{ template.template_name }}
-          </h5>
-          <div class="type-pill fw-bold mb-2">
+  <div class="row row-cols-1 row-cols-md-2 g-4" *ngIf="paginatedTemplates.length > 0 && isLoaded">
+    <div class="col" *ngFor="let template of paginatedTemplates">
+      <div class="template-card card shadow h-100">
+        <div class="card-body">
+          <div class="type-pill">
             {{ template.type | titlecase }}
           </div>
-          <p class="card-text text-muted" style="text-align: justify;">
+          <h5 class="card-title fw-bold text-primary">
+            {{ template.template_name }}
+          </h5>
+          <p class="card-text text-muted">
             {{ template.about }}
           </p>
         </div>
-        <div class="card-footer bg-white border-0 d-flex justify-content-end gap-2 flex-wrap">
-          <button class="btn-view" (click)="viewTemplate(template)">
+        <div class="card-footer d-flex justify-content-end gap-2">
+          <button class="btn-view" (click)="viewTemplate(template)" aria-label="View template">
             <mat-icon class="me-1">visibility</mat-icon>
             View
           </button>
-          <button mat-flat-button [matMenuTriggerFor]="downloadMenu" class="btn-download">
+          <button mat-flat-button [matMenuTriggerFor]="downloadMenu" class="btn-download"
+            aria-label="Download template">
             <mat-icon class="me-1">download</mat-icon>
             Download
           </button>
@@ -71,29 +81,34 @@
     </div>
   </div>
 
-  <div class="text-center text-muted py-5" *ngIf="paginatedTemplates.length === 0">
-    No templates found matching your criteria.
+  <div class="text-center py-5 my-4" *ngIf="paginatedTemplates.length === 0 && isLoaded">
+    <mat-icon class="text-muted mb-3" style="font-size: 48px; width: 48px; height: 48px;">search_off</mat-icon>
+    <h6 class="fw-bold text-muted">No templates found</h6>
+    <p class="text-muted">Try adjusting your search or filter criteria.</p>
   </div>
 
   <div class="pagination-container d-flex justify-content-center align-items-center" *ngIf="totalPages > 1 && isLoaded">
     <nav aria-label="Templates Pagination">
       <ul class="pagination">
-        <!-- Previous Button -->
         <li class="page-item" [class.disabled]="currentPage === 1">
-          <button class="page-link" (click)="prevPage()">
-            Previous
+          <button class="page-link" (click)="prevPage()" aria-label="Previous page">
+            <mat-icon
+              style="font-size: 18px; height: 18px; width: 18px; vertical-align: middle;">chevron_left</mat-icon>
+            <span class="d-none d-sm-inline">Prev</span>
           </button>
         </li>
 
         <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
-          <button class="page-link" (click)="goToPage(page)">
+          <button class="page-link" (click)="goToPage(page)" [attr.aria-current]="page === currentPage ? 'page' : null">
             {{ page }}
           </button>
         </li>
 
         <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <button class="page-link" (click)="nextPage()">
-            Next
+          <button class="page-link" (click)="nextPage()" aria-label="Next page">
+            <span class="d-none d-sm-inline">Next</span>
+            <mat-icon
+              style="font-size: 18px; height: 18px; width: 18px; vertical-align: middle;">chevron_right</mat-icon>
           </button>
         </li>
       </ul>

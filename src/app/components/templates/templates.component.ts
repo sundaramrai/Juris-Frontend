@@ -131,8 +131,9 @@ export class TemplatesComponent implements OnInit {
     });
   }
 
-  filterTemplatesByType(event: MatSelectChange) {
-    this.selectedType = event.value;
+  filterTemplatesByTypeBootstrap(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedType = selectElement.value;
     this.filterTemplates(this.selectedType, this.searchControl.value || '');
     this.currentPage = 1;
     this.loadSuccess();
