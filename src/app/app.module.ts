@@ -19,6 +19,7 @@ import { MatOption } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { HomeComponent } from './components/home/home.component';
 import { ToolsComponent } from './components/tools/tools.component';
 import { RecentChatsComponent } from './components/recent-chats/recent-chats.component';
@@ -58,6 +59,7 @@ import { TemplatesComponent } from './components/templates/templates.component';
     MatSelectModule,
     MatFormFieldModule,
     MatInputModule,
+    MatTooltipModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

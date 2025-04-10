@@ -1,10 +1,12 @@
 // src/app/components/ai-assistant/ai-assistant.component.ts
-import { Component, ElementRef, OnInit, ViewChild, NgZone, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, NgZone, AfterViewInit, OnDestroy } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { jsPDF } from 'jspdf';
+import { Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-ai-assistant',
@@ -12,121 +14,185 @@ import { jsPDF } from 'jspdf';
   templateUrl: './ai-assistant.component.html',
   styleUrls: ['./ai-assistant.component.css']
 })
-export class AiAssistantComponent implements OnInit, AfterViewInit {
+export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   messages: Message[] = [];
   userInput: string = '';
   username: string | null = null;
+  titleJustSaved: boolean = false;
+  chatTitle: string = 'New Chat';
+  chatId: string | null = null;
   isLoading: boolean = false;
   isListening: boolean = false;
+  isSpeaking: boolean = false;
+  chatNotFound: boolean = false;
   recognition: any;
+  synthesis: SpeechSynthesis | null = null;
+  synthesisVoice: SpeechSynthesisVoice | null = null;
   interimTranscript: string = '';
   finalTranscript: string = '';
   confidenceThreshold: number = 0.7;
   pauseDelay: number = 2000;
   pauseTimer: any;
   showCopied: boolean = false;
+  speechSynthesisUtterance: SpeechSynthesisUtterance | null = null;
+  editingTitle: boolean = false;
+  tempTitle: string = '';
+  private routeSub: Subscription | null = null;
+  private chatIdSub: Subscription | null = null;
 
   @ViewChild('messagesArea') messagesArea!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
+  @ViewChild('titleInput') titleInput!: ElementRef;
 
   constructor(
     private responseService: ResponseService,
     private http: HttpClient,
     private ngZone: NgZone,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.initSpeechRecognition();
+    this.initSpeechSynthesis();
   }
 
   ngOnInit(): void {
     const user = localStorage.getItem('user');
     if (user) {
       this.username = JSON.parse(user).username;
-      this.loadChatHistory();
     }
+
+    this.routeSub = this.route.queryParams.subscribe(params => {
+      const newChatId = params['chatId'];
+      if (newChatId) {
+        this.responseService.setCurrentChatId(newChatId);
+        this.loadChatHistory(newChatId);
+      } else {
+        this.createNewChat();
+      }
+    });
+
+    this.chatIdSub = this.responseService.currentChatId$.subscribe(chatId => {
+      if (chatId && chatId !== this.chatId) {
+        this.chatId = chatId;
+        this.loadChatHistory(chatId);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
     this.initScrollListener();
-    this.scrollToBottom();
+  }
+
+  ngOnDestroy(): void {
+    this.stopSpeechRecognition();
+    this.stopSpeechSynthesis();
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
+    if (this.chatIdSub) {
+      this.chatIdSub.unsubscribe();
+    }
+  }
+
+  createNewChat(): void {
+    this.isLoading = true;
+    this.chatNotFound = false;
+
+    this.responseService.createNewChat().subscribe({
+      next: (response) => {
+        this.chatId = response.chatId;
+        this.chatTitle = response.title;
+        this.messages = [];
+        this.router.navigate(['/tools/assistant'], {
+          queryParams: { chatId: response.chatId },
+          replaceUrl: true
+        });
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error creating new chat:', error);
+        this.isLoading = false;
+      }
+    });
   }
 
   initSpeechRecognition(): void {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      this.recognition = new SpeechRecognition();
-      this.recognition.continuous = true;
-      this.recognition.interimResults = true;
-      this.recognition.maxAlternatives = 1;
-      this.recognition.lang = 'en-US';
+      const SpeechRecognition = (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition ||
+        (window as any).mozSpeechRecognition ||
+        (window as any).msSpeechRecognition;
 
-      this.recognition.onstart = () => {
-        this.finalTranscript = '';
-        this.interimTranscript = '';
-      };
+      if (SpeechRecognition) {
+        this.recognition = new SpeechRecognition();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.maxAlternatives = 1;
+        this.recognition.lang = 'en-US';
 
-      this.recognition.onresult = (event: any) => {
-        if (this.pauseTimer) {
-          clearTimeout(this.pauseTimer);
-        }
+        this.recognition.onstart = () => {
+          this.finalTranscript = '';
+          this.interimTranscript = '';
+        };
 
-        this.interimTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          const confidence = event.results[i][0].confidence;
-          if (event.results[i].isFinal) {
-            if (confidence >= this.confidenceThreshold) {
-              this.finalTranscript += ' ' + transcript;
-              this.finalTranscript = this.finalTranscript.trim();
-            }
-          } else {
-            if (confidence >= this.confidenceThreshold) {
-              this.interimTranscript += transcript;
+        this.recognition.onresult = (event: any) => {
+          if (this.pauseTimer) {
+            clearTimeout(this.pauseTimer);
+          }
+
+          this.interimTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            const confidence = event.results[i][0].confidence;
+            if (event.results[i].isFinal) {
+              if (confidence >= this.confidenceThreshold) {
+                this.finalTranscript += ' ' + transcript;
+                this.finalTranscript = this.finalTranscript.trim();
+              }
+            } else {
+              if (confidence >= this.confidenceThreshold) {
+                this.interimTranscript += transcript;
+              }
             }
           }
-        }
 
-        this.ngZone.run(() => {
-          this.userInput = (this.finalTranscript + ' ' + this.interimTranscript).trim();
-          setTimeout(() => {
-            if (this.messageInput) {
-              this.autoResizeTextarea(this.messageInput.nativeElement);
-            }
-          }, 0);
-        });
-
-        this.pauseTimer = setTimeout(() => {
           this.ngZone.run(() => {
-            this.processFinalTranscript();
-            if (this.isListening) {
-              this.recognition.stop();
-              this.isListening = false;
-            }
+            this.userInput = (this.finalTranscript + ' ' + this.interimTranscript).trim();
+            setTimeout(() => {
+              if (this.messageInput) {
+                this.autoResizeTextarea(this.messageInput.nativeElement);
+              }
+            }, 0);
           });
-        }, this.pauseDelay);
-      };
 
-      this.recognition.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        if (event.error !== 'no-speech') {
+          this.pauseTimer = setTimeout(() => {
+            this.ngZone.run(() => {
+              this.processFinalTranscript();
+              if (this.isListening) {
+                this.stopSpeechRecognition();
+              }
+            });
+          }, this.pauseDelay);
+        };
+
+        this.recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          if (event.error !== 'no-speech') {
+            this.ngZone.run(() => {
+              this.isListening = false;
+            });
+          }
+        };
+
+        this.recognition.onend = () => {
           this.ngZone.run(() => {
             this.isListening = false;
+            this.processFinalTranscript();
           });
-        }
-      };
-
-      this.recognition.onend = () => {
-        this.ngZone.run(() => {
-          this.processFinalTranscript();
-        });
-      };
+        };
+      }
     }
-  }
-
-  autoResizeTextarea(textarea: HTMLTextAreaElement): void {
-    textarea.style.height = 'auto';
-    const newHeight = Math.min(150, textarea.scrollHeight);
-    textarea.style.height = `${newHeight}px`;
   }
 
   toggleSpeechRecognition(): void {
@@ -134,11 +200,49 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
       alert('Speech recognition is not supported in your browser.');
       return;
     }
+
     if (this.isListening) {
+      this.stopSpeechRecognition();
+    } else {
+      this.startSpeechRecognition();
+    }
+  }
+
+  startSpeechRecognition(): void {
+    if (this.isSpeaking) {
+      this.stopSpeechSynthesis();
+    }
+
+    this.finalTranscript = this.userInput.trim() || '';
+    this.interimTranscript = '';
+    try {
+      this.recognition.start();
+      this.isListening = true;
+    } catch (error) {
+      console.error('Error starting speech recognition:', error);
+      this.stopSpeechRecognition();
+      setTimeout(() => {
+        try {
+          this.recognition.start();
+          this.isListening = true;
+        } catch (retryError) {
+          console.error('Error on retry speech recognition:', retryError);
+          this.isListening = false;
+        }
+      }, 100);
+    }
+  }
+
+  stopSpeechRecognition(): void {
+    if (this.recognition && this.isListening) {
       if (this.pauseTimer) {
         clearTimeout(this.pauseTimer);
       }
-      this.recognition.stop();
+      try {
+        this.recognition.stop();
+      } catch (error) {
+        console.error('Error stopping speech recognition:', error);
+      }
       this.isListening = false;
       this.ngZone.run(() => {
         this.userInput = this.finalTranscript.trim();
@@ -148,15 +252,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
           }
         }, 0);
       });
-    } else {
-      this.finalTranscript = this.userInput.trim() || '';
-      this.interimTranscript = '';
-      try {
-        this.recognition.start();
-        this.isListening = true;
-      } catch (error) {
-        console.error('Error starting speech recognition:', error);
-      }
     }
   }
 
@@ -173,6 +268,89 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
     }
     this.finalTranscript = transcript;
     this.userInput = transcript;
+  }
+
+  initSpeechSynthesis(): void {
+    if ('speechSynthesis' in window) {
+      this.synthesis = window.speechSynthesis;
+      this.loadVoices();
+      if (this.synthesis) {
+        if (this.synthesis.onvoiceschanged !== undefined) {
+          this.synthesis.onvoiceschanged = this.loadVoices.bind(this);
+        }
+      }
+    }
+  }
+
+  loadVoices(): void {
+    if (!this.synthesis) return;
+    const voices = this.synthesis.getVoices();
+    this.synthesisVoice = voices.find(voice =>
+      voice.lang.includes('en-US') && voice.localService
+    ) || voices.find(voice =>
+      voice.lang.includes('en') && voice.localService
+    ) || voices[0];
+
+    console.log('Voice selected:', this.synthesisVoice?.name);
+  }
+
+  speakMessage(text: string): void {
+    if (!this.synthesis || this.isSpeaking) return;
+
+    if (this.isListening) {
+      this.stopSpeechRecognition();
+    }
+    const cleanText = text
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/`(.+?)`/g, '$1')
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/https?:\/\/[^\s]+/g, 'link');
+
+    this.speechSynthesisUtterance = new SpeechSynthesisUtterance(cleanText);
+
+    if (this.synthesisVoice) {
+      this.speechSynthesisUtterance.voice = this.synthesisVoice;
+    }
+
+    this.speechSynthesisUtterance.rate = 1.0;
+    this.speechSynthesisUtterance.pitch = 1.0;
+    this.speechSynthesisUtterance.volume = 1.0;
+
+    this.speechSynthesisUtterance.onstart = () => {
+      this.ngZone.run(() => {
+        this.isSpeaking = true;
+      });
+    };
+
+    this.speechSynthesisUtterance.onend = () => {
+      this.ngZone.run(() => {
+        this.isSpeaking = false;
+      });
+    };
+
+    this.speechSynthesisUtterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      this.ngZone.run(() => {
+        this.isSpeaking = false;
+      });
+    };
+
+    this.synthesis.speak(this.speechSynthesisUtterance);
+  }
+
+  stopSpeechSynthesis(): void {
+    if (this.synthesis && this.isSpeaking) {
+      this.synthesis.cancel();
+      this.isSpeaking = false;
+    }
+  }
+
+  autoResizeTextarea(textarea: HTMLTextAreaElement): void {
+    textarea.style.height = 'auto';
+    const newHeight = Math.min(150, textarea.scrollHeight);
+    textarea.style.height = `${newHeight}px`;
   }
 
   adjustConfidence(value: number): void {
@@ -288,18 +466,25 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
     }
   }
 
-  loadChatHistory(): void {
+  loadChatHistory(chatId: string): void {
     this.isLoading = true;
-    this.responseService.getMessages().subscribe({
-      next: (messages) => {
-        this.messages = messages;
+    this.chatNotFound = false;
+
+    this.responseService.getChatHistory(chatId).subscribe({
+      next: (data) => {
+        this.messages = data.messages;
+        this.chatTitle = data.title;
         this.scrollToBottom();
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading chat history:', error);
-      },
-      complete: () => {
-        this.isLoading = false;
+        if (error.status === 404) {
+          console.log('Chat not found, creating new chat...');
+          this.createNewChat();
+        } else {
+          this.createNewChat();
+        }
       }
     });
   }
@@ -308,11 +493,11 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
     if (!this.userInput.trim()) return;
 
     if (this.isListening) {
-      if (this.pauseTimer) {
-        clearTimeout(this.pauseTimer);
-      }
-      this.recognition.stop();
-      this.isListening = false;
+      this.stopSpeechRecognition();
+    }
+
+    if (this.isSpeaking) {
+      this.stopSpeechSynthesis();
     }
 
     const userMessage: Message = {
@@ -339,9 +524,22 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
       }, 0);
     }
 
-    this.responseService.sendMessage(messageText).subscribe({
+    this.responseService.sendMessage(messageText, this.chatId || undefined).subscribe({
       next: (response) => {
-        this.messages.push(response);
+        this.messages.push({
+          type: 'bot',
+          text: response.botResponse,
+          time: new Date().toISOString()
+        });
+        if (response.title && this.chatTitle !== response.title) {
+          this.chatTitle = response.title;
+        }
+
+        if (response.chatId && this.chatId !== response.chatId) {
+          this.chatId = response.chatId;
+          this.router.navigate(['/tools/assistant'], { queryParams: { chatId: response.chatId }, replaceUrl: true });
+        }
+
         this.scrollToBottom();
       },
       error: (error) => {
@@ -371,6 +569,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
       });
     }
   }
+
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -379,10 +578,12 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
   }
 
   clearChat(): void {
+    if (!this.chatId) return;
+
     this.isLoading = true;
-    this.responseService.clearChat().subscribe({
+    this.responseService.clearChat(this.chatId).subscribe({
       next: () => {
-        this.messages = [];
+        this.createNewChat();
       },
       error: (error) => {
         console.error('Error clearing chat history:', error);
@@ -414,6 +615,55 @@ export class AiAssistantComponent implements OnInit, AfterViewInit {
       });
     }
   }
+
+  startEditingTitle(): void {
+    this.editingTitle = true;
+    this.tempTitle = this.chatTitle;
+    setTimeout(() => {
+      if (this.titleInput) {
+        this.titleInput.nativeElement.focus();
+      }
+    });
+  }
+
+  saveChatTitle(): void {
+    if (!this.chatId) return;
+
+    const newTitle = this.tempTitle.trim();
+    if (!newTitle || newTitle === this.chatTitle) {
+      this.editingTitle = false;
+      return;
+    }
+
+    this.responseService.updateChatTitle(this.chatId, newTitle).subscribe({
+      next: (response) => {
+        this.chatTitle = response.title;
+        this.editingTitle = false;
+        this.titleJustSaved = true;
+        setTimeout(() => {
+          this.titleJustSaved = false;
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Error updating chat title:', error);
+        this.editingTitle = false;
+      }
+    });
+  }
+
+  cancelEditTitle(): void {
+    this.editingTitle = false;
+  }
+
+  handleTitleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.saveChatTitle();
+    } else if (event.key === 'Escape') {
+      this.cancelEditTitle();
+    }
+  }
+
 
   exportChatAsPDF(): void {
     const pdf = new jsPDF('p', 'mm', 'a4');

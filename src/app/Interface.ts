@@ -13,6 +13,15 @@ export interface Feedback {
   userId?: string;
 }
 
+export interface ChatInfo {
+  chatId: string;
+  title: string;
+  summary: string;
+  messageCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MessageResponse extends Omit<Message, 'id'> {
   _id: string;
 }

@@ -5,19 +5,40 @@
       <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center me-3 assistant-icon">
         <mat-icon class="text-white">chat</mat-icon>
       </div>
-      <div>
-        <h5 class="mb-0 fw-bold text-primary">AI Assistant</h5>
-        <p class="text-muted small mb-0">
-          <span *ngIf="isLoading" class="status-text">Thinking<span class="dot-pulse">.</span><span
-              class="dot-pulse">.</span><span class="dot-pulse">.</span></span>
-          <span *ngIf="!isLoading" class="status-text">Ready to help</span>
-        </p>
+
+      <div class="chat-title-container" *ngIf="!editingTitle" (click)="startEditingTitle()">
+        <h5 class="mb-0 fw-bold text-primary chat-title" [ngClass]="{'title-saved': titleJustSaved}"
+          [matTooltip]="chatTitle" matTooltipPosition="above">{{ chatTitle }}
+        </h5>
+        <mat-icon class="text-muted edit-icon">edit</mat-icon>
       </div>
+
+      <div class="chat-title-edit" *ngIf="editingTitle">
+        <input #titleInput type="text" class="form-control" [(ngModel)]="tempTitle"
+          (keydown)="handleTitleKeyDown($event)" (blur)="saveChatTitle()" maxlength="50" placeholder="Enter chat title">
+      </div>
+
+      <p class="text-muted ms-2 mb-0">
+        <span *ngIf="isLoading" class="badge bg-warning text-dark rounded-pill px-2 py-1 status-text">
+          Thinking<span class="dot-pulse">.</span><span class="dot-pulse">.</span><span class="dot-pulse">.</span>
+        </span>
+        <span *ngIf="!isLoading && !isListening && !isSpeaking"
+          class="badge bg-primary text-white rounded-pill px-2 py-1 status-text">Ready to help</span>
+        <span *ngIf="isListening"
+          class="badge bg-danger text-white rounded-pill px-2 py-1 status-text">Listening...</span>
+        <span *ngIf="isSpeaking"
+          class="badge bg-success text-white rounded-pill px-2 py-1 status-text">Speaking...</span>
+      </p>
+
       <div class="ms-auto d-flex align-items-center">
-        <button class="btn btn-icon" title="Share your chat" (click)="exportChatAsPDF()">
+        <button class="btn btn-icon" matTooltip="Start new chat" (click)="createNewChat()">
+          <mat-icon class="text-primary">add</mat-icon>
+        </button>
+        <button class="btn btn-icon" matTooltip="Share your chat" (click)="exportChatAsPDF()"
+          *ngIf="!chatNotFound && messages.length > 0">
           <mat-icon class="text-primary">share</mat-icon>
         </button>
-        <button class="btn btn-icon ms-2" [matMenuTriggerFor]="menu">
+        <button class="btn btn-icon ms-2" matTooltip="More options" [matMenuTriggerFor]="menu" *ngIf="!chatNotFound">
           <mat-icon class="text-primary">more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu" xPosition="before" class="custom-menu">
@@ -38,66 +59,90 @@
 
   <div class="card-body p-0">
     <div class="chat-container">
-      <div #messagesArea class="messages-area p-3 d-flex flex-column"
-        [style.overflowY]="messages.length > 0 ? 'auto' : 'hidden'">
-        <div *ngIf="messages.length === 0" class="empty-state text-center p-5">
-          <div class="my-5">
-            <div class="empty-icon-container">
-              <mat-icon class="text-primary empty-icon">sentiment_satisfied</mat-icon>
-            </div>
-            <p class="mt-3 text-muted">No messages yet. Start a conversation!</p>
+      <div *ngIf="chatNotFound" class="p-5 text-center">
+        <div class="my-5">
+          <div class="empty-icon-container">
+            <mat-icon class="text-warning" style="font-size: 64px;">search_off</mat-icon>
           </div>
-        </div>
-        <div class="message-wrapper" *ngFor="let message of messages"
-          [ngClass]="{'bot-wrapper': message.type === 'bot', 'user-wrapper': message.type === 'user'}">
-          <div class="message"
-            [ngClass]="{'bot-message': message.type === 'bot', 'user-message': message.type === 'user'}">
-            <div class="message-content" [innerHTML]="parseMessage(message.text)"></div>
-            <div class="message-footer d-flex justify-content-between align-items-center mt-2">
-              <small class="message-time"
-                [ngClass]="{'text-muted': message.type === 'bot', 'text-white-50': message.type === 'user'}">
-                {{ message.time | date:'shortTime' }}
-              </small>
-              <div class="message-actions" *ngIf="message.type === 'bot'">
-                <button *ngIf="!showCopied" class="btn btn-sm btn-icon copy-btn" (click)="copyMessage(message.text)"
-                  title="Copy message">
-                  <mat-icon>content_copy</mat-icon>
-                </button>
-                <button *ngIf="showCopied" class="btn btn-sm btn-icon copy-btn copied">
-                  <mat-icon>done</mat-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="isLoading && messages.length > 0" class="bot-wrapper">
-          <div class="message bot-message typing-indicator">
-            <div class="dot-flashing"></div>
-          </div>
+          <h4 class="mt-4 text-warning">Chat Not Found</h4>
+          <p class="text-muted mb-4">The chat you're looking for doesn't exist or may have been deleted.</p>
+          <button class="btn btn-primary btn-lg" (click)="createNewChat()">
+            <mat-icon>add</mat-icon> Start New Chat
+          </button>
         </div>
       </div>
 
-      <div class="input-container p-3 border-0">
-        <div class="input-group">
-          <button class="btn mic-btn d-flex align-items-center" [ngClass]="{'btn-outline-primary': !isListening, 'btn-danger pulse': isListening}"
-            type="button" [disabled]="isLoading" (click)="toggleSpeechRecognition()" title="Click to speak">
-            <mat-icon>{{ isListening ? 'mic' : 'mic_none' }}</mat-icon>
-          </button>
-          <textarea #messageInput class="form-control auto-resize-textarea"
-            [placeholder]="isListening ? 'Speak clearly...' : 'Type your message here...'" [(ngModel)]="userInput"
-            (input)="autoResizeTextarea(messageInput)" (keydown)="handleKeyDown($event)" [disabled]="isLoading" rows="1"
-            autofocus></textarea>
-          <button class="btn btn-primary send-btn" type="button" (click)="sendMessage()"
-            [disabled]="!userInput.trim() || isLoading">
-            <mat-icon>send</mat-icon>
-          </button>
+      <ng-container *ngIf="!chatNotFound">
+        <div #messagesArea class="messages-area p-3 d-flex flex-column"
+          [style.overflowY]="messages.length > 0 ? 'auto' : 'hidden'">
+          <div *ngIf="messages.length === 0" class="empty-state text-center p-5">
+            <div class="my-5">
+              <div class="empty-icon-container">
+                <mat-icon class="text-primary empty-icon">sentiment_satisfied</mat-icon>
+              </div>
+              <p class="mt-3 text-muted">No messages yet. Start a conversation!</p>
+            </div>
+          </div>
+          <div class="message-wrapper" *ngFor="let message of messages"
+            [ngClass]="{'bot-wrapper': message.type === 'bot', 'user-wrapper': message.type === 'user'}">
+            <div class="message"
+              [ngClass]="{'bot-message': message.type === 'bot', 'user-message': message.type === 'user'}">
+              <div class="message-content" [innerHTML]="parseMessage(message.text)"></div>
+              <div class="message-footer d-flex justify-content-between align-items-center mt-2">
+                <small class="message-time"
+                  [ngClass]="{'text-muted': message.type === 'bot', 'text-white-50': message.type === 'user'}">
+                  {{ message.time | date:'shortTime' }}
+                </small>
+                <div class="message-actions d-flex align-items-center" *ngIf="message.type === 'bot'">
+                  <button class="btn btn-sm btn-icon action-btn"
+                    [ngClass]="{'text-primary': !isSpeaking, 'text-danger': isSpeaking}"
+                    (click)="isSpeaking ? stopSpeechSynthesis() : speakMessage(message.text)"
+                    [matTooltip]="isSpeaking ? 'Stop speaking' : 'Listen to message'" matTooltipPosition="above">
+                    <mat-icon>{{ isSpeaking ? 'volume_off' : 'volume_up' }}</mat-icon>
+                  </button>
+                  <button *ngIf="!showCopied" class="btn btn-sm btn-icon action-btn ms-2 text-primary"
+                    (click)="copyMessage(message.text)" matTooltip="Copy message" matTooltipPosition="above">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                  <button *ngIf="showCopied" class="btn btn-sm btn-icon action-btn ms-2 text-primary"
+                    matTooltip="Copied!" matTooltipPosition="above">
+                    <mat-icon>done</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="isLoading && messages.length > 0" class="bot-wrapper">
+            <div class="message bot-message typing-indicator">
+              <div class="dot-flashing"></div>
+            </div>
+          </div>
         </div>
-        <div class="text-center mt-2">
-          <small class="status-indicator" [ngClass]="{'text-muted': !isListening, 'text-danger': isListening}">
-            {{ isListening ? 'Speak clearly for best accuracy' : 'We typically reply within seconds' }}
-          </small>
+
+        <div class="input-container p-3 border-0">
+          <div class="input-group">
+            <button class="btn mic-btn d-flex align-items-center"
+              [ngClass]="{'btn-outline-primary': !isListening, 'btn-danger pulse': isListening}" type="button"
+              [disabled]="isLoading" (click)="toggleSpeechRecognition()"
+              [matTooltip]="isListening ? 'Stop listening' : 'Click to speak'" matTooltipPosition="above">
+              <mat-icon>{{ isListening ? 'mic' : 'mic_none' }}</mat-icon>
+            </button>
+            <textarea #messageInput class="form-control auto-resize-textarea"
+              [placeholder]="isListening ? 'Speak clearly...' : 'Type your message here...'" [(ngModel)]="userInput"
+              (input)="autoResizeTextarea(messageInput)" (keydown)="handleKeyDown($event)" [disabled]="isLoading"
+              rows="1" autofocus></textarea>
+            <button class="btn btn-primary send-btn" type="button" (click)="sendMessage()"
+              [disabled]="!userInput.trim() || isLoading" matTooltip="Send message" matTooltipPosition="above">
+              <mat-icon>send</mat-icon>
+            </button>
+          </div>
+          <div class="text-center mt-2">
+            <small class="status-indicator" [ngClass]="{'text-muted': !isListening, 'text-danger': isListening}">
+              {{ isListening ? 'Speak clearly for best accuracy' : 'We typically reply within seconds' }}
+            </small>
+          </div>
         </div>
-      </div>
+      </ng-container>
     </div>
   </div>
 </div>

@@ -1,33 +1,72 @@
 <!-- src/app/components/recent-chats/recent-chats.component.html -->
 <div class="card border-0 shadow">
   <div class="card-body">
-    <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center justify-content-between mb-2">
       <h5 class="card-title fw-bold text-primary mb-0">Recent Chats</h5>
-      <mat-icon class="text-primary" style="cursor: pointer;" (click)="refreshChatHistory()">
-        refresh
-      </mat-icon>
+      <div class="d-flex">
+        <button class="btn btn-icon" matTooltip="Create new chat" (click)="createNewChat()">
+          <mat-icon class="text-primary">add_circle</mat-icon>
+        </button>
+        <button class="btn btn-icon ms-2" matTooltip="Refresh chats" (click)="refreshChats()">
+          <mat-icon class="text-primary">refresh</mat-icon>
+        </button>
+      </div>
     </div>
 
-    <div class="list-group list-group-flush mt-2" *ngIf="isMessages">
-      <a class="list-group-item list-group-item-action">
-        <div class="d-flex align-items-center justify-content-between" style="flex-wrap: nowrap; width: 100%;">
-          <h6 class="mb-1 me-3 text-truncate"
-            style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" [title]="chatSummary">
-            {{ chatSummary }}
-          </h6>
-          <small class="text-nowrap">
-            {{ messages[0].time | date:'MMM-yyyy' }}
-          </small>
-        </div>
-      </a>
+    <div *ngIf="isLoading && chats.length === 0" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
 
-    <div class="list-group list-group-flush mt-2" *ngIf="!isMessages">
-      <a class="list-group-item list-group-item-action">
-        <div class="d-flex justify-content-between">
-          <h6 class="mb-1">No chats</h6>
-        </div>
-      </a>
+    <div *ngIf="loadingError" class="alert alert-danger">
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn-outline-danger btn-sm" (click)="refreshChats()">
+        <mat-icon class="me-1">refresh</mat-icon> Try Again
+      </button>
     </div>
+
+    <ng-container *ngIf="!isLoading || chats.length > 0">
+      <div class="list-group list-group-flush mt-2" *ngIf="chatsWithMessages && chatsWithMessages.length > 0">
+        <a *ngFor="let chat of chatsWithMessages"
+          class="list-group-item list-group-item-action d-flex align-items-center"
+          [class.active]="chat.chatId === currentChatId" (click)="openChat(chat.chatId)">
+          <div class="d-flex align-items-center justify-content-between" style="flex-wrap: nowrap; width: 100%;">
+            <div class="d-flex flex-column" style="flex: 1; min-width: 0;">
+              <h6 class="mb-0 me-3 text-truncate" [class.text-primary]="chat.chatId !== currentChatId"
+                [class.text-white]="chat.chatId === currentChatId" [matTooltip]="chat.title || 'New Chat'">
+                {{ chat.title || 'New Chat' }}
+              </h6>
+              <p class="mb-0 small text-truncate" [class.text-muted]="chat.chatId !== currentChatId"
+                [class.text-white]="chat.chatId === currentChatId" [matTooltip]="chat.summary || 'No messages yet'">
+                {{ chat.summary || 'No messages yet' }}
+              </p>
+            </div>
+            <small class="text-nowrap" [class.text-muted]="chat.chatId !== currentChatId"
+              [class.text-white]="chat.chatId === currentChatId" [matTooltip]="chat.updatedAt | date:'medium'">
+              {{ chat.updatedAt | date:'MMM d' }}
+            </small>
+          </div>
+        </a>
+      </div>
+      <div class="empty-state text-center py-5" *ngIf="!chatsWithMessages || chatsWithMessages.length === 0">
+        <div class="mb-3">
+          <mat-icon class="text-muted"
+            style="font-size: 48px; height: 48px; width: 48px;">chat_bubble_outline</mat-icon>
+        </div>
+        <h6 class="text-muted mb-3">No Chats Yet</h6>
+        <p class="text-muted mb-4">Start a new conversation to get legal assistance</p>
+        <button class="btn btn-primary" (click)="createNewChat()">
+          <mat-icon class="me-2">add</mat-icon> Start New Chat
+        </button>
+      </div>
+
+      <div *ngIf="hasMoreChats" class="text-center mt-3">
+        <button class="btn btn-outline-primary btn-sm" [disabled]="isLoading" (click)="loadMoreChats()">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          Load More
+        </button>
+      </div>
+    </ng-container>
   </div>
 </div>
