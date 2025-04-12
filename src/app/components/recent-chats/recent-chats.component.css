@@ -1,4 +1,8 @@
 /* src/app/components/recent-chats/recent-chats.component.css */
+.list-group-item:hover {
+  cursor: pointer;
+}
+
 :host-context(.dark-theme) .card {
   background-color: #1e1e1e;
   border: none;
