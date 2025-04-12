@@ -2,7 +2,8 @@
 <div class="card border-0 shadow-lg">
   <div class="card-header bg-white py-3 border-0">
     <div class="d-flex align-items-center">
-      <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center me-3 assistant-icon">
+      <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center me-3 assistant-icon"
+        style="min-width: 48px; min-height: 48px;">
         <mat-icon class="text-white">chat</mat-icon>
       </div>
 
@@ -41,7 +42,7 @@
         <button class="btn btn-icon ms-2" matTooltip="More options" [matMenuTriggerFor]="menu" *ngIf="!chatNotFound">
           <mat-icon class="text-primary">more_vert</mat-icon>
         </button>
-        <mat-menu #menu="matMenu" xPosition="before" class="custom-menu">
+        <mat-menu #menu="matMenu" xPosition="before" class="custom-menu bg-white">
           <div class="px-3 py-2 border-bottom" *ngIf="username">
             <div class="d-flex align-items-center">
               <mat-icon class="text-primary me-2">person</mat-icon>

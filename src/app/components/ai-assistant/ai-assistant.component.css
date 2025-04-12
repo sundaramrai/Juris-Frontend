@@ -7,8 +7,8 @@
 }
 
 .assistant-icon {
-  width: 48px;
-  height: 48px;
+  width: 48px !important;
+  height: 48px !important;
   transition: transform 0.3s ease;
 }
 
@@ -539,49 +539,4 @@
 
 :host-context(.dark-theme) .status-text {
   background-color: rgba(100, 181, 246, 0.15);
-}
-
-@media (max-width: 576px) {
-  .message {
-    max-width: 85%;
-  }
-
-  .assistant-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .chat-title {
-    max-width: 150px;
-  }
-}
-
-@media (max-width: 768px) {
-  .message {
-    max-width: 85%;
-  }
-
-  .assistant-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .chat-title {
-    max-width: 150px;
-  }
-}
-
-@media (max-width: 992px) {
-  .message {
-    max-width: 85%;
-  }
-
-  .assistant-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .chat-title {
-    max-width: 150px;
-  }
 }

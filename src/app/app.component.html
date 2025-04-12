@@ -19,9 +19,9 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item me-2 w-20 h-20">
-            <button class="btn btn-lg border-0 text-primary bg-transparent"
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item me-2">
+          <button class="btn border-0 text-primary bg-transparent"
             [ngClass]="{'btn-outline-light': isDarkTheme, 'btn-outline-dark': !isDarkTheme}" (click)="toggleTheme()">
             <span *ngIf="isDarkTheme" matTooltip="Switch to light theme">
               <mat-icon class="d-flex align-items-center">light_mode</mat-icon>
@@ -29,16 +29,16 @@
             <span *ngIf="!isDarkTheme" matTooltip="Switch to dark theme">
               <mat-icon class="d-flex align-items-center">dark_mode</mat-icon>
             </span>
-            </button>
+          </button>
         </li>
 
-        <li class="nav-item ms-lg-3" *ngIf="isLoggedIn">
+        <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="isLoggedIn">
           <button class="btn btn-outline-primary" type="button" (click)="onLogout()">Logout</button>
         </li>
-        <li class="nav-item ms-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && !isChatbotPage()">
+        <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && !isChatbotPage()">
           <button class="btn btn-primary" type="button" (click)="onGetStarted()">Get Started</button>
         </li>
-        <li class="nav-item ms-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && isChatbotPage()">
+        <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && isChatbotPage()">
           <button class="btn btn-primary" type="button" (click)="onLogin()">Login</button>
         </li>
       </ul>
