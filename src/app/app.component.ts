@@ -1,5 +1,5 @@
 // src/app/app.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { AuthService } from './services/auth.service';
 
@@ -9,12 +9,14 @@ import { AuthService } from './services/auth.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Juris AI';
   isLoginPage = false;
   isRegisterPage = false;
   isLoggedIn = false;
   isDarkTheme = false;
+  private systemThemeMediaQuery: MediaQueryList;
+  private mediaQueryListener: ((e: MediaQueryListEvent) => void) | null = null;
 
   constructor(private router: Router, private authService: AuthService) {
     this.router.events.subscribe((event) => {
@@ -22,22 +24,42 @@ export class AppComponent implements OnInit {
         this.updateRouteState(event.url);
       }
     });
+
+    this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   }
 
   ngOnInit() {
     this.isLoggedIn = !!localStorage.getItem('token');
-
     const savedTheme = localStorage.getItem('theme');
-    this.isDarkTheme = savedTheme === 'dark';
+
+    if (savedTheme) {
+      this.isDarkTheme = savedTheme === 'dark';
+    } else {
+      this.isDarkTheme = this.systemThemeMediaQuery.matches;
+    }
+
     this.applyTheme();
+    this.mediaQueryListener = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        this.isDarkTheme = e.matches;
+        this.applyTheme();
+      }
+    };
+
+    this.systemThemeMediaQuery.addEventListener('change', this.mediaQueryListener);
 
     this.checkLoginTimestamp();
+  }
+
+  ngOnDestroy() {
+    if (this.mediaQueryListener) {
+      this.systemThemeMediaQuery.removeEventListener('change', this.mediaQueryListener);
+    }
   }
 
   toggleTheme(): void {
     this.isDarkTheme = !this.isDarkTheme;
     localStorage.setItem('theme', this.isDarkTheme ? 'dark' : 'light');
-
     this.applyTheme();
   }
 
