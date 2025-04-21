@@ -664,129 +664,304 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
   exportChatAsPDF(): void {
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+    try {
+      const startTime = performance.now();
+      console.log('Starting PDF export...');
 
-    const margin = 20;
-    const textWidth = pageWidth - 2 * margin;
-    const lineHeight = 7;
-    const messageSpacing = 10;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+        precision: 16
+      });
 
-    let yOffset = margin;
-    let currentPage = 1;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const textWidth = pageWidth - 2 * margin;
+      const lineHeight = 7;
+      const messageSpacing = 15;
 
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Chat History', margin, yOffset);
-    yOffset += 10;
+      const cleanText = (text: string): string => {
+        if (!text) return '';
 
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'italic');
-    const exportTime = new Date().toLocaleString();
-    pdf.text(`Exported on: ${exportTime}`, margin, yOffset);
-    yOffset += 15;
+        return text
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/?\s*p[^>]*>/gi, '\n')
+          .replace(/<li[^>]*>/gi, '• ')
+          .replace(/<\/li>/gi, '\n')
+          .replace(/<\/?\s*(?:div|h\d|span|strong|em|ul|ol)[^>]*>/gi, '')
+          .replace(/<[^>]*>?/gm, '')
+          .replace(/\*\*(.+?)\*\*/g, '$1')
+          .replace(/\*(.+?)\*/g, '$1')
+          .replace(/`(.+?)`/g, '$1')
+          .replace(/```[\s\S]*?```/g, '')
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+          .replace(/#{1,6}\s+(.+)$/gm, '$1')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+      };
 
-    for (let i = 0; i < this.messages.length; i++) {
-      const msg = this.messages[i];
-      const sender = msg.type === 'user' ? 'User' : 'Bot';
-      const timeStr = new Date(msg.time).toLocaleString();
-      const header = `${i + 1}. ${sender} (${timeStr}):`;
+      pdf.setProperties({
+        title: `Chat History - ${this.chatTitle}`,
+        subject: 'AI Assistant Chat Export',
+        author: this.username || 'User',
+        keywords: 'chat, history, export',
+        creator: 'Juris AI Assistant'
+      });
 
-      pdf.setFontSize(11);
+      pdf.setFillColor(42, 98, 195);
+      pdf.rect(0, 0, pageWidth, 40, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(24);
       pdf.setFont('helvetica', 'bold');
+      pdf.text('Chat History', margin, 28);
 
-      const headerHeight = lineHeight + 2;
-      pdf.setFontSize(10);
+      pdf.setFillColor(248, 249, 250);
+      pdf.rect(0, 40, pageWidth, pageHeight - 40, 'F');
+
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Chat Information', margin, 60);
+
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
-      const textLines = pdf.splitTextToSize(msg.text, textWidth);
-      const contentHeight = textLines.length * lineHeight;
 
-      const totalMessageHeight = headerHeight + contentHeight + messageSpacing;
+      let infoY = 75;
+      const infoSpacing = 10;
 
-      const remainingSpace = pageHeight - margin - yOffset;
-      const minimumContentToShow = headerHeight + (lineHeight * 2);
+      const chatTitleLines = pdf.splitTextToSize(`Title: ${this.chatTitle}`, textWidth);
+      pdf.text(chatTitleLines, margin, infoY);
+      infoY += (chatTitleLines.length * lineHeight) + 5;
 
-      if (remainingSpace < minimumContentToShow) {
-        pdf.addPage();
-        currentPage++;
-        yOffset = margin;
-
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'italic');
-        pdf.text('Chat History (continued)', margin, yOffset);
-        yOffset += 10;
+      const exportTime = new Date().toLocaleString();
+      pdf.text(`Exported on: ${exportTime}`, margin, infoY);
+      infoY += infoSpacing;
+      if (this.username) {
+        pdf.text(`User: ${this.username}`, margin, infoY);
+        infoY += infoSpacing;
       }
 
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'bold');
+      pdf.text(`Total messages: ${this.messages.length}`, margin, infoY);
+      infoY += infoSpacing;
 
-      if (msg.type === 'user') {
-        pdf.setFillColor(240, 240, 240);
-      } else {
-        pdf.setFillColor(230, 240, 250);
-      }
-      pdf.rect(margin - 2, yOffset - 5, textWidth + 4, headerHeight + 4, 'F');
-      pdf.text(header, margin, yOffset);
-      yOffset += headerHeight;
+      if (this.messages.length > 0) {
+        const firstDate = new Date(this.messages[0].time).toLocaleString();
+        pdf.text(`Chat started: ${firstDate}`, margin, infoY);
+        infoY += infoSpacing;
 
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      const maxLinesOnCurrentPage = Math.floor((pageHeight - margin - yOffset) / lineHeight);
+        const lastDate = new Date(this.messages[this.messages.length - 1].time).toLocaleString();
+        pdf.text(`Last message: ${lastDate}`, margin, infoY);
+        infoY += infoSpacing;
 
-      if (textLines.length <= maxLinesOnCurrentPage) {
-        pdf.text(textLines, margin, yOffset);
-        yOffset += contentHeight + messageSpacing;
-      } else {
-        let linesProcessed = 0;
+        const startTime = new Date(this.messages[0].time).getTime();
+        const endTime = new Date(this.messages[this.messages.length - 1].time).getTime();
+        const durationMs = endTime - startTime;
 
-        while (linesProcessed < textLines.length) {
-          const remainingLines = Math.min(
-            maxLinesOnCurrentPage,
-            textLines.length - linesProcessed
-          );
+        if (durationMs > 0) {
+          const durationMinutes = Math.floor(durationMs / 60000);
+          const durationHours = Math.floor(durationMinutes / 60);
+          const remainingMinutes = durationMinutes % 60;
 
-          const currentPageLines = textLines.slice(
-            linesProcessed,
-            linesProcessed + remainingLines
-          );
-          pdf.text(currentPageLines, margin, yOffset);
-          linesProcessed += remainingLines;
-          if (linesProcessed < textLines.length) {
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'italic');
-            pdf.text('(Continued on next page...)', margin, pageHeight - margin);
-
-            pdf.addPage();
-            currentPage++;
-            yOffset = margin;
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'italic');
-            pdf.text(`Chat History (continued) - Message ${i + 1}`, margin, yOffset);
-            yOffset += 10;
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'normal');
+          let durationText = '';
+          if (durationHours > 0) {
+            durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
+            if (remainingMinutes > 0) {
+              durationText += ` ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}`;
+            }
+          } else if (durationMinutes > 0) {
+            durationText = `${durationMinutes} minute${durationMinutes > 1 ? 's' : ''}`;
           } else {
-            yOffset += messageSpacing;
+            durationText = 'less than a minute';
           }
+
+          pdf.text(`Conversation duration: ${durationText}`, margin, infoY);
+          infoY += infoSpacing;
         }
       }
-      if (i < this.messages.length - 1) {
-        pdf.setDrawColor(200, 200, 200);
-        pdf.line(margin, yOffset - messageSpacing / 2, margin + textWidth, yOffset - messageSpacing / 2);
-      }
-    }
-    const totalPages = pdf.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      pdf.setPage(i);
-      pdf.setFontSize(9);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin - 25, pageHeight - margin);
-    }
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
-    pdf.save(`chat_history_${timestamp}.pdf`);
+      infoY += 10;
+      pdf.setDrawColor(100, 100, 100);
+      pdf.setLineWidth(0.3);
+      pdf.line(margin, infoY - 5, pageWidth - margin, infoY - 5);
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('This document contains an exported chat history from Juris AI Assistant.', margin, infoY);
+      infoY += 7;
+      pdf.text('The content of this export is confidential and for personal use only.', margin, infoY);
+
+      pdf.setFontSize(8);
+      pdf.text('© ' + new Date().getFullYear() + ' Juris. All rights reserved.', margin, pageHeight - margin);
+
+      pdf.addPage();
+      let yOffset = margin;
+      let currentPage = 2;
+
+      pdf.setFillColor(235, 240, 250);
+      pdf.rect(margin - 5, yOffset - 10, textWidth + 10, 20, 'F');
+
+      pdf.setFontSize(14);
+      pdf.setTextColor(60, 60, 60);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Conversation', margin, yOffset);
+      yOffset += 20;
+
+      for (let i = 0; i < this.messages.length; i++) {
+        const msg = this.messages[i];
+        const sender = msg.type === 'user' ? 'User' : 'Bot';
+        const timeStr = new Date(msg.time).toLocaleString();
+        const header = `${i + 1}. ${sender} (${timeStr}):`;
+
+        const messageText = cleanText(msg.text);
+
+        const headerHeight = lineHeight + 3;
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        const textLines = pdf.splitTextToSize(messageText, textWidth);
+        const contentHeight = textLines.length * lineHeight;
+
+        const remainingSpace = pageHeight - margin - yOffset;
+        const minimumContentToShow = headerHeight + (lineHeight * 2);
+
+        if (remainingSpace < minimumContentToShow) {
+          pdf.addPage();
+          currentPage++;
+          yOffset = margin;
+
+          pdf.setFillColor(235, 240, 250);
+          pdf.rect(margin - 5, yOffset - 10, textWidth + 10, 15, 'F');
+          pdf.setFontSize(12);
+          pdf.setTextColor(60, 60, 60);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('Conversation (continued)', margin, yOffset);
+          yOffset += 15;
+        }
+
+        if (msg.type === 'user') {
+          pdf.setFillColor(240, 240, 240);
+          pdf.setTextColor(50, 50, 50);
+        } else {
+          pdf.setFillColor(230, 240, 250);
+          pdf.setTextColor(40, 40, 40);
+        }
+
+        pdf.setDrawColor(200, 200, 200);
+        pdf.roundedRect(margin - 3, yOffset - 5, textWidth + 6, headerHeight + 4, 2, 2, 'FD');
+
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(header, margin, yOffset);
+        yOffset += headerHeight;
+
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+
+        const messageBackgroundHeight = Math.max(contentHeight + 5, 10);
+        pdf.setFillColor(255, 255, 255);
+        pdf.roundedRect(margin - 3, yOffset - 4, textWidth + 6, messageBackgroundHeight, 1, 1, 'F');
+
+        const maxLinesOnCurrentPage = Math.floor((pageHeight - margin - yOffset) / lineHeight);
+
+        if (textLines.length <= maxLinesOnCurrentPage) {
+          pdf.text(textLines, margin, yOffset);
+          yOffset += contentHeight + messageSpacing;
+        } else {
+          let linesProcessed = 0;
+
+          while (linesProcessed < textLines.length) {
+            const actualLinesOnPage = Math.min(
+              maxLinesOnCurrentPage,
+              textLines.length - linesProcessed
+            );
+
+            const currentPageLines = textLines.slice(
+              linesProcessed,
+              linesProcessed + actualLinesOnPage
+            );
+
+            pdf.text(currentPageLines, margin, yOffset);
+            linesProcessed += actualLinesOnPage;
+
+            if (linesProcessed < textLines.length) {
+              pdf.setFontSize(9);
+              pdf.setFont('helvetica', 'italic');
+              pdf.setTextColor(100, 100, 100);
+              pdf.text('(Continued on next page...)', margin, pageHeight - margin);
+
+              pdf.addPage();
+              currentPage++;
+              yOffset = margin;
+
+              pdf.setFillColor(245, 245, 250);
+              pdf.rect(0, 0, pageWidth, 20, 'F');
+
+              pdf.setTextColor(80, 80, 80);
+              pdf.setFontSize(10);
+              pdf.setFont('helvetica', 'italic');
+              pdf.text(`Message ${i + 1} (continued from previous page)`, margin, 15);
+
+              pdf.setTextColor(0, 0, 0);
+              pdf.setFontSize(10);
+              pdf.setFont('helvetica', 'normal');
+            } else {
+              yOffset += messageSpacing;
+            }
+          }
+        }
+
+        if (i < this.messages.length - 1) {
+          pdf.setDrawColor(210, 210, 210);
+          pdf.setLineWidth(0.5);
+          pdf.line(margin, yOffset - messageSpacing / 2, margin + textWidth, yOffset - messageSpacing / 2);
+        }
+
+        if (i > 0 && i % 10 === 0) {
+          console.log(`Processing message ${i} of ${this.messages.length}...`);
+        }
+      }
+
+      const totalPages = pdf.getNumberOfPages();
+      console.log(`PDF generated with ${totalPages} pages`);
+
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        if (i > 1) {
+          pdf.setFillColor(245, 245, 250);
+          pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+        }
+        pdf.setFontSize(9);
+        pdf.setTextColor(120, 120, 120);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin - 25, pageHeight - 7);
+        if (i > 1) {
+          const shortTime = new Date().toLocaleTimeString();
+          pdf.text(`Generated: ${shortTime}`, margin, pageHeight - 7);
+        }
+      }
+
+      const safeTitle = this.chatTitle
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase()
+        .substring(0, 30);
+
+      const timestamp = new Date().toISOString()
+        .replace(/[:.]/g, '-')
+        .substring(0, 19);
+
+      const fileName = `chat_${safeTitle}_${timestamp}.pdf`;
+
+      pdf.save(fileName);
+      const endTime = performance.now();
+      const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+      console.log(`PDF successfully exported in ${timeTaken} seconds with ${totalPages} pages`);
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('There was a problem generating the PDF. Please try again.');
+    }
   }
 }
