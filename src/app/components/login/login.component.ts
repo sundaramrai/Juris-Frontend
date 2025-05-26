@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent implements OnInit {
   isLoading = false;
+  isSubmitting = false;
   loginForm: FormGroup;
   errorMessage: string | null = null;
   showPassword = false;
@@ -38,11 +39,19 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin() {
-    if (this.loginForm.invalid) {
+    if (this.isSubmitting) {
+      return;
+    }
+    if (!this.isSubmitting && this.loginForm.invalid) {
+      Object.keys(this.loginForm.controls).forEach(key => {
+        const control = this.loginForm.get(key);
+        control?.markAsTouched();
+      });
       return;
     }
 
     this.isLoading = true;
+    this.isSubmitting = true;
     this.errorMessage = null;
 
     const credentials = this.loginForm.value;
@@ -60,6 +69,7 @@ export class LoginComponent implements OnInit {
       error: (error) => {
         console.error("❌ Login failed:", error);
         this.isLoading = false;
+        this.isSubmitting = false;
         this.errorMessage = error.error?.message || 'Login failed';
       }
     });

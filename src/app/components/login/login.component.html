@@ -18,11 +18,11 @@
             <span class="input-group-text"><mat-icon>person</mat-icon></span>
             <input type="text" class="form-control" id="username" formControlName="username"
               placeholder="Enter your username"
-              [class.is-invalid]="loginForm.get('username')?.invalid && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)"
+              [class.is-invalid]="!isSubmitting && loginForm.get('username')?.invalid && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)"
               (input)="onUsernameInput($event)" required />
           </div>
           <ng-container
-            *ngIf="loginForm.get('username')?.errors && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)">
+            *ngIf="!isSubmitting && loginForm.get('username')?.errors && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)">
             <p class="text-danger mt-1" *ngIf="loginForm.get('username')?.errors?.['required']">
               Username is required.
             </p>
@@ -35,14 +35,14 @@
             <span class="input-group-text"><mat-icon>lock</mat-icon></span>
             <input [type]="showPassword ? 'text' : 'password'" class="form-control" id="password"
               formControlName="password" placeholder="Enter your password"
-              [class.is-invalid]="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
+              [class.is-invalid]="!isSubmitting && loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
               required />
             <span class="input-group-text bg-light" (click)="togglePasswordVisibility()" style="cursor: pointer;">
               <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </span>
           </div>
           <ng-container
-            *ngIf="loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)">
+            *ngIf="!isSubmitting && loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)">
             <p class="text-danger mt-1" *ngIf="loginForm.get('password')?.errors?.['required']">
               Password is required.
             </p>
@@ -50,7 +50,7 @@
         </div>
 
         <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-primary shadow-sm" [disabled]="loginForm.invalid || isLoading">
+          <button type="submit" class="btn btn-primary shadow-sm" [disabled]="!isSubmitting && (loginForm.invalid || isLoading)">
             <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
             {{ isLoading ? 'Logging in...' : 'Login' }}
           </button>
