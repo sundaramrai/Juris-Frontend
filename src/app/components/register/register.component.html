@@ -21,11 +21,11 @@
             <div class="input-group">
               <span class="input-group-text"><mat-icon>email</mat-icon></span>
               <input type="email" class="form-control" id="email" formControlName="email" placeholder="Enter your email"
-                [class.is-invalid]="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)"
+                [class.is-invalid]="!isSubmitting && registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)"
                 required />
             </div>
             <ng-container
-              *ngIf="registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)">
+              *ngIf="!isSubmitting && registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)">
               <p class="text-danger mt-1" *ngIf="registerForm.get('email')?.errors?.['required']">
                 Email is required.
               </p>
@@ -51,11 +51,11 @@
               <span class="input-group-text"><mat-icon>person</mat-icon></span>
               <input type="text" class="form-control" id="username" formControlName="username"
                 placeholder="Choose a username"
-                [class.is-invalid]="registerForm.get('username')?.invalid && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)"
+                [class.is-invalid]="!isSubmitting && registerForm.get('username')?.invalid && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)"
                 (input)="onUsernameInput($event)" required />
             </div>
             <ng-container
-              *ngIf="registerForm.get('username')?.errors && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)">
+              *ngIf="!isSubmitting && registerForm.get('username')?.errors && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)">
               <p class="text-danger mt-1" *ngIf="registerForm.get('username')?.errors?.['required']">
                 Username is required.
               </p>
@@ -84,14 +84,14 @@
               <span class="input-group-text"><mat-icon>lock</mat-icon></span>
               <input [type]="showPassword ? 'text' : 'password'" class="form-control" id="password"
                 formControlName="password" placeholder="Create a strong password"
-                [class.is-invalid]="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)"
+                [class.is-invalid]="!isSubmitting && registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)"
                 required />
               <span class="input-group-text bg-light" (click)="togglePasswordVisibility()" style="cursor: pointer;">
                 <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
               </span>
             </div>
             <ng-container
-              *ngIf="registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)">
+              *ngIf="!isSubmitting && registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)">
               <p class="text-danger mt-1" *ngIf="registerForm.get('password')?.errors?.['required']">
                 Password is required.
               </p>
@@ -103,7 +103,7 @@
               lowercase letters</small>
           </div>
           <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isLoading">
+            <button type="submit" class="btn btn-primary" [disabled]="!isSubmitting && (registerForm.invalid || isLoading)">
               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
               {{ isLoading ? 'Sending OTP...' : 'Send OTP' }}
             </button>
@@ -124,8 +124,9 @@
               placeholder="6-digit OTP"
               maxlength="6"
               (input)="onOtpInput($event)"
+              [class.is-invalid]="!isSubmitting && otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)"
             />
-            <div *ngIf="otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)" class="text-danger mt-1">
+            <div *ngIf="!isSubmitting && otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)" class="text-danger mt-1">
               <small *ngIf="otpForm.get('otp')?.errors?.['required']">OTP is required</small>
               <small *ngIf="otpForm.get('otp')?.errors?.['minlength'] || otpForm.get('otp')?.errors?.['maxlength']">
                 OTP must be 6 digits
@@ -133,7 +134,7 @@
             </div>
           </div>
           <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="otpForm.invalid || isLoading">
+            <button type="submit" class="btn btn-primary" [disabled]="!isSubmitting && (otpForm.invalid || isLoading)">
               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
               {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
             </button>

@@ -13,6 +13,7 @@ import { TldService } from '../../services/tld.service';
 })
 export class RegisterComponent implements OnInit {
   isLoading = false;
+  isSubmitting = false;
   registerForm: FormGroup;
   errorMessage: string | null = null;
   showPassword = false;
@@ -135,7 +136,10 @@ export class RegisterComponent implements OnInit {
   }
 
   onRegister() {
-    if (this.registerForm.invalid) {
+    if (this.isSubmitting) {
+      return;
+    }
+    if (!this.isSubmitting && this.registerForm.invalid) {
       Object.keys(this.registerForm.controls).forEach(key => {
         const control = this.registerForm.get(key);
         control?.markAsTouched();
@@ -144,6 +148,7 @@ export class RegisterComponent implements OnInit {
     }
 
     this.isLoading = true;
+    this.isSubmitting = true;
     this.errorMessage = null;
 
     const userData = this.registerForm.value;
@@ -154,6 +159,7 @@ export class RegisterComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
+        this.isSubmitting = false;
         if (error.error.message.includes('username')) {
           this.errorMessage = 'Username already exists. Please choose a different username.';
         } else if (error.error.message.includes('email')) {
@@ -170,7 +176,10 @@ export class RegisterComponent implements OnInit {
   }
 
   onRequestOTP() {
-    if (this.registerForm.invalid) {
+    if (this.isSubmitting) {
+      return;
+    }
+    if (!this.isSubmitting && this.registerForm.invalid) {
       Object.keys(this.registerForm.controls).forEach(key => {
         const control = this.registerForm.get(key);
         control?.markAsTouched();
@@ -179,6 +188,7 @@ export class RegisterComponent implements OnInit {
     }
 
     this.isLoading = true;
+    this.isSubmitting = true;
     this.errorMessage = null;
 
     const userData = this.registerForm.value;
@@ -187,25 +197,36 @@ export class RegisterComponent implements OnInit {
         this.isLoading = false;
         this.isOtpSent = true;
         this.registrationEmail = userData.email;
+        this.isSubmitting = false;
       },
       error: (error) => {
         this.isLoading = false;
+        this.isSubmitting = false;
         this.errorMessage = error.error.message || 'OTP request failed';
       }
     });
   }
 
   onVerifyOTP() {
-    if (this.otpForm.invalid) {
+    if (this.isSubmitting) {
+      return;
+    }
+    if (!this.isSubmitting && this.otpForm.invalid) {
+      Object.keys(this.otpForm.controls).forEach(key => {
+        const control = this.otpForm.get(key);
+        control?.markAsTouched();
+      });
       return;
     }
 
     this.isLoading = true;
+    this.isSubmitting = true;
     this.errorMessage = null;
 
     if (!this.registrationEmail) {
       this.errorMessage = 'Email is required for OTP verification.';
       this.isLoading = false;
+      this.isSubmitting = false;
       return;
     }
 
@@ -221,6 +242,7 @@ export class RegisterComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
+        this.isSubmitting = false;
         this.errorMessage = error.error.message || 'OTP verification failed';
       }
     });
