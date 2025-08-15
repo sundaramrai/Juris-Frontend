@@ -249,8 +249,7 @@
   min-height: 42px;
   max-height: 150px;
   resize: none;
-  overflow-y: hidden;
-  overflow: auto;
+  overflow-y: auto;
   line-height: 1.2;
   padding: 10px 14px;
   transition: all 0.2s ease;
