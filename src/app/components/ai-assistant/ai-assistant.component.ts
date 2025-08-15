@@ -378,14 +378,14 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     const headerRegex = new RegExp(`^(${sectionNames.join('|')})\\s*:\\s*(.*)$`, 'i');
 
     const lines = cleanedText.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      const headerMatch = line.match(headerRegex);
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      const headerMatch = trimmedLine.match(headerRegex);
       if (headerMatch) {
         currentSection = headerMatch[1].trim();
         sections[currentSection] = headerMatch[2].trim();
       } else if (currentSection) {
-        sections[currentSection] += "\n" + line;
+        sections[currentSection] += "\n" + trimmedLine;
       }
     }
 

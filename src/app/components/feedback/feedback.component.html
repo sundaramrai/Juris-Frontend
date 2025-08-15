@@ -1,6 +1,6 @@
 <!-- src/app/components/feedback/feedback.component.html -->
-<div *ngIf="successPopup" class="popup-overlay" (click)="closePopup($event)">
-  <div class="popup-card" (click)="$event.stopPropagation()">
+<div *ngIf="successPopup" class="popup-overlay" (click)="closePopup($event)" (keydown.enter)="closePopup($event)">
+  <div class="popup-card" (click)="$event.stopPropagation()" (keydown.enter)="closePopup($event)">
     <img
       src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmUzemdla3U5emw5MHptbHdrajhvcGNieGRjNjhoajQ1NG9yYW0wNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/lwdArutvbQTeuBDEBZ/giphy.gif"
       alt="Success" class="img-fluid" style="max-width: 100px;">
@@ -19,7 +19,7 @@
 
     <form [formGroup]="feedbackForm" (ngSubmit)="submitFeedback()">
       <div class="mb-3">
-        <label class="form-label fw-bold">How satisfied are you?</label>
+        <label for="satisfaction" class="form-label fw-bold">How satisfied are you?</label>
         <div class="d-flex gap-2">
           <ng-container *ngFor="let rating of ratings">
             <button type="button" class="btn"
@@ -35,14 +35,14 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">What issues did you face?</label>
-        <textarea class="form-control" rows="3" formControlName="issues"
+        <label for="issues" class="form-label fw-bold">What issues did you face?</label>
+        <textarea id="issues" class="form-control" rows="3" formControlName="issues"
           placeholder="Describe any problems you faced..."></textarea>
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-bold">What can we improve?</label>
-        <textarea class="form-control" rows="3" formControlName="improvements"
+        <label for="improvements" class="form-label fw-bold">What can we improve?</label>
+        <textarea id="improvements" class="form-control" rows="3" formControlName="improvements"
           placeholder="Share your suggestions..."></textarea>
       </div>
 

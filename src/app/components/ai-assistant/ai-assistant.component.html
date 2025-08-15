@@ -7,7 +7,7 @@
         <mat-icon class="text-white">chat</mat-icon>
       </div>
 
-      <div class="chat-title-container" *ngIf="!editingTitle" (click)="startEditingTitle()">
+      <div class="chat-title-container" *ngIf="!editingTitle" (click)="startEditingTitle()" (keydown.enter)="saveChatTitle()" (keyup.enter)="saveChatTitle()">
         <h5 class="mb-0 fw-bold text-primary chat-title" [ngClass]="{'title-saved': titleJustSaved}"
           [matTooltip]="chatTitle" matTooltipPosition="above">{{ chatTitle }}
         </h5>
