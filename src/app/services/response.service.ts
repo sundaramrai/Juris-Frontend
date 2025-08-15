@@ -56,9 +56,6 @@ export class ResponseService {
     }
 
     return this.http.post<{ chatId: string, title: string }>(`${API_URL}/chat/new`, {}).pipe(
-      tap(response => {
-        this.setCurrentChatId(response.chatId);
-      }),
       catchError(error => {
         console.error('Error creating new chat:', error);
         return throwError(() => error);
