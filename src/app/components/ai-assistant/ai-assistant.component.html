@@ -32,7 +32,8 @@
       </p>
 
       <div class="ms-auto d-flex">
-        <button class="btn btn-icon d-flex align-items-center" matTooltip="Start new chat" (click)="createNewChat()">
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Start new chat" (click)="createNewChat()"
+        *ngIf="!chatNotFound && messages.length > 0">
           <mat-icon class="text-primary">add</mat-icon>
         </button>
         <button class="btn btn-icon d-flex align-items-center" matTooltip="Share your chat" (click)="exportChatAsPDF()"
