@@ -31,15 +31,15 @@
           class="badge bg-success text-white rounded-pill px-2 py-1 status-text">Speaking...</span>
       </p>
 
-      <div class="ms-auto d-flex align-items-center">
-        <button class="btn btn-icon" matTooltip="Start new chat" (click)="createNewChat()">
+      <div class="ms-auto d-flex">
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Start new chat" (click)="createNewChat()">
           <mat-icon class="text-primary">add</mat-icon>
         </button>
-        <button class="btn btn-icon" matTooltip="Share your chat" (click)="exportChatAsPDF()"
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Share your chat" (click)="exportChatAsPDF()"
           *ngIf="!chatNotFound && messages.length > 0">
           <mat-icon class="text-primary">share</mat-icon>
         </button>
-        <button class="btn btn-icon ms-2" matTooltip="More options" [matMenuTriggerFor]="menu" *ngIf="!chatNotFound">
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="More options" [matMenuTriggerFor]="menu" *ngIf="!chatNotFound">
           <mat-icon class="text-primary">more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu" xPosition="before" class="custom-menu bg-white">
