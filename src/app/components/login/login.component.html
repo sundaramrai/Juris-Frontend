@@ -37,9 +37,10 @@
               formControlName="password" placeholder="Enter your password"
               [class.is-invalid]="!isSubmitting && loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
               required />
-            <span class="input-group-text bg-light" (click)="togglePasswordVisibility()" style="cursor: pointer;">
+            <button type="button" class="input-group-text bg-light" (click)="togglePasswordVisibility()"
+              aria-label="Toggle password visibility" style="border: 1px solid white; cursor: pointer;">
               <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </span>
+            </button>
           </div>
           <ng-container
             *ngIf="!isSubmitting && loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)">
@@ -50,8 +51,9 @@
         </div>
 
         <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-primary shadow-sm" [disabled]="!isSubmitting && (loginForm.invalid || isLoading)">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+          <button type="submit" class="btn btn-primary shadow-sm"
+            [disabled]="!isSubmitting && (loginForm.invalid || isLoading)">
+            <output *ngIf="isLoading"><span class="spinner-border spinner-border-sm me-1"></span></output>
             {{ isLoading ? 'Logging in...' : 'Login' }}
           </button>
           <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center"
