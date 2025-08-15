@@ -66,8 +66,24 @@ export class AppComponent implements OnInit, OnDestroy {
   private applyTheme(): void {
     if (this.isDarkTheme) {
       document.body.classList.add('dark-theme');
+      this.updateFavicon('dark');
     } else {
       document.body.classList.remove('dark-theme');
+      this.updateFavicon('light');
+    }
+  }
+
+  private updateFavicon(theme: 'light' | 'dark'): void {
+    const favicon = document.getElementById('favicon') as HTMLLinkElement;
+    if (favicon) {
+      const timestamp = new Date().getTime();
+      if (theme === 'dark') {
+        favicon.href = `logo-white.svg?v=${timestamp}`;
+      } else {
+        favicon.href = `logo-blue.svg?v=${timestamp}`;
+      }
+    } else {
+      console.error('Favicon element not found');
     }
   }
 
