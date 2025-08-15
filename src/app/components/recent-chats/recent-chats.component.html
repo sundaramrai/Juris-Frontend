@@ -4,18 +4,18 @@
     <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap">
       <h5 class="card-title fw-bold text-primary mb-2 mb-sm-0">Recent Chats</h5>
       <div class="d-flex">
-        <button class="btn btn-icon" matTooltip="Create new chat" (click)="createNewChat()">
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Create new chat" (click)="createNewChat()">
           <mat-icon class="text-primary">add_circle</mat-icon>
         </button>
-        <button class="btn btn-icon ms-2" matTooltip="Refresh chats" (click)="refreshChats()">
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Refresh chats" (click)="refreshChats()">
           <mat-icon class="text-primary">refresh</mat-icon>
         </button>
       </div>
     </div>
 
     <div *ngIf="isLoading && chats.length === 0" class="text-center py-4">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+      <div class="spinner-border text-primary">
+        <output class="visually-hidden">Loading...</output>
       </div>
     </div>
 
@@ -59,7 +59,9 @@
 
       <div *ngIf="hasMoreChats" class="text-center mt-3">
         <button class="btn btn-outline-primary btn-sm" [disabled]="isLoading" (click)="loadMoreChats()">
-          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1">
+            <output class="visually-hidden">Loading more chats...</output>
+          </span>
           Load More
         </button>
       </div>
