@@ -37,22 +37,10 @@
           *ngIf="!chatNotFound && messages.length > 0">
           <mat-icon class="text-primary">add</mat-icon>
         </button>
-        <button class="btn btn-icon d-flex align-items-center" matTooltip="More options" [matMenuTriggerFor]="menu"
-          *ngIf="!chatNotFound">
-          <mat-icon class="text-primary">more_vert</mat-icon>
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Delete chat" (click)="clearChat()"
+          *ngIf="!chatNotFound && messages.length > 0">
+          <mat-icon class="text-primary">delete</mat-icon>
         </button>
-        <mat-menu #menu="matMenu" xPosition="before" class="custom-menu bg-white">
-          <div class="px-3 py-2 border-bottom" *ngIf="username">
-            <div class="d-flex align-items-center">
-              <mat-icon class="text-primary me-2">person</mat-icon>
-              <span class="fw-medium text-primary">{{ username }}</span>
-            </div>
-          </div>
-          <button mat-menu-item class="d-flex align-items-center px-3 py-2 border-0 bg-transparent" (click)="clearChat()">
-            <mat-icon class="text-primary me-2">delete</mat-icon>
-            <span class="text-primary fw-medium">Clear Chat</span>
-          </button>
-        </mat-menu>
       </div>
     </div>
   </div>

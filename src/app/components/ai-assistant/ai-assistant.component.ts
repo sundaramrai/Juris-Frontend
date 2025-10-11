@@ -11,13 +11,12 @@ import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatMenuTrigger, MatMenu } from '@angular/material/menu';
 
 @Component({
   selector: 'app-ai-assistant',
   templateUrl: './ai-assistant.component.html',
   styleUrls: ['./ai-assistant.component.css'],
-  imports: [NgIf, NgClass, NgFor, CommonModule, MatIconModule, MatTooltipModule, ReactiveFormsModule, MatMenu, MatMenuTrigger, FormsModule],
+  imports: [NgIf, NgClass, NgFor, CommonModule, MatIconModule, MatTooltipModule, ReactiveFormsModule, FormsModule],
 })
 export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   messages: Message[] = [];
@@ -611,6 +610,10 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clearChat(): void {
     if (!this.chatId) return;
+    const confirmed = window.confirm('Are you sure you want to clear this chat? This action cannot be undone.');
+    if (!confirmed) {
+      return;
+    }
 
     this.isLoading = true;
     this.responseService.clearChat(this.chatId).subscribe({
