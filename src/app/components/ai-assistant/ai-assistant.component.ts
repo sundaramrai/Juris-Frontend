@@ -73,6 +73,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         this.responseService.setCurrentChatId(newChatId);
         this.loadChatHistory(newChatId);
       } else {
+        this.responseService.setCurrentChatId(null);
         this.createNewChat();
       }
     });
@@ -110,7 +111,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         this.chatTitle = response.title;
         this.messages = [];
         this.router.navigate(['/tools/assistant'], {
-          queryParams: { chatId: response.chatId },
+          queryParams: {},
           replaceUrl: true
         });
         this.isLoading = false;
@@ -496,15 +497,16 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         this.chatTitle = data.title;
         this.scrollToBottom();
         this.isLoading = false;
+        if (!this.messages.length) {
+          this.router.navigate(['/tools/assistant'], {
+            queryParams: {},
+            replaceUrl: true
+          });
+        }
       },
       error: (error) => {
         console.error('Error loading chat history:', error);
-        if (error.status === 404) {
-          console.log('Chat not found, creating new chat...');
-          this.createNewChat();
-        } else {
-          this.createNewChat();
-        }
+        this.createNewChat();
       }
     });
   }
@@ -557,7 +559,12 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (response.chatId && this.chatId !== response.chatId) {
           this.chatId = response.chatId;
-          this.router.navigate(['/tools/assistant'], { queryParams: { chatId: response.chatId }, replaceUrl: true });
+        }
+        if (this.chatId) {
+          this.router.navigate(['/tools/assistant'], {
+            queryParams: { chatId: this.chatId },
+            replaceUrl: true
+          });
         }
 
         this.scrollToBottom();
