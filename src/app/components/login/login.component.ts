@@ -1,14 +1,17 @@
 // src/app/components/login/login.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule, NgIf } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-login',
-  standalone: false,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
+  imports: [NgIf, CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule]
 })
 export class LoginComponent implements OnInit {
   isLoading = false;
