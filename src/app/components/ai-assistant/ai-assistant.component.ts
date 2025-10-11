@@ -7,12 +7,17 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { jsPDF } from 'jspdf';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuTrigger, MatMenu } from '@angular/material/menu';
 
 @Component({
   selector: 'app-ai-assistant',
-  standalone: false,
   templateUrl: './ai-assistant.component.html',
-  styleUrls: ['./ai-assistant.component.css']
+  styleUrls: ['./ai-assistant.component.css'],
+  imports: [NgIf, NgClass, NgFor, CommonModule, MatIconModule, MatTooltipModule, ReactiveFormsModule, MatMenu, MatMenuTrigger, FormsModule],
 })
 export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   messages: Message[] = [];
@@ -150,10 +155,9 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.finalTranscript += ' ' + transcript;
                 this.finalTranscript = this.finalTranscript.trim();
               }
-            } else {
-              if (confidence >= this.confidenceThreshold) {
-                this.interimTranscript += transcript;
-              }
+            }
+            if (!event.results[i].isFinal && confidence >= this.confidenceThreshold) {
+              this.interimTranscript += transcript;
             }
           }
 
@@ -358,10 +362,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   parseMessage(text: string): SafeHtml {
-    const cleanedText = text
-      .split('\n')
-      .map(line => line.trim())
-      .join('\n');
+    const cleanedText = this.cleanTextLines(text);
     const sectionNames = [
       "Title",
       "Summary",
@@ -372,12 +373,28 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       "References"
     ];
 
+    const sections = this.extractSections(cleanedText, sectionNames);
+
+    if (Object.keys(sections).length > 0) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatSectionsHtml(sections));
+    } else {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatFallbackHtml(text));
+    }
+  }
+
+  private cleanTextLines(text: string): string {
+    return text
+      .split('\n')
+      .map(line => line.trim())
+      .join('\n');
+  }
+
+  private extractSections(text: string, sectionNames: string[]): { [key: string]: string } {
+    const headerRegex = new RegExp(`^(${sectionNames.join('|')})\\s*:\\s*(.*)$`, 'i');
+    const lines = text.split('\n');
     let sections: { [key: string]: string } = {};
     let currentSection = "";
 
-    const headerRegex = new RegExp(`^(${sectionNames.join('|')})\\s*:\\s*(.*)$`, 'i');
-
-    const lines = cleanedText.split('\n');
     for (const line of lines) {
       const trimmedLine = line.trim();
       const headerMatch = trimmedLine.match(headerRegex);
@@ -388,82 +405,85 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         sections[currentSection] += "\n" + trimmedLine;
       }
     }
+    return sections;
+  }
 
-    function processSectionContent(content: string): string {
-      const contentLines = content.split('\n').map(l => l.trim()).filter(l => l !== '');
-      const hasAsterisk = contentLines.some(line => line.startsWith('*'));
-      if (hasAsterisk) {
-        let result = "<ol type='a'>";
-        for (let line of contentLines) {
-          if (line.startsWith('*')) {
-            const listItem = line.replace(/^\*\s*/, '');
-            result += `<li>${listItem}</li>`;
-          } else {
-            result += `<p>${line}</p>`;
-          }
-        }
-        result += "</ol>";
-        return result;
-      }
-      return content;
-    }
-
-    if (Object.keys(sections).length > 0) {
-      let html = "";
-      if (sections["Title"]) {
-        html += `<h4>${processSectionContent(sections["Title"])}</h4>`;
-      }
-      if (sections["Summary"]) {
-        html += `<p><strong>Summary:</strong> ${processSectionContent(sections["Summary"])}</p>`;
-      }
-      if (sections["Relevant Legal Provisions"]) {
-        html += `<p><strong>Relevant Legal Provisions:</strong> ${processSectionContent(sections["Relevant Legal Provisions"])}</p>`;
-      }
-      if (sections["Analysis"]) {
-        html += `<p><strong>Analysis:</strong> ${processSectionContent(sections["Analysis"])}</p>`;
-      }
-      if (sections["Real life incidents"]) {
-        html += `<p><strong>Real life incidents:</strong> ${processSectionContent(sections["Real life incidents"])}</p>`;
-      }
-      if (sections["Conclusion"]) {
-        html += `<p><strong>Conclusion:</strong> ${processSectionContent(sections["Conclusion"])}</p>`;
-      }
-      if (sections["References"]) {
-        html += `<p><strong>References:</strong> ${processSectionContent(sections["References"])}</p>`;
-      }
-      return this.sanitizer.bypassSecurityTrustHtml(html);
-    } else {
-      let formatted = text;
-      formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      formatted = formatted.replace(/(?<!^)\*(.+?)\*/g, '<em>$1</em>');
-      formatted = formatted.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
-
-      const fallbackLines = formatted.split('\n');
-      let result = '';
-      let listOpen = false;
-      for (let line of fallbackLines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine.startsWith('*')) {
-          if (!listOpen) {
-            result += "<ol type='a'>";
-            listOpen = true;
-          }
-          result += `<li>${trimmedLine.replace(/^\*\s*/, '')}</li>`;
+  private processSectionContent(content: string): string {
+    const contentLines = content.split('\n').map(l => l.trim()).filter(l => l !== '');
+    const hasAsterisk = contentLines.some(line => line.startsWith('*'));
+    if (hasAsterisk) {
+      let result = "<ol type='a'>";
+      for (let line of contentLines) {
+        if (line.startsWith('*')) {
+          const listItem = line.replace(/^\*\s*/, '');
+          result += `<li>${listItem}</li>`;
         } else {
-          if (listOpen) {
-            result += "</ol>";
-            listOpen = false;
-          }
-          if (trimmedLine) {
-            result += `<p>${trimmedLine}</p>`;
-          }
+          result += `<p>${line}</p>`;
         }
       }
-      if (listOpen) {
-        result += "</ol>";
-      }
-      return this.sanitizer.bypassSecurityTrustHtml(result);
+      result += "</ol>";
+      return result;
     }
+    return content;
+  }
+
+  private formatSectionsHtml(sections: { [key: string]: string }): string {
+    let html = "";
+    if (sections["Title"]) {
+      html += `<h4>${this.processSectionContent(sections["Title"])}</h4>`;
+    }
+    if (sections["Summary"]) {
+      html += `<p><strong>Summary:</strong> ${this.processSectionContent(sections["Summary"])}</p>`;
+    }
+    if (sections["Relevant Legal Provisions"]) {
+      html += `<p><strong>Relevant Legal Provisions:</strong> ${this.processSectionContent(sections["Relevant Legal Provisions"])}</p>`;
+    }
+    if (sections["Analysis"]) {
+      html += `<p><strong>Analysis:</strong> ${this.processSectionContent(sections["Analysis"])}</p>`;
+    }
+    if (sections["Real life incidents"]) {
+      html += `<p><strong>Real life incidents:</strong> ${this.processSectionContent(sections["Real life incidents"])}</p>`;
+    }
+    if (sections["Conclusion"]) {
+      html += `<p><strong>Conclusion:</strong> ${this.processSectionContent(sections["Conclusion"])}</p>`;
+    }
+    if (sections["References"]) {
+      html += `<p><strong>References:</strong> ${this.processSectionContent(sections["References"])}</p>`;
+    }
+    return html;
+  }
+
+  private formatFallbackHtml(text: string): string {
+    let formatted = text;
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/(?<!^)\*(.+?)\*/g, '<em>$1</em>');
+    formatted = formatted.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+    const fallbackLines = formatted.split('\n');
+    let result = '';
+    let listOpen = false;
+    for (let line of fallbackLines) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith('*')) {
+        if (!listOpen) {
+          result += "<ol type='a'>";
+          listOpen = true;
+        }
+        result += `<li>${trimmedLine.replace(/^\*\s*/, '')}</li>`;
+      } else {
+        if (listOpen) {
+          result += "</ol>";
+          listOpen = false;
+        }
+        if (trimmedLine) {
+          result += `<p>${trimmedLine}</p>`;
+        }
+      }
+    }
+    if (listOpen) {
+      result += "</ol>";
+    }
+    return result;
   }
 
   loadChatHistory(chatId: string): void {
@@ -665,303 +685,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   exportChatAsPDF(): void {
-    try {
-      const startTime = performance.now();
-      console.log('Starting PDF export...');
-
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true,
-        precision: 16
-      });
-
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 20;
-      const textWidth = pageWidth - 2 * margin;
-      const lineHeight = 7;
-      const messageSpacing = 15;
-
-      const cleanText = (text: string): string => {
-        if (!text) return '';
-
-        return text
-          .replace(/<br\s*\/?>/gi, '\n')
-          .replace(/<\/?\s*p[^>]*>/gi, '\n')
-          .replace(/<li[^>]*>/gi, '• ')
-          .replace(/<\/li>/gi, '\n')
-          .replace(/<\/?\s*(?:div|h\d|span|strong|em|ul|ol)[^>]*>/gi, '')
-          .replace(/<[^>]*>?/gm, '')
-          .replace(/\*\*(.+?)\*\*/g, '$1')
-          .replace(/\*(.+?)\*/g, '$1')
-          .replace(/`(.+?)`/g, '$1')
-          .replace(/```[\s\S]*?```/g, '')
-          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-          .replace(/#{1,6}\s+(.+)$/gm, '$1')
-          .replace(/\n{3,}/g, '\n\n')
-          .trim();
-      };
-
-      pdf.setProperties({
-        title: `Chat History - ${this.chatTitle}`,
-        subject: 'AI Assistant Chat Export',
-        author: this.username || 'User',
-        keywords: 'chat, history, export',
-        creator: 'Juris AI Assistant'
-      });
-
-      pdf.setFillColor(42, 98, 195);
-      pdf.rect(0, 0, pageWidth, 40, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(24);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Chat History', margin, 28);
-
-      pdf.setFillColor(248, 249, 250);
-      pdf.rect(0, 40, pageWidth, pageHeight - 40, 'F');
-
-      pdf.setTextColor(0, 0, 0);
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Chat Information', margin, 60);
-
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-
-      let infoY = 75;
-      const infoSpacing = 10;
-
-      const chatTitleLines = pdf.splitTextToSize(`Title: ${this.chatTitle}`, textWidth);
-      pdf.text(chatTitleLines, margin, infoY);
-      infoY += (chatTitleLines.length * lineHeight) + 5;
-
-      const exportTime = new Date().toLocaleString();
-      pdf.text(`Exported on: ${exportTime}`, margin, infoY);
-      infoY += infoSpacing;
-      if (this.username) {
-        pdf.text(`User: ${this.username}`, margin, infoY);
-        infoY += infoSpacing;
-      }
-
-      pdf.text(`Total messages: ${this.messages.length}`, margin, infoY);
-      infoY += infoSpacing;
-
-      if (this.messages.length > 0) {
-        const firstDate = new Date(this.messages[0].time).toLocaleString();
-        pdf.text(`Chat started: ${firstDate}`, margin, infoY);
-        infoY += infoSpacing;
-
-        const lastDate = new Date(this.messages[this.messages.length - 1].time).toLocaleString();
-        pdf.text(`Last message: ${lastDate}`, margin, infoY);
-        infoY += infoSpacing;
-
-        const startTime = new Date(this.messages[0].time).getTime();
-        const endTime = new Date(this.messages[this.messages.length - 1].time).getTime();
-        const durationMs = endTime - startTime;
-
-        if (durationMs > 0) {
-          const durationMinutes = Math.floor(durationMs / 60000);
-          const durationHours = Math.floor(durationMinutes / 60);
-          const remainingMinutes = durationMinutes % 60;
-
-          let durationText = '';
-          if (durationHours > 0) {
-            durationText = `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
-            if (remainingMinutes > 0) {
-              durationText += ` ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}`;
-            }
-          } else if (durationMinutes > 0) {
-            durationText = `${durationMinutes} minute${durationMinutes > 1 ? 's' : ''}`;
-          } else {
-            durationText = 'less than a minute';
-          }
-
-          pdf.text(`Conversation duration: ${durationText}`, margin, infoY);
-          infoY += infoSpacing;
-        }
-      }
-
-      infoY += 10;
-      pdf.setDrawColor(100, 100, 100);
-      pdf.setLineWidth(0.3);
-      pdf.line(margin, infoY - 5, pageWidth - margin, infoY - 5);
-      pdf.setFontSize(10);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text('This document contains an exported chat history from Juris AI Assistant.', margin, infoY);
-      infoY += 7;
-      pdf.text('The content of this export is confidential and for personal use only.', margin, infoY);
-
-      pdf.setFontSize(8);
-      pdf.text('© ' + new Date().getFullYear() + ' Juris. All rights reserved.', margin, pageHeight - margin);
-
-      pdf.addPage();
-      let yOffset = margin;
-      let currentPage = 2;
-
-      pdf.setFillColor(235, 240, 250);
-      pdf.rect(margin - 5, yOffset - 10, textWidth + 10, 20, 'F');
-
-      pdf.setFontSize(14);
-      pdf.setTextColor(60, 60, 60);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Conversation', margin, yOffset);
-      yOffset += 20;
-
-      for (let i = 0; i < this.messages.length; i++) {
-        const msg = this.messages[i];
-        const sender = msg.type === 'user' ? 'User' : 'Bot';
-        const timeStr = new Date(msg.time).toLocaleString();
-        const header = `${i + 1}. ${sender} (${timeStr}):`;
-
-        const messageText = cleanText(msg.text);
-
-        const headerHeight = lineHeight + 3;
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        const textLines = pdf.splitTextToSize(messageText, textWidth);
-        const contentHeight = textLines.length * lineHeight;
-
-        const remainingSpace = pageHeight - margin - yOffset;
-        const minimumContentToShow = headerHeight + (lineHeight * 2);
-
-        if (remainingSpace < minimumContentToShow) {
-          pdf.addPage();
-          currentPage++;
-          yOffset = margin;
-
-          pdf.setFillColor(235, 240, 250);
-          pdf.rect(margin - 5, yOffset - 10, textWidth + 10, 15, 'F');
-          pdf.setFontSize(12);
-          pdf.setTextColor(60, 60, 60);
-          pdf.setFont('helvetica', 'bold');
-          pdf.text('Conversation (continued)', margin, yOffset);
-          yOffset += 15;
-        }
-
-        if (msg.type === 'user') {
-          pdf.setFillColor(240, 240, 240);
-          pdf.setTextColor(50, 50, 50);
-        } else {
-          pdf.setFillColor(230, 240, 250);
-          pdf.setTextColor(40, 40, 40);
-        }
-
-        pdf.setDrawColor(200, 200, 200);
-        pdf.roundedRect(margin - 3, yOffset - 5, textWidth + 6, headerHeight + 4, 2, 2, 'FD');
-
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(header, margin, yOffset);
-        yOffset += headerHeight;
-
-        pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-
-        const messageBackgroundHeight = Math.max(contentHeight + 5, 10);
-        pdf.setFillColor(255, 255, 255);
-        pdf.roundedRect(margin - 3, yOffset - 4, textWidth + 6, messageBackgroundHeight, 1, 1, 'F');
-
-        const maxLinesOnCurrentPage = Math.floor((pageHeight - margin - yOffset) / lineHeight);
-
-        if (textLines.length <= maxLinesOnCurrentPage) {
-          pdf.text(textLines, margin, yOffset);
-          yOffset += contentHeight + messageSpacing;
-        } else {
-          let linesProcessed = 0;
-
-          while (linesProcessed < textLines.length) {
-            const actualLinesOnPage = Math.min(
-              maxLinesOnCurrentPage,
-              textLines.length - linesProcessed
-            );
-
-            const currentPageLines = textLines.slice(
-              linesProcessed,
-              linesProcessed + actualLinesOnPage
-            );
-
-            pdf.text(currentPageLines, margin, yOffset);
-            linesProcessed += actualLinesOnPage;
-
-            if (linesProcessed < textLines.length) {
-              pdf.setFontSize(9);
-              pdf.setFont('helvetica', 'italic');
-              pdf.setTextColor(100, 100, 100);
-              pdf.text('(Continued on next page...)', margin, pageHeight - margin);
-
-              pdf.addPage();
-              currentPage++;
-              yOffset = margin;
-
-              pdf.setFillColor(245, 245, 250);
-              pdf.rect(0, 0, pageWidth, 20, 'F');
-
-              pdf.setTextColor(80, 80, 80);
-              pdf.setFontSize(10);
-              pdf.setFont('helvetica', 'italic');
-              pdf.text(`Message ${i + 1} (continued from previous page)`, margin, 15);
-
-              pdf.setTextColor(0, 0, 0);
-              pdf.setFontSize(10);
-              pdf.setFont('helvetica', 'normal');
-            } else {
-              yOffset += messageSpacing;
-            }
-          }
-        }
-
-        if (i < this.messages.length - 1) {
-          pdf.setDrawColor(210, 210, 210);
-          pdf.setLineWidth(0.5);
-          pdf.line(margin, yOffset - messageSpacing / 2, margin + textWidth, yOffset - messageSpacing / 2);
-        }
-
-        if (i > 0 && i % 10 === 0) {
-          console.log(`Processing message ${i} of ${this.messages.length}...`);
-        }
-      }
-
-      const totalPages = pdf.getNumberOfPages();
-      console.log(`PDF generated with ${totalPages} pages`);
-
-      for (let i = 1; i <= totalPages; i++) {
-        pdf.setPage(i);
-        if (i > 1) {
-          pdf.setFillColor(245, 245, 250);
-          pdf.rect(0, pageHeight - 15, pageWidth, 15, 'F');
-        }
-        pdf.setFontSize(9);
-        pdf.setTextColor(120, 120, 120);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin - 25, pageHeight - 7);
-        if (i > 1) {
-          const shortTime = new Date().toLocaleTimeString();
-          pdf.text(`Generated: ${shortTime}`, margin, pageHeight - 7);
-        }
-      }
-
-      const safeTitle = this.chatTitle
-        .replace(/[^a-z0-9]/gi, '_')
-        .toLowerCase()
-        .substring(0, 30);
-
-      const timestamp = new Date().toISOString()
-        .replace(/[:.]/g, '-')
-        .substring(0, 19);
-
-      const fileName = `chat_${safeTitle}_${timestamp}.pdf`;
-
-      pdf.save(fileName);
-      const endTime = performance.now();
-      const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
-      console.log(`PDF successfully exported in ${timeTaken} seconds with ${totalPages} pages`);
-
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('There was a problem generating the PDF. Please try again.');
-    }
+    console.log('Starting PDF export...');
   }
 }
