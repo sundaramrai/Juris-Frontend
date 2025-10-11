@@ -33,8 +33,22 @@
         </li>
 
         <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="isLoggedIn">
-          <button class="btn btn-outline-primary" type="button" (click)="onLogout()">Logout</button>
+          <button mat-button [matMenuTriggerFor]="profileMenu"
+            class="d-flex align-items-center border-0 bg-transparent px-2 py-1 rounded"
+            [ngStyle]="{'color': isDarkTheme ? '#fff' : '#0d6efd', 'background': isDarkTheme ? '#0d6efd' : '#fff'}"
+            id="profileDropdown">
+            <mat-icon class="me-2"
+              [ngClass]="{'text-white': isDarkTheme, 'text-primary': !isDarkTheme}">account_circle</mat-icon>
+            <span class="fw-semibold">{{username}}</span>
+            <mat-icon [ngClass]="{'text-white': isDarkTheme, 'text-primary': !isDarkTheme}">arrow_drop_down</mat-icon>
+          </button>
         </li>
+        <mat-menu #profileMenu="matMenu" xPosition="after" yPosition="below" class="profile-menu-panel">
+          <button mat-menu-item (click)="onLogout()" class="d-flex align-items-center">
+            <mat-icon class="me-2 text-danger">logout</mat-icon>
+            <span class="text-danger">Logout</span>
+          </button>
+        </mat-menu>
         <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && !isChatbotPage()">
           <button class="btn btn-primary" type="button" (click)="onGetStarted()">Get Started</button>
         </li>

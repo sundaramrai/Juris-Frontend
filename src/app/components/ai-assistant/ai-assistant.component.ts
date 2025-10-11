@@ -4,7 +4,6 @@ import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { jsPDF } from 'jspdf';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';

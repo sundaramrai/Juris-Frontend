@@ -5,6 +5,7 @@ import { AuthService } from './services/auth.service';
 import { CommonModule, NgClass, NgIf } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 
 const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
 
@@ -12,7 +13,7 @@ const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports: [NgClass, NgIf, ReactiveFormsModule, CommonModule, MatIconModule, RouterOutlet],
+  imports: [NgClass, NgIf, ReactiveFormsModule, CommonModule, MatIconModule, RouterOutlet, MatMenuModule],
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Juris AI';
@@ -20,6 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isRegisterPage = false;
   isLoggedIn = false;
   isDarkTheme = false;
+  username: string | undefined;
   private systemThemeMediaQuery: MediaQueryList;
   private mediaQueryListener: ((e: MediaQueryListEvent) => void) | null = null;
   private routerSubscription: any;
@@ -29,6 +31,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.username = JSON.parse(localStorage.getItem('user') || '{}').username || undefined;
     this.routerSubscription = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this.updateRouteState(event.url);
     });
