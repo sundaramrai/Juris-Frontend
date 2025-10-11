@@ -1,12 +1,15 @@
 // src/app/components/tools/tools.component.ts
 import { Component } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { CommonModule, NgIf } from '@angular/common';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { OptionsComponent } from '../options/options.component';
+import { RecentChatsComponent } from '../recent-chats/recent-chats.component';
 
 @Component({
   selector: 'app-tools',
-  standalone: false,
   templateUrl: './tools.component.html',
-  styleUrl: './tools.component.css'
+  styleUrl: './tools.component.css',
+  imports: [NgIf, CommonModule, RouterModule, OptionsComponent, RecentChatsComponent],
 })
 export class ToolsComponent {
   constructor(private router: Router, private route: ActivatedRoute) {
