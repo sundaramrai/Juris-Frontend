@@ -87,11 +87,15 @@ export class RecentChatsComponent implements OnInit, OnDestroy {
   }
 
   openChat(chatId: string): void {
-    const chatExists = this.chats.some(chat => chat.chatId === chatId);
+    const chat = this.chats.find(chat => chat.chatId === chatId);
 
-    if (chatExists) {
+    if (chat) {
       this.responseService.setCurrentChatId(chatId);
-      this.router.navigate(['/tools/assistant'], { queryParams: { chatId } });
+      if (!chat.messageCount || chat.messageCount === 0) {
+        this.router.navigate(['/tools/assistant']);
+      } else {
+        this.router.navigate(['/tools/assistant'], { queryParams: { chatId } });
+      }
     } else {
       this.createNewChat();
     }
@@ -99,8 +103,8 @@ export class RecentChatsComponent implements OnInit, OnDestroy {
 
   createNewChat(): void {
     this.responseService.createNewChat().subscribe({
-      next: (response) => {
-        this.router.navigate(['/tools/assistant'], { queryParams: { chatId: response.chatId } });
+      next: () => {
+        this.router.navigate(['/tools/assistant']);
         setTimeout(() => this.loadAllChats(), 500);
       },
       error: (error) => {
