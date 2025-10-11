@@ -1,15 +1,18 @@
 // src/app/components/register/register.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TldService } from '../../services/tld.service';
+import { CommonModule, NgIf } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-register',
-  standalone: false,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
+  imports: [NgIf, CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule, ReactiveFormsModule]
 })
 export class RegisterComponent implements OnInit {
   isLoading = false;
@@ -29,8 +32,8 @@ export class RegisterComponent implements OnInit {
   constructor(private fb: FormBuilder, private router: Router, private authService: AuthService, private tldService: TldService) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, this.enhancedEmailValidator.bind(this)], [this.existingEmailValidator.bind(this)]],
-      username: ['', [Validators.required, Validators.minLength(this.usernameMinLength),Validators.maxLength(this.usernameMaxLength),
-          this.enhancedUsernameValidator], [this.existingUsernameValidator]],
+      username: ['', [Validators.required, Validators.minLength(this.usernameMinLength), Validators.maxLength(this.usernameMaxLength),
+      this.enhancedUsernameValidator], [this.existingUsernameValidator]],
       password: ['', [Validators.required, this.enhancedPasswordValidator]],
     });
     this.otpForm = this.fb.group({
@@ -62,7 +65,7 @@ export class RegisterComponent implements OnInit {
 
     if (username === '_') return { invalidFormat: true };
 
-    const hasInvalidChars = /[^a-zA-Z0-9_]/.test(username);
+    const hasInvalidChars = /\W/.test(username);
     if (hasInvalidChars) return { invalidCharacters: true };
 
     return null;
@@ -108,7 +111,7 @@ export class RegisterComponent implements OnInit {
       errors['invalidFormat'] = true;
       return errors;
     }
-    const [local, domain] = email.split('@');
+    const [domain] = email.split('@');
     if (!domain || domain.indexOf('.') === -1) {
       errors['invalidDomain'] = true;
     }
