@@ -695,8 +695,4 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cancelEditTitle();
     }
   }
-
-  exportChatAsPDF(): void {
-    console.log('Starting PDF export...');
-  }
 }

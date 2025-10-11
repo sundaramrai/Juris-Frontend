@@ -37,10 +37,6 @@
           *ngIf="!chatNotFound && messages.length > 0">
           <mat-icon class="text-primary">add</mat-icon>
         </button>
-        <button class="btn btn-icon d-flex align-items-center" matTooltip="Share your chat" (click)="exportChatAsPDF()"
-          *ngIf="!chatNotFound && messages.length > 0">
-          <mat-icon class="text-primary">share</mat-icon>
-        </button>
         <button class="btn btn-icon d-flex align-items-center" matTooltip="More options" [matMenuTriggerFor]="menu"
           *ngIf="!chatNotFound">
           <mat-icon class="text-primary">more_vert</mat-icon>
