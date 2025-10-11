@@ -7,7 +7,8 @@
         <mat-icon class="text-white">chat</mat-icon>
       </div>
 
-      <div class="chat-title-container" *ngIf="!editingTitle" (click)="startEditingTitle()" (keydown.enter)="saveChatTitle()" (keyup.enter)="saveChatTitle()">
+      <div class="chat-title-container" *ngIf="!editingTitle" (click)="startEditingTitle()"
+        (keydown.enter)="saveChatTitle()" (keyup.enter)="saveChatTitle()">
         <h5 class="mb-0 fw-bold text-primary chat-title" [ngClass]="{'title-saved': titleJustSaved}"
           [matTooltip]="chatTitle" matTooltipPosition="above">{{ chatTitle }}
         </h5>
@@ -33,14 +34,15 @@
 
       <div class="ms-auto d-flex">
         <button class="btn btn-icon d-flex align-items-center" matTooltip="Start new chat" (click)="createNewChat()"
-        *ngIf="!chatNotFound && messages.length > 0">
+          *ngIf="!chatNotFound && messages.length > 0">
           <mat-icon class="text-primary">add</mat-icon>
         </button>
         <button class="btn btn-icon d-flex align-items-center" matTooltip="Share your chat" (click)="exportChatAsPDF()"
           *ngIf="!chatNotFound && messages.length > 0">
           <mat-icon class="text-primary">share</mat-icon>
         </button>
-        <button class="btn btn-icon d-flex align-items-center" matTooltip="More options" [matMenuTriggerFor]="menu" *ngIf="!chatNotFound">
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="More options" [matMenuTriggerFor]="menu"
+          *ngIf="!chatNotFound">
           <mat-icon class="text-primary">more_vert</mat-icon>
         </button>
         <mat-menu #menu="matMenu" xPosition="before" class="custom-menu bg-white">
