@@ -65,7 +65,7 @@
 }
 
 .recent-chats-card {
-  height: 70%;
+  max-height: 68vh;
   overflow-y: auto;
 }
 
