@@ -88,6 +88,11 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initScrollListener();
+    setTimeout(() => {
+      if (this.messageInput) {
+        this.messageInput.nativeElement.focus();
+      }
+    });
   }
 
   ngOnDestroy(): void {
