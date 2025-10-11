@@ -86,7 +86,8 @@
                 formControlName="password" placeholder="Create a strong password"
                 [class.is-invalid]="!isSubmitting && registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)"
                 required />
-              <span class="input-group-text bg-light" (click)="togglePasswordVisibility()" style="cursor: pointer;">
+              <span class="input-group-text bg-light" (click)="togglePasswordVisibility()"
+                (keydown)="togglePasswordVisibility()" style="cursor: pointer;">
                 <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
               </span>
             </div>
@@ -103,8 +104,9 @@
               lowercase letters</small>
           </div>
           <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="!isSubmitting && (registerForm.invalid || isLoading)">
-              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+            <button type="submit" class="btn btn-primary"
+              [disabled]="!isSubmitting && (registerForm.invalid || isLoading)">
+              <output *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></output>
               {{ isLoading ? 'Sending OTP...' : 'Send OTP' }}
             </button>
             <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center"
@@ -116,17 +118,12 @@
         <form *ngIf="isOtpSent" [formGroup]="otpForm" (ngSubmit)="onVerifyOTP()">
           <div class="mb-3">
             <label for="otp" class="form-label fw-bold">Enter OTP</label>
-            <input
-              type="text"
-              class="form-control"
-              id="otp"
-              formControlName="otp"
-              placeholder="6-digit OTP"
-              maxlength="6"
-              (input)="onOtpInput($event)"
-              [class.is-invalid]="!isSubmitting && otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)"
-            />
-            <div *ngIf="!isSubmitting && otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)" class="text-danger mt-1">
+            <input type="text" class="form-control" id="otp" formControlName="otp" placeholder="6-digit OTP"
+              maxlength="6" (input)="onOtpInput($event)"
+              [class.is-invalid]="!isSubmitting && otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)" />
+            <div
+              *ngIf="!isSubmitting && otpForm.get('otp')?.invalid && (otpForm.get('otp')?.touched || otpForm.get('otp')?.dirty)"
+              class="text-danger mt-1">
               <small *ngIf="otpForm.get('otp')?.errors?.['required']">OTP is required</small>
               <small *ngIf="otpForm.get('otp')?.errors?.['minlength'] || otpForm.get('otp')?.errors?.['maxlength']">
                 OTP must be 6 digits
@@ -135,7 +132,7 @@
           </div>
           <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary" [disabled]="!isSubmitting && (otpForm.invalid || isLoading)">
-              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+              <output *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></output>
               {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
             </button>
             <button type="button" class="btn btn-outline-secondary" (click)="onChangeEmail()">
