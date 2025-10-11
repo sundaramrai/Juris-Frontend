@@ -1,13 +1,16 @@
 // src/app/app.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { CommonModule, NgClass, NgIf } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
-  standalone: false,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  imports: [NgClass, NgIf, ReactiveFormsModule, CommonModule, MatIconModule, RouterOutlet],
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Juris AI';
