@@ -8,7 +8,6 @@ import { ToolsComponent } from './components/tools/tools.component';
 import { AiAssistantComponent } from './components/ai-assistant/ai-assistant.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { TemplatesComponent } from './components/templates/templates.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
@@ -19,7 +18,6 @@ const routes: Routes = [
     children: [
       { path: 'assistant', component: AiAssistantComponent },
       { path: 'feedback', component: FeedbackComponent },
-      { path: 'templates', component: TemplatesComponent },
       { path: '', redirectTo: 'assistant', pathMatch: 'full' }
     ]
   },
@@ -35,3 +33,4 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class AppRoutingModule { }
+export { routes };
