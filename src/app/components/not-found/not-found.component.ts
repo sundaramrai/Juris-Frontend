@@ -1,12 +1,12 @@
 // src/app/components/not-found/not-found.component.ts
 import { Component } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-not-found',
-  standalone: false,
-
   templateUrl: './not-found.component.html',
-  styleUrl: './not-found.component.css'
+  styleUrls: ['./not-found.component.css'],
+  imports: [MatIconModule]
 })
 export class NotFoundComponent {
   constructor() { }
