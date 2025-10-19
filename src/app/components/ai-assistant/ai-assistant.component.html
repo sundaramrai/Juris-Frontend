@@ -106,24 +106,23 @@
           </div>
         </div>
 
-        <div class="input-container p-3 border-0">
+        <div class="input-container border-0">
           <div class="input-group">
-            <button class="btn mic-btn d-flex align-items-center"
-              [ngClass]="{'btn-outline-primary': !isListening, 'btn-danger pulse': isListening}" type="button"
+            <button class="btn mic-btn" type="button" [ngClass]="{'btn-danger pulse': isListening}"
               [disabled]="isLoading" (click)="toggleSpeechRecognition()"
               [matTooltip]="isListening ? 'Stop listening' : 'Click to speak'" matTooltipPosition="above">
               <mat-icon>{{ isListening ? 'mic' : 'mic_none' }}</mat-icon>
             </button>
             <textarea #messageInput class="form-control auto-resize-textarea"
-              [placeholder]="isListening ? 'Speak clearly...' : 'Type your message here...'" [(ngModel)]="userInput"
+              [placeholder]="isListening ? 'Listening...' : 'Type your message here...'" [(ngModel)]="userInput"
               (input)="autoResizeTextarea(messageInput)" (keydown)="handleKeyDown($event)" [disabled]="isLoading"
               rows="1" autofocus></textarea>
-            <button class="btn btn-primary send-btn" type="button" (click)="sendMessage()"
+            <button class="btn send-btn" type="button" (click)="sendMessage()"
               [disabled]="!userInput.trim() || isLoading" matTooltip="Send message" matTooltipPosition="above">
               <mat-icon>send</mat-icon>
             </button>
           </div>
-          <div class="text-center mt-2">
+          <div class="text-center">
             <small class="status-indicator" [ngClass]="{'text-muted': !isListening, 'text-danger': isListening}">
               {{ isListening ? 'Speak clearly for best accuracy' : 'We typically reply within seconds' }}
             </small>
