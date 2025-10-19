@@ -27,7 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private routerSubscription: any;
 
   constructor(private router: Router, private authService: AuthService) {
-    this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.systemThemeMediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)');
   }
 
   ngOnInit() {
@@ -93,7 +93,7 @@ export class AppComponent implements OnInit, OnDestroy {
   checkLoginTimestamp = () => {
     const loginTimestamp = localStorage.getItem('loginTimestamp');
     if (loginTimestamp) {
-      const elapsed = Date.now() - parseInt(loginTimestamp, 10);
+      const elapsed = Date.now() - Number.parseInt(loginTimestamp, 10);
       if (elapsed > TWELVE_HOURS_MS) {
         this.logout();
       } else {

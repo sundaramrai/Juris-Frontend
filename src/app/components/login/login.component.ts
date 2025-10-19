@@ -46,10 +46,10 @@ export class LoginComponent implements OnInit {
       return;
     }
     if (!this.isSubmitting && this.loginForm.invalid) {
-      Object.keys(this.loginForm.controls).forEach(key => {
+      for (const key of Object.keys(this.loginForm.controls)) {
         const control = this.loginForm.get(key);
         control?.markAsTouched();
-      });
+      }
       return;
     }
 

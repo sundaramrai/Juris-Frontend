@@ -127,11 +127,11 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   initSpeechRecognition(): void {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition ||
-        (window as any).mozSpeechRecognition ||
-        (window as any).msSpeechRecognition;
+    if ('webkitSpeechRecognition' in globalThis || 'SpeechRecognition' in globalThis) {
+      const SpeechRecognition = (globalThis as any).SpeechRecognition ||
+        (globalThis as any).webkitSpeechRecognition ||
+        (globalThis as any).mozSpeechRecognition ||
+        (globalThis as any).msSpeechRecognition;
 
       if (SpeechRecognition) {
         this.recognition = new SpeechRecognition();
@@ -279,8 +279,8 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   initSpeechSynthesis(): void {
-    if ('speechSynthesis' in window) {
-      this.synthesis = window.speechSynthesis;
+    if ('speechSynthesis' in globalThis) {
+      this.synthesis = globalThis.speechSynthesis;
       this.loadVoices();
       if (this.synthesis) {
         if (this.synthesis.onvoiceschanged !== undefined) {
@@ -309,12 +309,12 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       this.stopSpeechRecognition();
     }
     const cleanText = text
-      .replace(/\*\*(.+?)\*\*/g, '$1')
-      .replace(/\*(.+?)\*/g, '$1')
-      .replace(/`(.+?)`/g, '$1')
-      .replace(/```[\s\S]*?```/g, '')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      .replace(/https?:\/\/[^\s]+/g, 'link');
+      .replaceAll(/\*\*(.+?)\*\*/g, '$1')
+      .replaceAll(/\*(.+?)\*/g, '$1')
+      .replaceAll(/`(.+?)`/g, '$1')
+      .replaceAll(/```[\s\S]*?```/g, '')
+      .replaceAll(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replaceAll(/https?:\/\/[^\s]+/g, 'link');
 
     this.speechSynthesisUtterance = new SpeechSynthesisUtterance(cleanText);
 
@@ -322,9 +322,9 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       this.speechSynthesisUtterance.voice = this.synthesisVoice;
     }
 
-    this.speechSynthesisUtterance.rate = 1.0;
-    this.speechSynthesisUtterance.pitch = 1.0;
-    this.speechSynthesisUtterance.volume = 1.0;
+    this.speechSynthesisUtterance.rate = 1;
+    this.speechSynthesisUtterance.pitch = 1;
+    this.speechSynthesisUtterance.volume = 1;
 
     this.speechSynthesisUtterance.onstart = () => {
       this.ngZone.run(() => {
@@ -419,7 +419,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       let result = "<ol type='a'>";
       for (let line of contentLines) {
         if (line.startsWith('*')) {
-          const listItem = line.replace(/^\*\s*/, '');
+          const listItem = line.replaceAll(/^\*\s*/, '');
           result += `<li>${listItem}</li>`;
         } else {
           result += `<p>${line}</p>`;
@@ -459,9 +459,9 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private formatFallbackHtml(text: string): string {
     let formatted = text;
-    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/(?<!^)\*(.+?)\*/g, '<em>$1</em>');
-    formatted = formatted.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+    formatted = formatted.replaceAll(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replaceAll(/(?<!^)\*(.+?)\*/g, '<em>$1</em>');
+    formatted = formatted.replaceAll(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 
     const fallbackLines = formatted.split('\n');
     let result = '';
@@ -473,7 +473,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
           result += "<ol type='a'>";
           listOpen = true;
         }
-        result += `<li>${trimmedLine.replace(/^\*\s*/, '')}</li>`;
+        result += `<li>${trimmedLine.replaceAll(/^\*\s*/, '')}</li>`;
       } else {
         if (listOpen) {
           result += "</ol>";
@@ -609,7 +609,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clearChat(): void {
     if (!this.chatId) return;
-    const confirmed = window.confirm('Are you sure you want to clear this chat? This action cannot be undone.');
+    const confirmed = globalThis.confirm('Are you sure you want to clear this chat? This action cannot be undone.');
     if (!confirmed) {
       return;
     }

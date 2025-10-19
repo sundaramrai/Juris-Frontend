@@ -111,8 +111,8 @@ export class RegisterComponent implements OnInit {
       errors['invalidFormat'] = true;
       return errors;
     }
-    const [domain] = email.split('@');
-    if (!domain || domain.indexOf('.') === -1) {
+    const [, domain] = email.split('@');
+    if (!domain || !domain.includes('.')) {
       errors['invalidDomain'] = true;
     }
     const domainTld = domain.split('.').pop()?.toLowerCase();
@@ -143,10 +143,10 @@ export class RegisterComponent implements OnInit {
       return;
     }
     if (!this.isSubmitting && this.registerForm.invalid) {
-      Object.keys(this.registerForm.controls).forEach(key => {
+      for (const key of Object.keys(this.registerForm.controls)) {
         const control = this.registerForm.get(key);
         control?.markAsTouched();
-      });
+      }
       return;
     }
 
@@ -183,10 +183,10 @@ export class RegisterComponent implements OnInit {
       return;
     }
     if (!this.isSubmitting && this.registerForm.invalid) {
-      Object.keys(this.registerForm.controls).forEach(key => {
+      for (const key of Object.keys(this.registerForm.controls)) {
         const control = this.registerForm.get(key);
         control?.markAsTouched();
-      });
+      }
       return;
     }
 
@@ -215,10 +215,10 @@ export class RegisterComponent implements OnInit {
       return;
     }
     if (!this.isSubmitting && this.otpForm.invalid) {
-      Object.keys(this.otpForm.controls).forEach(key => {
+      for (const key of Object.keys(this.otpForm.controls)) {
         const control = this.otpForm.get(key);
         control?.markAsTouched();
-      });
+      }
       return;
     }
 
@@ -252,7 +252,7 @@ export class RegisterComponent implements OnInit {
   }
 
   onOtpInput(event: Event): void {
-    const input = (event.target as HTMLInputElement).value.replace(/\D/g, '');
+    const input = (event.target as HTMLInputElement).value.replaceAll(/\D/g, '');
     this.otpForm.get('otp')?.setValue(input);
   }
 
