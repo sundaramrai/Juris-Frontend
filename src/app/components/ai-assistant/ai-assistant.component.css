@@ -455,6 +455,10 @@
   color: #ef4444 !important;
 }
 
+:host-context(.dark-theme) .empty-state p {
+  color: #9ca3af !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .chat-container {

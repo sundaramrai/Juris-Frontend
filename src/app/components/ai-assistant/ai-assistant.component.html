@@ -47,7 +47,7 @@
   <div class="card-body p-0">
     <div class="chat-container">
       <div *ngIf="chatNotFound" class="p-5 text-center">
-        <div class="my-5">
+        <div class="my-5 d-flex flex-column align-items-center justify-content-center">
           <div class="empty-icon-container">
             <mat-icon class="text-warning" style="font-size: 64px;">search_off</mat-icon>
           </div>
@@ -63,7 +63,7 @@
         <div #messagesArea class="messages-area p-3 d-flex flex-column"
           [style.overflowY]="messages.length > 0 ? 'auto' : 'hidden'">
           <div *ngIf="messages.length === 0" class="empty-state text-center p-5">
-            <div class="my-5">
+            <div class="my-5 d-flex flex-column align-items-center justify-content-center">
               <div class="empty-icon-container">
                 <mat-icon class="text-primary empty-icon">sentiment_satisfied</mat-icon>
               </div>
