@@ -94,9 +94,14 @@ export class ResponseService {
       return throwError(() => new Error('User not authenticated'));
     }
 
+    const body: { message: string; chatId?: string } = { message };
+    if (chatId) {
+      body.chatId = chatId;
+    }
+
     return this.http.post<{ chatId: string, userMessage: string, botResponse: string, title: string }>(
       `${API_URL}/chat`,
-      { message, chatId: chatId || this.getCurrentChatId() }
+      body
     ).pipe(
       tap(response => {
         if (response.chatId) {
