@@ -63,13 +63,13 @@ export class ResponseService {
     );
   }
 
-  getChatHistory(chatId: string): Observable<{ messages: Message[], chatSummary: string, title: string }> {
+  getChatHistory(chatId: string): Observable<{ messages: Message[], title: string }> {
     const userId = this.getUserId();
     if (!userId) {
       return throwError(() => new Error('User not authenticated'));
     }
 
-    return this.http.get<{ chatId: string, messages: MessageResponse[], chatSummary: string, title: string }>(
+    return this.http.get<{ chatId: string, messages: MessageResponse[], title: string }>(
       `${API_URL}/chat/history/${chatId}`
     ).pipe(
       map(response => ({
@@ -78,7 +78,6 @@ export class ResponseService {
           text: msg.text,
           time: new Date(msg.time).toISOString()
         })),
-        chatSummary: response.chatSummary || "",
         title: response.title || "New Chat"
       })),
       catchError(error => {
