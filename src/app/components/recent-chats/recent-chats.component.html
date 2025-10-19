@@ -37,10 +37,6 @@
                 [class.text-white]="chat.chatId === currentChatId" [matTooltip]="chat.title || 'New Chat'">
                 {{ chat.title || 'New Chat' }}
               </h6>
-              <p class="mb-0 small text-truncate chat-summary" [class.text-muted]="chat.chatId !== currentChatId"
-                [class.text-white]="chat.chatId === currentChatId" [matTooltip]="chat.summary || 'No messages yet'">
-                {{ chat.summary || 'No messages yet' }}
-              </p>
             </div>
             <small class="text-nowrap ms-2 chat-date" [class.text-muted]="chat.chatId !== currentChatId"
               [class.text-white]="chat.chatId === currentChatId" [matTooltip]="chat.updatedAt | date:'medium'">
