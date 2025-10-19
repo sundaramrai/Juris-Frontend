@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AiAssistantComponent } from './ai-assistant.component';
+import "jasmine";
 
 describe('AiAssistantComponent', () => {
   let component: AiAssistantComponent;

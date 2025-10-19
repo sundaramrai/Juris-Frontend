@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { CanActivateFn } from '@angular/router';
 
-import { loggedOutGuard } from './logged-out.guard';
+import { LoggedOutGuard } from './logged-out.guard';
+import "jasmine";
 
-describe('loggedOutGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => loggedOutGuard(...guardParameters));
+describe('LoggedOutGuard', () => {
+  const executeGuard: CanActivateFn = () =>
+    TestBed.runInInjectionContext(() => TestBed.inject(LoggedOutGuard).canActivate());
 
   beforeEach(() => {
     TestBed.configureTestingModule({});

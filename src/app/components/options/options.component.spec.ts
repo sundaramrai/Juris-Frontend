@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OptionsComponent } from './options.component';
+import "jasmine";
 
 describe('OptionsComponent', () => {
   let component: OptionsComponent;

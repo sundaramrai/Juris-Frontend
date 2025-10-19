@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ToolsComponent } from './tools.component';
+import "jasmine";
 
 describe('ToolsComponent', () => {
   let component: ToolsComponent;
