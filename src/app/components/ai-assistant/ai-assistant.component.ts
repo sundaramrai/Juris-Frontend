@@ -445,9 +445,10 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private formatFallbackHtml(text: string): string {
     let formatted = text;
+    formatted = formatted.replaceAll(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
     formatted = formatted.replaceAll(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replaceAll(/(?<!^)\*(.+?)\*/g, '<em>$1</em>');
-    formatted = formatted.replaceAll(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+    formatted = formatted.replaceAll(/(https?:\/\/[^\s<]+)(?![^<]*<\/a>)/g, '<a href="$1" target="_blank">$1</a>');
 
     const fallbackLines = formatted.split('\n');
     let result = '';
@@ -459,7 +460,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
           result += "<ol type='a'>";
           listOpen = true;
         }
-        result += `<li>${trimmedLine.replaceAll(/^\*\s*/, '')}</li>`;
+        result += `<li>${trimmedLine.replace(/^\*\s*/, '')}</li>`;
       } else {
         if (listOpen) {
           result += "</ol>";
