@@ -11,7 +11,7 @@
         <button type="button" class="btn-close" (click)="errorMessage = null"></button>
       </div>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="off">
         <div class="mb-3">
           <label for="username" class="form-label fw-bold">Username</label>
           <div class="input-group">
@@ -38,7 +38,7 @@
               [class.is-invalid]="!isSubmitting && loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
               required />
             <button type="button" class="input-group-text bg-light" (click)="togglePasswordVisibility()"
-              aria-label="Toggle password visibility" style="border: 1px solid white; cursor: pointer;">
+              aria-label="Toggle password visibility" style="cursor: pointer;">
               <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </div>

@@ -15,7 +15,7 @@
           <button type="button" class="btn-close" (click)="errorMessage = null"></button>
         </div>
 
-        <form *ngIf="!isOtpSent" [formGroup]="registerForm" (ngSubmit)="onRequestOTP()">
+        <form *ngIf="!isOtpSent" [formGroup]="registerForm" (ngSubmit)="onRequestOTP()" autocomplete="off">
           <div class="mb-3">
             <label for="email" class="form-label fw-bold">Email</label>
             <div class="input-group">
