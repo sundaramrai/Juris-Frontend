@@ -67,19 +67,16 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.routeSub = this.route.queryParams.subscribe(params => {
       const newChatId = params['chatId'];
-      if (newChatId) {
+      if (newChatId && newChatId !== this.chatId) {
+        this.chatId = newChatId;
         this.responseService.setCurrentChatId(newChatId);
         this.loadChatHistory(newChatId);
-      } else {
+      } else if (!newChatId) {
         this.responseService.setCurrentChatId(null);
-        this.createNewChat();
-      }
-    });
-
-    this.chatIdSub = this.responseService.currentChatId$.subscribe(chatId => {
-      if (chatId && chatId !== this.chatId) {
-        this.chatId = chatId;
-        this.loadChatHistory(chatId);
+        this.chatId = null;
+        this.messages = [];
+        this.chatTitle = 'New Chat';
+        this.isLoading = false;
       }
     });
   }
@@ -105,24 +102,13 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   createNewChat(): void {
-    this.isLoading = true;
-    this.chatNotFound = false;
-
-    this.responseService.createNewChat().subscribe({
-      next: (response) => {
-        this.chatId = response.chatId;
-        this.chatTitle = response.title;
-        this.messages = [];
-        this.router.navigate(['/tools/assistant'], {
-          queryParams: {},
-          replaceUrl: true
-        });
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error creating new chat:', error);
-        this.isLoading = false;
-      }
+    this.chatId = null;
+    this.messages = [];
+    this.chatTitle = 'New Chat';
+    this.responseService.setCurrentChatId(null);
+    this.router.navigate(['/tools/assistant'], {
+      queryParams: {},
+      replaceUrl: true
     });
   }
 
@@ -536,6 +522,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isLoading = true;
 
     const messageText = this.userInput;
+    const currentChatId = this.chatId;
     this.userInput = '';
     this.finalTranscript = '';
     this.interimTranscript = '';
@@ -549,7 +536,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 0);
     }
 
-    this.responseService.sendMessage(messageText, this.chatId || undefined).subscribe({
+    this.responseService.sendMessage(messageText, currentChatId || undefined).subscribe({
       next: (response) => {
         this.messages.push({
           type: 'bot',
@@ -560,12 +547,13 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
           this.chatTitle = response.title;
         }
 
-        if (response.chatId && this.chatId !== response.chatId) {
+        if (response.chatId && response.chatId !== this.chatId) {
           this.chatId = response.chatId;
-        }
-        if (this.chatId) {
-          this.router.navigate(['/tools/assistant'], {
-            queryParams: { chatId: this.chatId },
+          this.responseService.setCurrentChatId(response.chatId);
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { chatId: response.chatId },
+            queryParamsHandling: 'merge',
             replaceUrl: true
           });
         }
