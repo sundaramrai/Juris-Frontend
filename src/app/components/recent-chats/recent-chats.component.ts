@@ -89,27 +89,16 @@ export class RecentChatsComponent implements OnInit, OnDestroy {
   openChat(chatId: string): void {
     const chat = this.chats.find(chat => chat.chatId === chatId);
 
-    if (chat) {
+    if (chat && chat.messageCount && chat.messageCount > 0) {
       this.responseService.setCurrentChatId(chatId);
-      if (!chat.messageCount || chat.messageCount === 0) {
-        this.router.navigate(['/tools/assistant']);
-      } else {
-        this.router.navigate(['/tools/assistant'], { queryParams: { chatId } });
-      }
+      this.router.navigate(['/tools/assistant'], { queryParams: { chatId } });
     } else {
       this.createNewChat();
     }
   }
 
   createNewChat(): void {
-    this.responseService.createNewChat().subscribe({
-      next: () => {
-        this.router.navigate(['/tools/assistant']);
-        setTimeout(() => this.loadAllChats(), 500);
-      },
-      error: (error) => {
-        console.error('Error creating new chat:', error);
-      }
-    });
+    this.responseService.setCurrentChatId(null);
+    this.router.navigate(['/tools/assistant']);
   }
 }
