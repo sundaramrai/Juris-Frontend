@@ -16,7 +16,6 @@ export interface Feedback {
 export interface ChatInfo {
   chatId: string;
   title: string;
-  summary: string;
   messageCount?: number;
   createdAt: string;
   updatedAt: string;
