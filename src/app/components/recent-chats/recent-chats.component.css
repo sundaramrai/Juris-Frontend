@@ -90,43 +90,6 @@
   width: 48px;
 }
 
-@media (max-width: 576px) {
-  .card-body {
-    padding: 0.75rem;
-  }
-
-  .chat-title {
-    font-size: 0.9rem;
-  }
-
-  .chat-date {
-    font-size: 0.7rem;
-  }
-
-  .list-group-item {
-    padding: 0.5rem 0.75rem;
-  }
-
-  .empty-state-icon {
-    font-size: 40px;
-    height: 40px;
-    width: 40px;
-  }
-
-  .empty-state h6 {
-    font-size: 1rem;
-  }
-
-  .empty-state p {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .recent-chats-card {
-    max-height: calc(100vh - 120px);
-  }
-}
 
 :host-context(.dark-theme) .recent-chats-card {
   scrollbar-color: #444 #1e1e1e;
