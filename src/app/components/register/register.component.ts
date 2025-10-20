@@ -7,12 +7,13 @@ import { TldService } from '../../services/tld.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [NgIf, CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule, ReactiveFormsModule]
+  imports: [NgIf, CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule]
 })
 export class RegisterComponent implements OnInit {
   isLoading = false;
@@ -22,133 +23,130 @@ export class RegisterComponent implements OnInit {
   showPassword = false;
   validTlds: string[] = [];
 
-  usernameMinLength = 2;
-  usernameMaxLength = 20;
+  readonly usernameMinLength = 2;
+  readonly usernameMaxLength = 20;
 
-  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService, private tldService: TldService) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService,
+    private tldService: TldService
+  ) {
     this.registerForm = this.fb.group({
-      email: ['', [Validators.required, this.enhancedEmailValidator.bind(this)], [this.existingEmailValidator.bind(this)]],
-      username: ['', [Validators.required, Validators.minLength(this.usernameMinLength), Validators.maxLength(this.usernameMaxLength),
-      this.enhancedUsernameValidator], [this.existingUsernameValidator]],
-      password: ['', [Validators.required, this.enhancedPasswordValidator]],
+      email: [
+        '',
+        [Validators.required, this.enhancedEmailValidator],
+        [this.existingEmailValidator]
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(this.usernameMinLength),
+          Validators.maxLength(this.usernameMaxLength),
+          this.enhancedUsernameValidator
+        ],
+        [this.existingUsernameValidator]
+      ],
+      password: [
+        '',
+        [Validators.required, this.enhancedPasswordValidator]
+      ]
     });
   }
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
-      if (user) {
-        this.router.navigate(['/tools']);
-      }
+      if (user) this.router.navigate(['/tools']);
     });
 
     this.tldService.getTlds().subscribe((tlds: string[]) => {
       this.validTlds = tlds.map(tld => tld.toLowerCase());
+      this.registerForm.get('email')?.updateValueAndValidity();
     });
   }
 
-  enhancedUsernameValidator(control: AbstractControl): ValidationErrors | null {
+  private readonly enhancedUsernameValidator = (control: AbstractControl): ValidationErrors | null => {
     const username = control.value;
     if (!username) return null;
-
-    const isNumeric = /^\d+$/.test(username);
-    if (isNumeric) return { numericOnly: true };
-
-    const alphabeticCount = (username.match(/[a-zA-Z]/g) || []).length;
-    if (alphabeticCount < 2) return { insufficientLetters: true };
-
-    if (username === '_') return { invalidFormat: true };
-
-    const hasInvalidChars = /\W/.test(username);
-    if (hasInvalidChars) return { invalidCharacters: true };
-
+    if (!/^\w+$/.test(username)) return { invalidCharacters: true };
+    if ((username.match(/[a-zA-Z]/g) || []).length < 2) return { insufficientLetters: true };
+    if (/^\d+$/.test(username)) return { numericOnly: true };
+    if (/^_+$/.test(username)) return { invalidFormat: true };
     return null;
-  }
+  };
 
-  existingUsernameValidator(control: AbstractControl): ValidationErrors | null {
+  private readonly existingUsernameValidator = (control: AbstractControl) => {
     const username = control.value;
-    if (!username) return null;
-
+    if (!username) return of(null);
     const data = localStorage.getItem('registerData');
     const registeredUsers = JSON.parse(data || '[]');
     const exists = registeredUsers.some((user: any) => user.username === username);
+    return of(exists ? { usernameExists: true } : null);
+  };
 
-    return exists ? { usernameExists: true } : null;
+  onUsernameInput() {
+    const username = this.registerForm.get('username')?.value;
+    if (username) {
+      this.registerForm.get('username')?.patchValue(username.toLowerCase(), { emitEvent: false });
+    }
   }
 
-  onUsernameInput(event: any) {
-    const input = event.target;
-    input.value = input.value.toLowerCase();
-  }
-
-  enhancedPasswordValidator(control: AbstractControl): ValidationErrors | null {
+  private readonly enhancedPasswordValidator = (control: AbstractControl): ValidationErrors | null => {
     const password = control.value;
     if (!password) return null;
-
-    const errors: ValidationErrors = {};
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d{2,})(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-    if (!pattern.test(password)) {
-      errors['patternMismatch'] = true;
-    }
+    return pattern.test(password) ? null : { patternMismatch: true };
+  };
 
-    return Object.keys(errors).length ? errors : null;
-  }
-
-  enhancedEmailValidator = (control: AbstractControl): ValidationErrors | null => {
+  private readonly enhancedEmailValidator = (control: AbstractControl): ValidationErrors | null => {
     const email = control.value;
     if (!email) return null;
-
     const errors: ValidationErrors = {};
-
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(email)) {
       errors['invalidFormat'] = true;
       return errors;
     }
     const [, domain] = email.split('@');
-    if (!domain || !domain.includes('.')) {
-      errors['invalidDomain'] = true;
-    }
+    if (!domain || !domain.includes('.')) errors['invalidDomain'] = true;
     const domainTld = domain.split('.').pop()?.toLowerCase();
-    if (domainTld && !this.validTlds.includes(domainTld)) {
+    if (domainTld && this.validTlds.length > 0 && !this.validTlds.includes(domainTld)) {
       errors['invalidTLD'] = true;
     }
     return Object.keys(errors).length ? errors : null;
-  }
+  };
 
-
-  existingEmailValidator(control: AbstractControl): ValidationErrors | null {
+  private readonly existingEmailValidator = (control: AbstractControl) => {
     const email = control.value;
-    if (!email) return null;
-
+    if (!email) return of(null);
     const data = localStorage.getItem('registerData');
     const registeredUsers = JSON.parse(data || '[]');
     const exists = registeredUsers.some((user: any) => user.email === email);
-
-    return exists ? { emailExists: true } : null;
-  }
+    return of(exists ? { emailExists: true } : null);
+  };
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 
-  onRegister() {
-    if (this.isSubmitting) {
-      return;
+  private markAllControlsTouched() {
+    for (const control of Object.values(this.registerForm.controls)) {
+      control.markAsTouched();
     }
-    if (!this.isSubmitting && this.registerForm.invalid) {
-      for (const key of Object.keys(this.registerForm.controls)) {
-        const control = this.registerForm.get(key);
-        control?.markAsTouched();
-      }
-      return;
-    }
+  }
 
+  onRegister() {
+    if (this.isSubmitting) return;
+    if (this.registerForm.invalid) {
+      this.markAllControlsTouched();
+      return;
+    }
     this.isLoading = true;
     this.isSubmitting = true;
     this.errorMessage = null;
 
-    const userData = this.registerForm.value;
-    this.authService.register(userData).subscribe({
+    this.authService.register(this.registerForm.value).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/login']);
@@ -156,12 +154,13 @@ export class RegisterComponent implements OnInit {
       error: (error) => {
         this.isLoading = false;
         this.isSubmitting = false;
-        if (error.error.message.includes('username')) {
+        const msg = error?.error?.message || '';
+        if (msg.includes('username')) {
           this.errorMessage = 'Username already exists. Please choose a different username.';
-        } else if (error.error.message.includes('email')) {
+        } else if (msg.includes('email')) {
           this.errorMessage = 'Email already exists. Please choose a different email.';
         } else {
-          this.errorMessage = error.error.message || 'Registration failed';
+          this.errorMessage = msg || 'Registration failed';
         }
       }
     });
