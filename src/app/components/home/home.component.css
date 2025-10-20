@@ -5,36 +5,7 @@
   --light-bg: #f8f9fa;
 }
 
-/* .body-img {
-  background-image: url(../../../../public/login-bg-dots.png);
-  background-size: cover;
-  background-repeat: repeat-x;
-  position: relative;
-  min-height: 100dvh;
-}
-
-.body-img::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%);
-  z-index: -1;
-}
-
-.moving-bg {
-  animation: moveBackground 20s linear infinite;
-}
-
-@keyframes moveBackground {
-  0% { background-position: 0 0; }
-  100% { background-position: 100% 0; }
-} */
-
 .hero-section {
-  padding: 100px 0;
   position: relative;
   overflow: hidden;
 }
@@ -85,15 +56,8 @@
 }
 
 .feature-icon {
-  width: 80px;
-  height: 80px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
   background-color: rgba(13, 110, 253, 0.1);
-  margin-bottom: 20px;
 }
 
 .blob {
@@ -105,8 +69,6 @@
 .blob-1 {
   top: -100px;
   right: -100px;
-  width: 400px;
-  height: 400px;
   background-color: rgba(13, 110, 253, 0.1);
   border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   animation: blob-morph 10s linear infinite alternate;
@@ -115,8 +77,6 @@
 .blob-2 {
   bottom: -100px;
   left: -100px;
-  width: 350px;
-  height: 350px;
   background-color: rgba(13, 110, 253, 0.1);
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   animation: blob-morph 12s linear infinite alternate;
@@ -145,11 +105,6 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  border-radius: 8px;
-  padding: 10px 25px;
-  font-weight: 600;
   transition: all 0.3s ease;
 }
 
@@ -159,17 +114,13 @@
 }
 
 .btn-outline-primary {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  border-radius: 8px;
-  padding: 10px 25px;
-  font-weight: 600;
+  color: #212529;
   transition: all 0.3s ease;
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--primary-color);
-  color: white;
+  background-color: #fff;
+  color: #0d6efd;
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
 }
@@ -180,25 +131,8 @@
   overflow: hidden;
 }
 
-.typing-animation::after {
-  content: '|';
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-}
-
 .nav-pills .nav-link.active {
-  background-color: var(--primary-color);
+  background-color: #0d6efd;
 }
 
 .footer {
@@ -212,10 +146,7 @@
   left: 50%;
   transform: translateX(-50%);
   animation: bounce 2s infinite;
-}
-
-.btn-outline-primary:hover {
-  color: #0d6efd;
+  cursor: pointer;
 }
 
 @keyframes bounce {
@@ -235,10 +166,6 @@
   60% {
     transform: translateY(-15px) translateX(-50%);
   }
-}
-
-:host-context(.dark-theme) .body-img::before {
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(18, 18, 18, 0.8) 100%);
 }
 
 :host-context(.dark-theme) .feature-card {
@@ -317,20 +244,7 @@
 
 :host-context(.dark-theme) .btn-outline-primary:hover {
   color: #64b5f6;
-}
-
-:host-context(.dark-theme) .chat-demo-container {
   background-color: #1e1e1e;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-}
-
-:host-context(.dark-theme) .blob-1,
-:host-context(.dark-theme) .blob-2 {
-  background-color: rgba(13, 110, 253, 0.2);
-}
-
-:host-context(.dark-theme) .scroll-down svg {
-  fill: #64b5f6;
 }
 
 :host-context(.dark-theme) .chat-demo-container {
@@ -361,4 +275,49 @@
 :host-context(.dark-theme) .chat-demo-container ol,
 :host-context(.dark-theme) .chat-demo-container li {
   color: #f5f5f5 !important;
+}
+
+:host-context(.dark-theme) .blob-1,
+:host-context(.dark-theme) .blob-2 {
+  background-color: rgba(13, 110, 253, 0.2);
+}
+
+:host-context(.dark-theme) .scroll-down svg {
+  fill: #64b5f6;
+}
+
+.decorative-circle-1 {
+  width: 6rem;
+  height: 6rem;
+}
+
+.decorative-circle-2 {
+  width: 7.5rem;
+  height: 7.5rem;
+}
+
+.chat-demo-max-width {
+  max-width: 32rem;
+}
+
+.how-it-works-img {
+  width: 17.5rem;
+  height: 17.5rem;
+  object-fit: cover;
+}
+
+.feature-icon-size {
+  width: 5rem;
+  height: 5rem;
+}
+
+.chat-avatar-size {
+  width: 3rem;
+  height: 3rem;
+}
+
+.step-circle {
+  width: 3.75rem;
+  height: 3.75rem;
+  font-size: 1.5rem;
 }

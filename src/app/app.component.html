@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg"
   [ngClass]="{'navbar-dark bg-primary': isDarkTheme, 'navbar-light bg-white': !isDarkTheme, 'shadow-sm': true, 'py-2': true}">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" (click)="onHome()" style="cursor: pointer;">
+    <a class="navbar-brand d-flex align-items-center" (click)="onHome()">
       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" [attr.fill]="isDarkTheme ? '#ffffff' : '#0d6efd'"
         class="me-2" viewBox="0 0 16 16">
         <path
@@ -13,50 +13,37 @@
       <span class="fw-bold text-primary fs-4">Juris AI</span>
     </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item me-2">
-          <button class="btn border-0 text-primary bg-transparent"
-            [ngClass]="{'btn-outline-light': isDarkTheme, 'btn-outline-dark': !isDarkTheme}" (click)="toggleTheme()">
-            <span *ngIf="isDarkTheme" matTooltip="Switch to light theme">
-              <mat-icon class="d-flex align-items-center">light_mode</mat-icon>
-            </span>
-            <span *ngIf="!isDarkTheme" matTooltip="Switch to dark theme">
-              <mat-icon class="d-flex align-items-center">dark_mode</mat-icon>
-            </span>
-          </button>
-        </li>
-
-        <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="isLoggedIn">
-          <button mat-button [matMenuTriggerFor]="profileMenu"
-            class="d-flex align-items-center border-0 bg-transparent px-2 py-1 rounded"
-            [ngStyle]="{'color': isDarkTheme ? '#fff' : '#0d6efd', 'background': isDarkTheme ? '#0d6efd' : '#fff'}"
-            id="profileDropdown">
-            <mat-icon class="me-2"
-              [ngClass]="{'text-white': isDarkTheme, 'text-primary': !isDarkTheme}">account_circle</mat-icon>
-            <span class="fw-semibold">{{username}}</span>
-            <mat-icon [ngClass]="{'text-white': isDarkTheme, 'text-primary': !isDarkTheme}">arrow_drop_down</mat-icon>
-          </button>
-        </li>
-        <mat-menu #profileMenu="matMenu" xPosition="after" yPosition="below" class="profile-menu-panel">
-          <button mat-menu-item (click)="onLogout()" class="d-flex align-items-center">
-            <mat-icon class="me-2 text-danger">logout</mat-icon>
-            <span class="text-danger">Logout</span>
-          </button>
-        </mat-menu>
-        <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && !isChatbotPage()">
-          <button class="btn btn-primary" type="button" (click)="onGetStarted()">Get Started</button>
-        </li>
-        <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && isChatbotPage()">
-          <button class="btn btn-primary" type="button" (click)="onLogin()">Login</button>
-        </li>
-      </ul>
-    </div>
+    <ul class="navbar-nav ms-auto d-flex align-items-center flex-row">
+      <li class="nav-item me-2">
+        <button class="btn border-0 bg-transparent text-primary"
+          [ngClass]="{'btn-outline-light': isDarkTheme, 'btn-outline-dark': !isDarkTheme}" (click)="toggleTheme()">
+          <span *ngIf="isDarkTheme" matTooltip="Switch to light theme">
+            <mat-icon class="d-flex align-items-center">light_mode</mat-icon>
+          </span>
+          <span *ngIf="!isDarkTheme" matTooltip="Switch to dark theme">
+            <mat-icon class="d-flex align-items-center">dark_mode</mat-icon>
+          </span>
+        </button>
+      </li>
+      <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="isLoggedIn">
+        <button mat-button [matMenuTriggerFor]="profileMenu"
+          class="d-flex align-items-center border-0 rounded px-2 py-1"
+          [ngClass]="isDarkTheme ? 'bg-primary text-white' : 'bg-white text-primary'" id="profileDropdown">
+          <mat-icon class="me-2" [ngClass]="isDarkTheme ? 'text-white' : 'text-primary'">account_circle</mat-icon>
+          <span class="fw-semibold">{{username}}</span>
+          <mat-icon [ngClass]="isDarkTheme ? 'text-white' : 'text-primary'">arrow_drop_down</mat-icon>
+        </button>
+      </li>
+      <mat-menu #profileMenu="matMenu" xPosition="after" yPosition="below" class="profile-menu-panel">
+        <button mat-menu-item (click)="onLogout()" class="d-flex align-items-center">
+          <mat-icon class="me-2 text-danger">logout</mat-icon>
+          <span class="text-danger">Logout</span>
+        </button>
+      </mat-menu>
+      <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && isChatbotPage()">
+        <button class="btn btn-primary" type="button" (click)="onLogin()">Login</button>
+      </li>
+    </ul>
   </div>
 </nav>
 
