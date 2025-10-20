@@ -34,22 +34,28 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  onUsernameInput(event: any) {
-    event.target.value = event.target.value.toLowerCase();
+  onUsernameInput() {
+    const username = this.loginForm.get('username')?.value;
+    if (username) {
+      this.loginForm.get('username')?.patchValue(username.toLowerCase(), { emitEvent: false });
+    }
   }
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+
+  private markAllControlsTouched() {
+    for (const control of Object.values(this.loginForm.controls)) {
+      control.markAsTouched();
+    }
   }
 
   onLogin() {
     if (this.isSubmitting) {
       return;
     }
-    if (!this.isSubmitting && this.loginForm.invalid) {
-      for (const key of Object.keys(this.loginForm.controls)) {
-        const control = this.loginForm.get(key);
-        control?.markAsTouched();
-      }
+    if (this.loginForm.invalid) {
+      this.markAllControlsTouched();
       return;
     }
 

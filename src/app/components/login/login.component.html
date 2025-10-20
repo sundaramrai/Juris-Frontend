@@ -1,7 +1,7 @@
 <!-- src/app/components/login/login.component.html -->
 <div class="full-screen-wrapper">
-  <div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100dvh - 70px);">
-    <div class="card shadow-lg p-4 border-0" style="max-width: 450px; width: 100%">
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg p-4 border-0 col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
       <div class="text-center">
         <h2 class="fw-bold text-primary">Login</h2>
         <p class="text-muted">Access your account securely</p>
@@ -19,14 +19,19 @@
             <input type="text" class="form-control" id="username" formControlName="username"
               placeholder="Enter your username"
               [class.is-invalid]="!isSubmitting && loginForm.get('username')?.invalid && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)"
-              (input)="onUsernameInput($event)" required />
+              (input)="onUsernameInput()" required aria-describedby="username-errors" />
           </div>
-          <ng-container
-            *ngIf="!isSubmitting && loginForm.get('username')?.errors && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)">
-            <p class="text-danger mt-1" *ngIf="loginForm.get('username')?.errors?.['required']">
-              Username is required.
-            </p>
-          </ng-container>
+          <div
+            *ngIf="!isSubmitting && loginForm.get('username')?.errors && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)"
+            id="username-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
+            role="alert" aria-live="polite" aria-atomic="true">
+            <ul class="mb-0 list-unstyled">
+              <li *ngIf="loginForm.get('username')?.errors?.['required']">
+                <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
+                Username is required.
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div class="mb-3">
@@ -36,18 +41,23 @@
             <input [type]="showPassword ? 'text' : 'password'" class="form-control" id="password"
               formControlName="password" placeholder="Enter your password"
               [class.is-invalid]="!isSubmitting && loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
-              required />
+              required aria-describedby="password-errors" />
             <button type="button" class="input-group-text bg-light" (click)="togglePasswordVisibility()"
-              aria-label="Toggle password visibility" style="cursor: pointer;">
+              aria-label="Toggle password visibility">
               <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </div>
-          <ng-container
-            *ngIf="!isSubmitting && loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)">
-            <p class="text-danger mt-1" *ngIf="loginForm.get('password')?.errors?.['required']">
-              Password is required.
-            </p>
-          </ng-container>
+          <div
+            *ngIf="!isSubmitting && loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
+            id="password-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
+            role="alert" aria-live="polite" aria-atomic="true">
+            <ul class="mb-0 list-unstyled">
+              <li *ngIf="loginForm.get('password')?.errors?.['required']">
+                <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
+                Password is required.
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div class="d-grid gap-2">
@@ -57,7 +67,7 @@
             {{ isLoading ? 'Logging in...' : 'Login' }}
           </button>
           <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center"
-            (click)="onRegister()" style="height: 40px">
+            (click)="onRegister()">
             <mat-icon class="me-2">person_add</mat-icon>Don't have an account? Register
           </button>
         </div>
