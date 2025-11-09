@@ -31,7 +31,9 @@
           </button>
           @if (rating !== ratings[ratings.length - 1]) {
           <span class="vr">
-            <i class="bi bi-circle-fill" *ngFor="let _ of [1, 2, 3, 4, 5, 6]"></i>
+            @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+            <i class="bi bi-circle-fill"></i>
+            }
           </span>
           }
           }
