@@ -2,13 +2,13 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FeedbackService } from '../../services/feedback.service';
-import { CommonModule, NgIf, NgClass, NgFor } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-feedback',
   templateUrl: './feedback.component.html',
   styleUrls: ['./feedback.component.css'],
-  imports: [NgIf, NgClass, NgFor, CommonModule, ReactiveFormsModule]
+  imports: [NgClass, CommonModule, ReactiveFormsModule]
 })
 export class FeedbackComponent {
   feedbackForm: FormGroup;

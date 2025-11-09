@@ -6,47 +6,56 @@
         <mat-icon class="text-white">chat</mat-icon>
       </div>
 
-      <div class="chat-title-container" *ngIf="!editingTitle" (click)="startEditingTitle()"
-        (keydown.enter)="saveChatTitle()" (keyup.enter)="saveChatTitle()">
+      @if (!editingTitle) {
+      <div class="chat-title-container" (click)="startEditingTitle()" (keydown.enter)="saveChatTitle()"
+        (keyup.enter)="saveChatTitle()">
         <h5 class="mb-0 fw-bold text-primary chat-title" [ngClass]="{'title-saved': titleJustSaved}"
           [matTooltip]="chatTitle" matTooltipPosition="above">{{ chatTitle }}
         </h5>
         <mat-icon class="text-muted edit-icon">edit</mat-icon>
       </div>
-
-      <div class="chat-title-edit" *ngIf="editingTitle">
+      }
+      @if (editingTitle) {
+      <div class="chat-title-edit">
         <input #titleInput type="text" class="form-control" [(ngModel)]="tempTitle"
           (keydown)="handleTitleKeyDown($event)" (blur)="saveChatTitle()" maxlength="50" placeholder="Enter chat title">
       </div>
+      }
 
       <p class="text-muted ms-2 mb-0">
-        <span *ngIf="isLoading" class="badge bg-warning text-dark rounded-pill px-2 py-1 status-text">
+        @if (isLoading) {
+        <span class="badge bg-warning text-dark rounded-pill px-2 py-1 status-text">
           Thinking<span class="dot-pulse">.</span><span class="dot-pulse">.</span><span class="dot-pulse">.</span>
         </span>
-        <span *ngIf="!isLoading && !isListening && !isSpeaking"
-          class="badge bg-primary text-white rounded-pill px-2 py-1 status-text">Ready to help</span>
-        <span *ngIf="isListening"
-          class="badge bg-danger text-white rounded-pill px-2 py-1 status-text">Listening...</span>
-        <span *ngIf="isSpeaking"
-          class="badge bg-success text-white rounded-pill px-2 py-1 status-text">Speaking...</span>
+        }
+        @if (!isLoading && !isListening && !isSpeaking) {
+        <span class="badge bg-primary text-white rounded-pill px-2 py-1 status-text">Ready to help</span>
+        }
+        @if (isListening) {
+        <span class="badge bg-danger text-white rounded-pill px-2 py-1 status-text">Listening...</span>
+        }
+        @if (isSpeaking) {
+        <span class="badge bg-success text-white rounded-pill px-2 py-1 status-text">Speaking...</span>
+        }
       </p>
 
       <div class="ms-auto d-flex">
-        <button class="btn btn-icon d-flex align-items-center" matTooltip="Start new chat" (click)="createNewChat()"
-          *ngIf="!chatNotFound && messages.length > 0">
+        @if (!chatNotFound && messages.length > 0) {
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Start new chat" (click)="createNewChat()">
           <mat-icon class="text-primary">add</mat-icon>
         </button>
-        <button class="btn btn-icon d-flex align-items-center" matTooltip="Delete chat" (click)="clearChat()"
-          *ngIf="!chatNotFound && messages.length > 0">
+        <button class="btn btn-icon d-flex align-items-center" matTooltip="Delete chat" (click)="clearChat()">
           <mat-icon class="text-primary">delete</mat-icon>
         </button>
+        }
       </div>
     </div>
   </div>
 
   <div class="card-body p-0">
     <div class="chat-container">
-      <div *ngIf="chatNotFound" class="p-5 text-center">
+      @if (chatNotFound) {
+      <div class="p-5 text-center">
         <div class="my-5 d-flex flex-column align-items-center justify-content-center">
           <div class="empty-icon-container">
             <mat-icon class="text-warning display-1">search_off</mat-icon>
@@ -58,11 +67,13 @@
           </button>
         </div>
       </div>
-
-      <ng-container *ngIf="!chatNotFound">
+      }
+      @else {
+      <ng-container>
         <div #messagesArea class="messages-area p-3 d-flex flex-column"
           [style.overflowY]="messages.length > 0 ? 'auto' : 'hidden'">
-          <div *ngIf="messages.length === 0" class="empty-state text-center p-5">
+          @if (messages.length === 0) {
+          <div class="empty-state text-center p-5">
             <div class="my-5 d-flex flex-column align-items-center justify-content-center">
               <div class="empty-icon-container">
                 <mat-icon class="text-primary empty-icon">sentiment_satisfied</mat-icon>
@@ -70,7 +81,9 @@
               <p class="mt-3 text-muted">No messages yet. Start a conversation!</p>
             </div>
           </div>
-          <div class="message-wrapper" *ngFor="let message of messages"
+          }
+          @for (message of messages; track message) {
+          <div class="message-wrapper"
             [ngClass]="{'bot-wrapper': message.type === 'bot', 'user-wrapper': message.type === 'user'}">
             <div class="message"
               [ngClass]="{'bot-message': message.type === 'bot', 'user-message': message.type === 'user'}">
@@ -80,30 +93,39 @@
                   [ngClass]="{'text-muted': message.type === 'bot', 'text-white-50': message.type === 'user'}">
                   {{ message.time | date:'shortTime' }}
                 </small>
-                <div class="message-actions d-flex align-items-center" *ngIf="message.type === 'bot'">
+                @if (message.type === 'bot') {
+                <div class="message-actions d-flex align-items-center">
                   <button class="btn btn-sm btn-icon action-btn"
                     [ngClass]="{'text-primary': !isSpeaking, 'text-danger': isSpeaking}"
                     (click)="isSpeaking ? stopSpeechSynthesis() : speakMessage(message.text)"
                     [matTooltip]="isSpeaking ? 'Stop speaking' : 'Listen to message'" matTooltipPosition="above">
                     <mat-icon>{{ isSpeaking ? 'volume_off' : 'volume_up' }}</mat-icon>
                   </button>
-                  <button *ngIf="!showCopied" class="btn btn-sm btn-icon action-btn ms-2 text-primary"
-                    (click)="copyMessage(message.text)" matTooltip="Copy message" matTooltipPosition="above">
+                  @if (!showCopied) {
+                  <button class="btn btn-sm btn-icon action-btn ms-2 text-primary" (click)="copyMessage(message.text)"
+                    matTooltip="Copy message" matTooltipPosition="above">
                     <mat-icon>content_copy</mat-icon>
                   </button>
-                  <button *ngIf="showCopied" class="btn btn-sm btn-icon action-btn ms-2 text-primary"
-                    matTooltip="Copied!" matTooltipPosition="above">
+                  }
+                  @if (showCopied) {
+                  <button class="btn btn-sm btn-icon action-btn ms-2 text-primary" matTooltip="Copied!"
+                    matTooltipPosition="above">
                     <mat-icon>done</mat-icon>
                   </button>
+                  }
                 </div>
+                }
               </div>
             </div>
           </div>
-          <div *ngIf="isLoading && messages.length > 0" class="bot-wrapper">
+          }
+          @if (isLoading && messages.length > 0) {
+          <div class="bot-wrapper">
             <div class="message bot-message typing-indicator">
               <div class="dot-flashing"></div>
             </div>
           </div>
+          }
         </div>
 
         <div class="input-container border-0">
@@ -129,6 +151,7 @@
           </div>
         </div>
       </ng-container>
+      }
     </div>
   </div>
 </div>

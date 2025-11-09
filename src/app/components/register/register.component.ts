@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, 
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TldService } from '../../services/tld.service';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { of } from 'rxjs';
@@ -13,7 +13,7 @@ import { of } from 'rxjs';
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [NgIf, CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule]
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule]
 })
 export class RegisterComponent implements OnInit {
   isLoading = false;

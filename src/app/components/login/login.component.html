@@ -6,10 +6,12 @@
         <h2 class="fw-bold text-primary">Login</h2>
         <p class="text-muted">Access your account securely</p>
       </div>
-      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+      @if (errorMessage) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ errorMessage }}
         <button type="button" class="btn-close" (click)="errorMessage = null"></button>
       </div>
+      }
 
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="off">
         <div class="mb-3">
@@ -21,17 +23,20 @@
               [class.is-invalid]="!isSubmitting && loginForm.get('username')?.invalid && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)"
               (input)="onUsernameInput()" required aria-describedby="username-errors" />
           </div>
-          <div
-            *ngIf="!isSubmitting && loginForm.get('username')?.errors && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)"
-            id="username-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
+          @if (!isSubmitting && loginForm.get('username')?.errors && (loginForm.get('username')?.touched ||
+          loginForm.get('username')?.dirty)) {
+          <div id="username-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
             role="alert" aria-live="polite" aria-atomic="true">
             <ul class="mb-0 list-unstyled">
-              <li *ngIf="loginForm.get('username')?.errors?.['required']">
+              @if (loginForm.get('username')?.errors?.['required']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Username is required.
               </li>
+              }
             </ul>
           </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -47,23 +52,28 @@
               <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </div>
-          <div
-            *ngIf="!isSubmitting && loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)"
-            id="password-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
+          @if (!isSubmitting && loginForm.get('password')?.errors && (loginForm.get('password')?.touched ||
+          loginForm.get('password')?.dirty)) {
+          <div id="password-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
             role="alert" aria-live="polite" aria-atomic="true">
             <ul class="mb-0 list-unstyled">
-              <li *ngIf="loginForm.get('password')?.errors?.['required']">
+              @if (loginForm.get('password')?.errors?.['required']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Password is required.
               </li>
+              }
             </ul>
           </div>
+          }
         </div>
 
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-primary shadow-sm"
             [disabled]="!isSubmitting && (loginForm.invalid || isLoading)">
-            <output *ngIf="isLoading"><span class="spinner-border spinner-border-sm me-1"></span></output>
+            @if (isLoading) {
+            <output><span class="spinner-border spinner-border-sm me-1"></span></output>
+            }
             {{ isLoading ? 'Logging in...' : 'Login' }}
           </button>
           <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center"

@@ -17,15 +17,19 @@
       <li class="nav-item me-2">
         <button class="btn border-0 bg-transparent text-primary"
           [ngClass]="{'btn-outline-light': isDarkTheme, 'btn-outline-dark': !isDarkTheme}" (click)="toggleTheme()">
-          <span *ngIf="isDarkTheme" matTooltip="Switch to light theme">
+          @if (isDarkTheme) {
+          <span matTooltip="Switch to light theme">
             <mat-icon class="d-flex align-items-center">light_mode</mat-icon>
           </span>
-          <span *ngIf="!isDarkTheme" matTooltip="Switch to dark theme">
+          } @else {
+          <span matTooltip="Switch to dark theme">
             <mat-icon class="d-flex align-items-center">dark_mode</mat-icon>
           </span>
+          }
         </button>
       </li>
-      <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="isLoggedIn">
+      @if (isLoggedIn) {
+      <li class="nav-item my-1 my-lg-0 mx-lg-3">
         <button mat-button [matMenuTriggerFor]="profileMenu"
           class="d-flex align-items-center border-0 rounded px-2 py-1"
           [ngClass]="isDarkTheme ? 'bg-primary text-white' : 'bg-white text-primary'" id="profileDropdown">
@@ -34,15 +38,18 @@
           <mat-icon [ngClass]="isDarkTheme ? 'text-white' : 'text-primary'">arrow_drop_down</mat-icon>
         </button>
       </li>
+      }
       <mat-menu #profileMenu="matMenu" xPosition="after" yPosition="below" class="profile-menu-panel">
         <button mat-menu-item (click)="onLogout()" class="d-flex align-items-center">
           <mat-icon class="me-2 text-danger">logout</mat-icon>
           <span class="text-danger">Logout</span>
         </button>
       </mat-menu>
-      <li class="nav-item my-1 my-lg-0 mx-lg-3" *ngIf="!isLoggedIn && !isLoginOrRegisterPage() && isChatbotPage()">
+      @if (!isLoggedIn && !isLoginOrRegisterPage() && isChatbotPage()) {
+      <li class="nav-item my-1 my-lg-0 mx-lg-3">
         <button class="btn btn-primary" type="button" (click)="onLogin()">Login</button>
       </li>
+      }
     </ul>
   </div>
 </nav>

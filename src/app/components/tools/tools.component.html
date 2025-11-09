@@ -3,14 +3,18 @@
   <div class="row">
     <div class="col-md-3 d-none d-md-block">
       <app-options></app-options>
-      <app-recent-chats *ngIf="isAssistantRoute()"></app-recent-chats>
+      @if (isAssistantRoute()) {
+      <app-recent-chats></app-recent-chats>
+      }
     </div>
 
     <div class="col-md-9 mb-3">
       <router-outlet></router-outlet>
-      <div *ngIf="isAssistantRoute()" class="mt-1 text-muted small text-center">
+      @if (isAssistantRoute()) {
+      <div class="mt-1 text-muted small text-center">
         AI-assisted legal info for informational purposes only.
       </div>
+      }
     </div>
   </div>
 </div>

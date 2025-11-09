@@ -1,6 +1,6 @@
 // src/app/components/tools/tools.component.ts
 import { Component } from '@angular/core';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule} from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { OptionsComponent } from '../options/options.component';
 import { RecentChatsComponent } from '../recent-chats/recent-chats.component';
@@ -9,7 +9,7 @@ import { RecentChatsComponent } from '../recent-chats/recent-chats.component';
   selector: 'app-tools',
   templateUrl: './tools.component.html',
   styleUrl: './tools.component.css',
-  imports: [NgIf, CommonModule, RouterModule, OptionsComponent, RecentChatsComponent],
+  imports: [CommonModule, RouterModule, OptionsComponent, RecentChatsComponent],
 })
 export class ToolsComponent {
   constructor(private router: Router, private route: ActivatedRoute) {

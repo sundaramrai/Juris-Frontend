@@ -7,12 +7,13 @@
         <p class="text-muted">Sign up to access all features</p>
       </div>
 
-      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert"
-        aria-live="assertive" aria-atomic="true">
+      @if (errorMessage) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert" aria-live="assertive" aria-atomic="true">
         <mat-icon class="me-1 align-middle">error</mat-icon>
         {{ errorMessage }}
         <button type="button" class="btn-close" (click)="errorMessage = null" aria-label="Close"></button>
       </div>
+      }
 
       <form [formGroup]="registerForm" (ngSubmit)="onRegister()" autocomplete="off">
         <div class="mb-3">
@@ -23,29 +24,38 @@
               [class.is-invalid]="!isSubmitting && registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)"
               required aria-describedby="email-errors" />
           </div>
-          <div
-            *ngIf="!isSubmitting && registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)"
-            id="email-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
+          @if (!isSubmitting && registerForm.get('email')?.errors && (registerForm.get('email')?.touched ||
+          registerForm.get('email')?.dirty)) {
+          <div id="email-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
             role="alert" aria-live="polite" aria-atomic="true">
             <ul class="mb-0 list-unstyled">
-              <li *ngIf="registerForm.get('email')?.errors?.['required']">
+              @if (registerForm.get('email')?.errors?.['required']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Email is required.
               </li>
-              <li *ngIf="registerForm.get('email')?.errors?.['invalidFormat']">
+              }
+              @if (registerForm.get('email')?.errors?.['invalidFormat']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Invalid email format.
               </li>
-              <li *ngIf="registerForm.get('email')?.errors?.['emailExists']">
+              }
+              @if (registerForm.get('email')?.errors?.['emailExists']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Email already registered.
               </li>
-              <li *ngIf="registerForm.get('email')?.errors?.['invalidTLD']">
+              }
+              @if (registerForm.get('email')?.errors?.['invalidTLD']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Email domain TLD is not valid.
               </li>
+              }
             </ul>
           </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -56,41 +66,56 @@
               [class.is-invalid]="!isSubmitting && registerForm.get('username')?.invalid && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)"
               (input)="onUsernameInput()" required aria-describedby="username-errors" />
           </div>
-          <div
-            *ngIf="!isSubmitting && registerForm.get('username')?.errors && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)"
-            id="username-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
+          @if (!isSubmitting && registerForm.get('username')?.errors && (registerForm.get('username')?.touched ||
+          registerForm.get('username')?.dirty)) {
+          <div id="username-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
             role="alert" aria-live="polite" aria-atomic="true">
             <ul class="mb-0 list-unstyled">
-              <li *ngIf="registerForm.get('username')?.errors?.['required']">
+              @if (registerForm.get('username')?.errors?.['required']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Username is required.
               </li>
-              <li *ngIf="registerForm.get('username')?.errors?.['minlength']">
+              }
+              @if (registerForm.get('username')?.errors?.['minlength']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Minimum {{usernameMinLength}} characters.
               </li>
-              <li *ngIf="registerForm.get('username')?.errors?.['maxlength']">
+              }
+              @if (registerForm.get('username')?.errors?.['maxlength']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Maximum {{usernameMaxLength}} characters.
               </li>
-              <li *ngIf="registerForm.get('username')?.errors?.['invalidCharacters']">
+              }
+              @if (registerForm.get('username')?.errors?.['invalidCharacters']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Only letters, numbers, and underscores allowed.
               </li>
-              <li *ngIf="registerForm.get('username')?.errors?.['usernameExists']">
+              }
+              @if (registerForm.get('username')?.errors?.['usernameExists']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Username already taken.
               </li>
-              <li *ngIf="registerForm.get('username')?.errors?.['insufficientLetters']">
+              }
+              @if (registerForm.get('username')?.errors?.['insufficientLetters']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Username must contain at least 2 letters.
               </li>
-              <li *ngIf="registerForm.get('username')?.errors?.['numericOnly']">
+              }
+              @if (registerForm.get('username')?.errors?.['numericOnly']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Username cannot be only numbers.
               </li>
+              }
             </ul>
           </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -106,27 +131,34 @@
               <mat-icon class="text-primary">{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </div>
-          <div
-            *ngIf="!isSubmitting && registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)"
-            id="password-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
+          @if (!isSubmitting && registerForm.get('password')?.errors && (registerForm.get('password')?.touched ||
+          registerForm.get('password')?.dirty)) {
+          <div id="password-errors" class="alert alert-danger py-2 px-3 mt-2 mb-0 animate__animated animate__fadeIn"
             role="alert" aria-live="polite" aria-atomic="true">
             <ul class="mb-0 list-unstyled">
-              <li *ngIf="registerForm.get('password')?.errors?.['required']">
+              @if (registerForm.get('password')?.errors?.['required']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Password is required.
               </li>
-              <li *ngIf="registerForm.get('password')?.errors?.['patternMismatch']">
+              }
+              @if (registerForm.get('password')?.errors?.['patternMismatch']) {
+              <li>
                 <mat-icon class="me-1 text-danger align-middle">error_outline</mat-icon>
                 Must be 8+ chars, 2 numbers, 1 uppercase, 1 special.
               </li>
+              }
             </ul>
           </div>
+          }
         </div>
 
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-primary shadow-sm"
             [disabled]="!isSubmitting && (registerForm.invalid || isLoading)">
-            <output *ngIf="isLoading"><span class="spinner-border spinner-border-sm me-1"></span></output>
+            @if (isLoading) {
+            <output><span class="spinner-border spinner-border-sm me-1"></span></output>
+            }
             {{ isLoading ? 'Registering...' : 'Register' }}
           </button>
           <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center"

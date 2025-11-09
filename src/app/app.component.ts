@@ -2,7 +2,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
-import { CommonModule, NgClass, NgIf } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -13,7 +13,7 @@ const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports: [NgClass, NgIf, ReactiveFormsModule, CommonModule, MatIconModule, RouterOutlet, MatMenuModule],
+  imports: [NgClass, ReactiveFormsModule, CommonModule, MatIconModule, RouterOutlet, MatMenuModule],
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Juris AI';
