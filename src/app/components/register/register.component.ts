@@ -4,16 +4,14 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, 
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TldService } from '../../services/tld.service';
-import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { of } from 'rxjs';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule]
+  imports: [ReactiveFormsModule, MatIconModule]
 })
 export class RegisterComponent implements OnInit {
   isLoading = false;

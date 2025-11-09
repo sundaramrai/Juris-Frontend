@@ -1,6 +1,5 @@
 // src/app/components/tools/tools.component.ts
 import { Component } from '@angular/core';
-import { CommonModule} from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { OptionsComponent } from '../options/options.component';
 import { RecentChatsComponent } from '../recent-chats/recent-chats.component';
@@ -9,12 +8,10 @@ import { RecentChatsComponent } from '../recent-chats/recent-chats.component';
   selector: 'app-tools',
   templateUrl: './tools.component.html',
   styleUrl: './tools.component.css',
-  imports: [CommonModule, RouterModule, OptionsComponent, RecentChatsComponent],
+  imports: [RouterModule, OptionsComponent, RecentChatsComponent],
 })
 export class ToolsComponent {
-  constructor(private router: Router, private route: ActivatedRoute) {
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-  }
+  constructor(private router: Router, private route: ActivatedRoute) { }
 
   isAssistantRoute(): boolean {
     return this.router.url.startsWith('/tools/assistant');

@@ -4,16 +4,14 @@ import { ResponseService } from '../../services/response.service';
 import { ChatInfo } from '../../Interface';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { CommonModule} from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
 @Component({
   selector: 'app-recent-chats',
   templateUrl: './recent-chats.component.html',
   styleUrls: ['./recent-chats.component.css'],
-  imports: [ReactiveFormsModule, CommonModule, MatIconModule, MatTooltipModule],
+  imports: [DatePipe, MatIconModule, MatTooltipModule],
 })
 export class RecentChatsComponent implements OnInit, OnDestroy {
   chats: ChatInfo[] = [];
