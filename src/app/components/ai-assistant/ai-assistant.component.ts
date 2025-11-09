@@ -6,16 +6,16 @@ import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule, NgClass } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-ai-assistant',
   templateUrl: './ai-assistant.component.html',
   styleUrls: ['./ai-assistant.component.css'],
-  imports: [NgClass, CommonModule, MatIconModule, MatTooltipModule, ReactiveFormsModule, FormsModule],
+  imports: [NgClass, MatIconModule, MatTooltipModule, ReactiveFormsModule, FormsModule, DatePipe],
 })
 export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   messages: Message[] = [];
