@@ -1,4 +1,3 @@
-// src/app/components/options/options.component.ts
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 

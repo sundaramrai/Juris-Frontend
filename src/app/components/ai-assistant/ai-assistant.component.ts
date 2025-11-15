@@ -1,4 +1,3 @@
-// src/app/components/ai-assistant/ai-assistant.component.ts
 import { Component, ElementRef, OnInit, ViewChild, NgZone, AfterViewInit, OnDestroy } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';

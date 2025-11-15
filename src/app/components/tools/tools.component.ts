@@ -1,4 +1,3 @@
-// src/app/components/tools/tools.component.ts
 import { Component } from '@angular/core';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { OptionsComponent } from '../options/options.component';

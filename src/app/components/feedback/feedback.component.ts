@@ -1,4 +1,3 @@
-// src/app/components/feedback/feedback.component.ts
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FeedbackService } from '../../services/feedback.service';

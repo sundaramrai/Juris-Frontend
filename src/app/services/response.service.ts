@@ -1,4 +1,3 @@
-// src/app/services/response.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject, timer } from 'rxjs';

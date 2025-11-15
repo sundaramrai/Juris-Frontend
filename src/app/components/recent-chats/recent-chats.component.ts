@@ -1,4 +1,3 @@
-// src/app/components/recent-chats/recent-chats.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { ChatInfo } from '../../Interface';
