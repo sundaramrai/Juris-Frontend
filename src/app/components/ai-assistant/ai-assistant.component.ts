@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild, NgZone, AfterViewInit, OnDestroy } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
-import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -48,7 +47,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private responseService: ResponseService,
-    private http: HttpClient,
     private ngZone: NgZone,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
