@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: "https://juris-backend-eirw.onrender.com/api",
+  apiUrl: "https://juris-backend.vercel.app/api"
 };
