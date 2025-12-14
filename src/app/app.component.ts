@@ -93,7 +93,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (loginTimestamp) {
       const elapsed = Date.now() - Number.parseInt(loginTimestamp, 10);
       if (elapsed > TWELVE_HOURS_MS) {
-        this.logout();
+        this.performLogout();
       } else {
         this.setLogoutTimer(TWELVE_HOURS_MS - elapsed);
       }
@@ -101,21 +101,23 @@ export class AppComponent implements OnInit, OnDestroy {
   };
 
   setLogoutTimer = (timeout: number) => {
-    setTimeout(this.logout, timeout);
+    setTimeout(() => this.performLogout(), timeout);
   };
 
-  logout = () => {
-    localStorage.removeItem('loggedInUser');
-    localStorage.removeItem('loginTimestamp');
-    localStorage.removeItem('token');
-    this.authService.logout();
-    this.isLoggedIn = false;
-    if (this.router.url !== '/home') {
-      this.router.navigate(['/home']);
-    }
+  private performLogout = () => {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.isLoggedIn = false;
+      },
+      error: (error) => {
+        console.error('Logout failed:', error);
+        this.isLoggedIn = false;
+        this.router.navigate(['/home']);
+      }
+    });
   };
 
-  onLogout = () => this.logout();
+  onLogout = () => this.performLogout();
 
   get loggedInUser(): string | null {
     return this.authService.loggedInUser;
