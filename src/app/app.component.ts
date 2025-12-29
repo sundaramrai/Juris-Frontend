@@ -5,8 +5,6 @@ import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
-const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -46,8 +44,6 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     };
     this.systemThemeMediaQuery.addEventListener('change', this.mediaQueryListener);
-
-    this.checkLoginTimestamp();
   }
 
   ngOnDestroy() {
@@ -86,22 +82,6 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn && (this.isLoginPage || this.isRegisterPage)) {
       this.router.navigate(['/tools']);
     }
-  };
-
-  checkLoginTimestamp = () => {
-    const loginTimestamp = localStorage.getItem('loginTimestamp');
-    if (loginTimestamp) {
-      const elapsed = Date.now() - Number.parseInt(loginTimestamp, 10);
-      if (elapsed > TWELVE_HOURS_MS) {
-        this.performLogout();
-      } else {
-        this.setLogoutTimer(TWELVE_HOURS_MS - elapsed);
-      }
-    }
-  };
-
-  setLogoutTimer = (timeout: number) => {
-    setTimeout(() => this.performLogout(), timeout);
   };
 
   private performLogout = () => {
