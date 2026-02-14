@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
       console.log("🔄 User already logged in, redirecting...");
-      this.router.navigate(['/tools']);
+      this.router.navigate(['/assistant']);
     }
   }
 
@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('loginTimestamp', Date.now().toString());
 
         this.isLoading = false;
-        this.router.navigate(['/tools']);
+        this.router.navigate(['/assistant']);
       },
       error: (error) => {
         console.error("❌ Login failed:", error);

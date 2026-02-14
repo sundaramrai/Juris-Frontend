@@ -54,7 +54,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
-      if (user) this.router.navigate(['/tools']);
+      if (user) this.router.navigate(['/assistant']);
     });
 
     this.tldService.getTlds().subscribe((tlds: string[]) => {

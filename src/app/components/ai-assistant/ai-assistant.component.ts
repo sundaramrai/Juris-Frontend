@@ -103,7 +103,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     this.messages = [];
     this.chatTitle = 'New Chat';
     this.responseService.setCurrentChatId(null);
-    this.router.navigate(['/tools/assistant'], {
+    this.router.navigate(['/assistant'], {
       queryParams: {},
       replaceUrl: true
     });
@@ -377,7 +377,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private extractSections(text: string, sectionNames: string[]): { [key: string]: string } {
-    const headerRegex = new RegExp(`^(${sectionNames.join('|')})\\s*:\\s*(.*)$`, 'i');
+    const headerRegex = new RegExp(String.raw`^(${sectionNames.join('|')})\s*:\s*(.*)$`, 'i');
     const lines = text.split('\n');
     let sections: { [key: string]: string } = {};
     let currentSection = "";
@@ -485,7 +485,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         this.scrollToBottom();
         this.isLoading = false;
         if (!this.messages.length) {
-          this.router.navigate(['/tools/assistant'], {
+          this.router.navigate(['/assistant'], {
             queryParams: {},
             replaceUrl: true
           });

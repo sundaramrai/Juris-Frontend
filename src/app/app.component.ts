@@ -80,7 +80,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isLoggedIn = this.authService.isLoggedIn();
 
     if (this.isLoggedIn && (this.isLoginPage || this.isRegisterPage)) {
-      this.router.navigate(['/tools']);
+      this.router.navigate(['/assistant']);
     }
   };
 
@@ -107,6 +107,6 @@ export class AppComponent implements OnInit, OnDestroy {
   onGetStarted = () => this.router.navigate(['/login']);
   onLogin = () => this.router.navigate(['/login']);
 
-  isChatbotPage = (): boolean => this.router.url === '/tools';
+  isChatbotPage = (): boolean => this.router.url === '/assistant';
   isLoginOrRegisterPage = (): boolean => ['/login', '/register'].includes(this.router.url);
 }

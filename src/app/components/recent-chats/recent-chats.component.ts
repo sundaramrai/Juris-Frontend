@@ -88,7 +88,7 @@ export class RecentChatsComponent implements OnInit, OnDestroy {
 
     if (chat && chat.messageCount && chat.messageCount > 0) {
       this.responseService.setCurrentChatId(chatId);
-      this.router.navigate(['/tools/assistant'], { queryParams: { chatId } });
+      this.router.navigate(['/assistant'], { queryParams: { chatId } });
     } else {
       this.createNewChat();
     }
@@ -96,6 +96,6 @@ export class RecentChatsComponent implements OnInit, OnDestroy {
 
   createNewChat(): void {
     this.responseService.setCurrentChatId(null);
-    this.router.navigate(['/tools/assistant']);
+    this.router.navigate(['/assistant']);
   }
 }

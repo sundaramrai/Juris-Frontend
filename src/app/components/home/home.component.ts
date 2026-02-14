@@ -17,7 +17,7 @@ export class HomeComponent {
   }
   ontryNow() {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/tools']);
+      this.router.navigate(['/assistant']);
     } else {
       this.router.navigate(['/login']);
     }
