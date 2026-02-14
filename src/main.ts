@@ -1,3 +1,4 @@
+import { provideZoneChangeDetection } from "@angular/core";
 import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -19,7 +20,7 @@ if (environment.production) {
 try {
   await bootstrapApplication(AppComponent, {
     providers: [
-      provideHttpClient(withInterceptors([AuthInterceptor])),
+      provideZoneChangeDetection(),provideHttpClient(withInterceptors([AuthInterceptor])),
       provideRouter(routes),
     ]
   });
