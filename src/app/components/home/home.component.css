@@ -42,24 +42,6 @@
   }
 }
 
-.feature-card {
-  border-radius: 16px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  border: none;
-  box-shadow: 0 10px 30px #adabab;
-}
-
-.feature-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 35px rgba(13, 110, 253, 1);
-}
-
-.feature-icon {
-  border-radius: 50%;
-  background-color: rgba(13, 110, 253, 0.1);
-}
-
 .blob {
   position: absolute;
   z-index: -1;
@@ -168,37 +150,6 @@
   }
 }
 
-:host-context(.dark-theme) .feature-card {
-  background-color: #1e1e1e !important;
-  color: #f5f5f5;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  border: none;
-}
-
-:host-context(.dark-theme) .feature-card:hover {
-  box-shadow: 0 15px 35px rgba(13, 110, 253, 0.2);
-}
-
-:host-context(.dark-theme) .feature-icon {
-  background-color: rgba(13, 110, 253, 0.2);
-}
-
-:host-context(.dark-theme) .feature-icon svg {
-  fill: #64b5f6 !important;
-}
-
-:host-context(.dark-theme) #features .text-muted {
-  color: #adb5bd !important;
-}
-
-:host-context(.dark-theme) #features .text-primary {
-  color: #64b5f6 !important;
-}
-
-:host-context(.dark-theme) #features h2 {
-  color: #fff !important;
-}
-
 :host-context(.dark-theme) #how-it-works {
   background-color: #1e1e1e !important;
   color: #f5f5f5;
@@ -304,11 +255,6 @@
   width: 17.5rem;
   height: 17.5rem;
   object-fit: cover;
-}
-
-.feature-icon-size {
-  width: 5rem;
-  height: 5rem;
 }
 
 .chat-avatar-size {
