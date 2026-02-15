@@ -1,29 +1,22 @@
-import { provideZoneChangeDetection } from "@angular/core";
-import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app-routing.module';
 import { AuthInterceptor } from './app/interceptors/auth.interceptor';
 import { environment } from './environments/environment';
 
 if (environment.production) {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   console.log = () => { };
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   console.warn = () => { };
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   console.error = () => { };
 }
 
-try {
-  await bootstrapApplication(AppComponent, {
-    providers: [
-      provideZoneChangeDetection(),provideHttpClient(withInterceptors([AuthInterceptor])),
-      provideRouter(routes),
-    ]
-  });
-} catch (err) {
-  console.error(err);
-}
+await bootstrapApplication(AppComponent, {
+  providers: [
+    provideZonelessChangeDetection(),
+    provideHttpClient(withInterceptors([AuthInterceptor])),
+    provideRouter(routes),
+  ],
+});
