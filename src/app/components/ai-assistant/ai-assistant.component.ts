@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, NgZone, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -18,7 +18,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   messages: Message[] = [];
   userInput: string = '';
-  username: string | null = null;
   titleJustSaved: boolean = false;
   chatTitle: string = 'New Chat';
   chatId: string | null = null;
@@ -39,7 +38,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   editingTitle: boolean = false;
   tempTitle: string = '';
   private routeSub: Subscription | null = null;
-  private chatIdSub: Subscription | null = null;
 
   @ViewChild('messagesArea') messagesArea!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
@@ -47,7 +45,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private responseService: ResponseService,
-    private ngZone: NgZone,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private router: Router
@@ -57,11 +54,6 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const user = localStorage.getItem('user');
-    if (user) {
-      this.username = JSON.parse(user).username;
-    }
-
     this.routeSub = this.route.queryParams.subscribe(params => {
       const newChatId = params['chatId'];
       if (newChatId && newChatId !== this.chatId) {
@@ -80,22 +72,13 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initScrollListener();
-    setTimeout(() => {
-      if (this.messageInput) {
-        this.messageInput.nativeElement.focus();
-      }
-    });
+    this.messageInput?.nativeElement.focus();
   }
 
   ngOnDestroy(): void {
     this.stopSpeechRecognition();
     this.stopSpeechSynthesis();
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
-    }
-    if (this.chatIdSub) {
-      this.chatIdSub.unsubscribe();
-    }
+    this.routeSub?.unsubscribe();
   }
 
   createNewChat(): void {
@@ -148,42 +131,34 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           }
 
-          this.ngZone.run(() => {
-            this.userInput = (this.finalTranscript + ' ' + this.interimTranscript).trim();
-            setTimeout(() => {
-              if (this.messageInput) {
-                this.autoResizeTextarea(this.messageInput.nativeElement);
-              }
-            }, 0);
-          });
+          this.userInput = (this.finalTranscript + ' ' + this.interimTranscript).trim();
+          this.autoResizeTextarea(this.messageInput?.nativeElement);
 
-          this.pauseTimer = setTimeout(() => {
-            this.ngZone.run(() => {
-              this.processFinalTranscript();
-              if (this.isListening) {
-                this.stopSpeechRecognition();
-              }
-            });
-          }, this.pauseDelay);
+          this.pauseTimer = this.createPauseTimer();
         };
 
         this.recognition.onerror = (event: any) => {
           console.error('Speech recognition error:', event.error);
           if (event.error !== 'no-speech') {
-            this.ngZone.run(() => {
-              this.isListening = false;
-            });
+            this.isListening = false;
           }
         };
 
         this.recognition.onend = () => {
-          this.ngZone.run(() => {
-            this.isListening = false;
-            this.processFinalTranscript();
-          });
+          this.isListening = false;
+          this.processFinalTranscript();
         };
       }
     }
+  }
+
+  private createPauseTimer(): any {
+    return globalThis.setTimeout(() => {
+      this.processFinalTranscript();
+      if (this.isListening) {
+        this.stopSpeechRecognition();
+      }
+    }, this.pauseDelay);
   }
 
   toggleSpeechRecognition(): void {
@@ -212,7 +187,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch (error) {
       console.error('Error starting speech recognition:', error);
       this.stopSpeechRecognition();
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         try {
           this.recognition.start();
           this.isListening = true;
@@ -220,7 +195,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
           console.error('Error on retry speech recognition:', retryError);
           this.isListening = false;
         }
-      }, 100);
+      });
     }
   }
 
@@ -235,14 +210,8 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error('Error stopping speech recognition:', error);
       }
       this.isListening = false;
-      this.ngZone.run(() => {
-        this.userInput = this.finalTranscript.trim();
-        setTimeout(() => {
-          if (this.messageInput) {
-            this.autoResizeTextarea(this.messageInput.nativeElement);
-          }
-        }, 0);
-      });
+      this.userInput = this.finalTranscript.trim();
+      this.autoResizeTextarea(this.messageInput?.nativeElement);
     }
   }
 
@@ -265,10 +234,8 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     if ('speechSynthesis' in globalThis) {
       this.synthesis = globalThis.speechSynthesis;
       this.loadVoices();
-      if (this.synthesis) {
-        if (this.synthesis.onvoiceschanged !== undefined) {
-          this.synthesis.onvoiceschanged = this.loadVoices.bind(this);
-        }
+      if (this.synthesis?.onvoiceschanged !== undefined) {
+        this.synthesis.onvoiceschanged = this.loadVoices.bind(this);
       }
     }
   }
@@ -310,22 +277,16 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     this.speechSynthesisUtterance.volume = 1;
 
     this.speechSynthesisUtterance.onstart = () => {
-      this.ngZone.run(() => {
-        this.isSpeaking = true;
-      });
+      this.isSpeaking = true;
     };
 
     this.speechSynthesisUtterance.onend = () => {
-      this.ngZone.run(() => {
-        this.isSpeaking = false;
-      });
+      this.isSpeaking = false;
     };
 
     this.speechSynthesisUtterance.onerror = (event) => {
       console.error('Speech synthesis error:', event);
-      this.ngZone.run(() => {
-        this.isSpeaking = false;
-      });
+      this.isSpeaking = false;
     };
 
     this.synthesis.speak(this.speechSynthesisUtterance);
@@ -339,6 +300,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   autoResizeTextarea(textarea: HTMLTextAreaElement): void {
+    if (!textarea) return;
     textarea.style.height = 'auto';
     const newHeight = Math.min(150, textarea.scrollHeight);
     textarea.style.height = `${newHeight}px`;
@@ -529,9 +491,9 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       const textareaElement = this.messageInput.nativeElement;
       textareaElement.style.height = 'auto';
       textareaElement.style.height = '38px';
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         textareaElement.focus();
-      }, 0);
+      });
     }
 
     this.responseService.sendMessage(messageText, currentChatId || undefined).subscribe({
@@ -577,9 +539,11 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     if (text) {
       navigator.clipboard.writeText(text).then(() => {
         this.showCopied = true;
-        setTimeout(() => {
-          this.showCopied = false;
-        }, 1000);
+        requestAnimationFrame(() => {
+          globalThis.setTimeout(() => {
+            this.showCopied = false;
+          }, 1000);
+        });
       }, (error) => {
         console.error('Error copying message to clipboard:', error);
       });
@@ -618,9 +582,9 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     requestAnimationFrame(() => {
       if (this.messagesArea) {
         const element = this.messagesArea.nativeElement;
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           element.scrollTop = element.scrollHeight;
-        }, 10);
+        });
       }
     });
   }
@@ -639,10 +603,8 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   startEditingTitle(): void {
     this.editingTitle = true;
     this.tempTitle = this.chatTitle;
-    setTimeout(() => {
-      if (this.titleInput) {
-        this.titleInput.nativeElement.focus();
-      }
+    requestAnimationFrame(() => {
+      this.titleInput?.nativeElement.focus();
     });
   }
 
@@ -660,7 +622,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         this.chatTitle = response.title;
         this.editingTitle = false;
         this.titleJustSaved = true;
-        setTimeout(() => {
+        globalThis.setTimeout(() => {
           this.titleJustSaved = false;
         }, 1500);
       },
