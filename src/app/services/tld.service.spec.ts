@@ -1,13 +1,19 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { TldService } from './tld.service';
-import "jasmine";
 
 describe('TldService', () => {
   let service: TldService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        TldService,
+        provideHttpClient()
+      ]
+    });
+
     service = TestBed.inject(TldService);
   });
 

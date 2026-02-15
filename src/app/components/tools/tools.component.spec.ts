@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 
 import { ToolsComponent } from './tools.component';
-import "jasmine";
+
 
 describe('ToolsComponent', () => {
   let component: ToolsComponent;
@@ -9,7 +11,8 @@ describe('ToolsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ToolsComponent]
+      imports: [ToolsComponent],
+      providers: [provideRouter([]), provideHttpClient()]
     })
     .compileComponents();
 

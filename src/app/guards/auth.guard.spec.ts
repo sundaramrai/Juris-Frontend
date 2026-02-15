@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CanActivateFn } from '@angular/router';
 
 import { AuthGuard } from './auth.guard';
-import "jasmine";
+
 
 describe('AuthGuard', () => {
   const executeGuard: CanActivateFn = () =>

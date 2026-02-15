@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 
 import { AiAssistantComponent } from './ai-assistant.component';
-import "jasmine";
+
 
 describe('AiAssistantComponent', () => {
   let component: AiAssistantComponent;
@@ -9,7 +11,8 @@ describe('AiAssistantComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AiAssistantComponent]
+      imports: [AiAssistantComponent],
+      providers: [provideRouter([]), provideHttpClient()]
     })
     .compileComponents();
 

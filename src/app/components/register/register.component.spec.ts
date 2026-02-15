@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RegisterComponent } from './register.component';
-import "jasmine";
+
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -9,7 +9,7 @@ describe('RegisterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RegisterComponent]
+      imports: [RegisterComponent]
     })
     .compileComponents();
 
