@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, finalize } from 'rxjs';
 import { Router } from '@angular/router';
@@ -11,11 +11,13 @@ const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<any>(null);
+  private readonly currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private logoutTimer: any;
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor() {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
     if (token && user) {
