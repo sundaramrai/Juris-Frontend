@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [MatIconModule]
 })
 export class HomeComponent {
-  constructor(private router: Router, private authService: AuthService) { }
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   scrolltoBottom() {
     window.scrollTo(0, document.body.scrollHeight);
