@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,36 +19,18 @@ export class RegisterComponent implements OnInit {
   errorMessage: string | null = null;
   showPassword = false;
   validTlds: string[] = [];
-
   readonly usernameMinLength = 2;
   readonly usernameMaxLength = 20;
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly tldService = inject(TldService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService,
-    private tldService: TldService
-  ) {
+  constructor() {
     this.registerForm = this.fb.group({
-      email: [
-        '',
-        [Validators.required, this.enhancedEmailValidator],
-        [this.existingEmailValidator]
-      ],
-      username: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(this.usernameMinLength),
-          Validators.maxLength(this.usernameMaxLength),
-          this.enhancedUsernameValidator
-        ],
-        [this.existingUsernameValidator]
-      ],
-      password: [
-        '',
-        [Validators.required, this.enhancedPasswordValidator]
-      ]
+      email: ['', [Validators.required, this.enhancedEmailValidator], [this.existingEmailValidator]],
+      username: ['', [Validators.required, Validators.minLength(this.usernameMinLength), Validators.maxLength(this.usernameMaxLength), this.enhancedUsernameValidator], [this.existingUsernameValidator]],
+      password: ['', [Validators.required, this.enhancedPasswordValidator]]
     });
   }
 
@@ -106,7 +88,7 @@ export class RegisterComponent implements OnInit {
       return errors;
     }
     const [, domain] = email.split('@');
-    if (!domain || !domain.includes('.')) errors['invalidDomain'] = true;
+    if (!domain?.includes('.')) errors['invalidDomain'] = true;
     const domainTld = domain.split('.').pop()?.toLowerCase();
     if (domainTld && this.validTlds.length > 0 && !this.validTlds.includes(domainTld)) {
       errors['invalidTLD'] = true;
