@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { RecentChatsComponent } from '../recent-chats/recent-chats.component';
 
@@ -9,7 +9,8 @@ import { RecentChatsComponent } from '../recent-chats/recent-chats.component';
   imports: [RouterModule, RecentChatsComponent],
 })
 export class ToolsComponent {
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   isAssistantRoute(): boolean {
     return this.router.url.startsWith('/assistant');
