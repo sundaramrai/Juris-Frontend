@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { ChatInfo } from '../../Interface';
 import { Router } from '@angular/router';
@@ -21,11 +21,8 @@ export class RecentChatsComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   hasMoreChats: boolean = false;
   private chatIdSubscription: Subscription | null = null;
-
-  constructor(
-    private responseService: ResponseService,
-    private router: Router
-  ) { }
+  private readonly responseService = inject(ResponseService);
+  private readonly router = inject(Router);
 
   ngOnInit(): void {
     this.loadAllChats();
@@ -86,7 +83,7 @@ export class RecentChatsComponent implements OnInit, OnDestroy {
   openChat(chatId: string): void {
     const chat = this.chats.find(chat => chat.chatId === chatId);
 
-    if (chat && chat.messageCount && chat.messageCount > 0) {
+    if (chat?.messageCount && chat.messageCount > 0) {
       this.responseService.setCurrentChatId(chatId);
       this.router.navigate(['/assistant'], { queryParams: { chatId } });
     } else {
