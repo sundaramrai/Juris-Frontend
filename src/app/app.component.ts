@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { NgClass } from '@angular/common';
@@ -18,11 +18,13 @@ export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   isDarkTheme = false;
   username: string | undefined;
-  private systemThemeMediaQuery: MediaQueryList;
+  private readonly systemThemeMediaQuery: MediaQueryList;
   private mediaQueryListener: ((e: MediaQueryListEvent) => void) | null = null;
   private routerSubscription: any;
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor() {
     this.systemThemeMediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)');
   }
 
@@ -61,12 +63,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.applyTheme();
   };
 
-  private applyTheme = (): void => {
+  private readonly applyTheme = (): void => {
     document.body.classList.toggle('dark-theme', this.isDarkTheme);
     this.updateFavicon(this.isDarkTheme ? 'dark' : 'light');
   };
 
-  private updateFavicon = (theme: 'light' | 'dark'): void => {
+  private readonly updateFavicon = (theme: 'light' | 'dark'): void => {
     const favicon = document.getElementById('favicon') as HTMLLinkElement;
     if (favicon) {
       const timestamp = Date.now();
@@ -74,7 +76,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   };
 
-  private updateRouteState = (currentUrl: string) => {
+  private readonly updateRouteState = (currentUrl: string) => {
     this.isLoginPage = currentUrl === '/login';
     this.isRegisterPage = currentUrl === '/register';
     this.isLoggedIn = this.authService.isLoggedIn();
@@ -84,7 +86,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   };
 
-  private performLogout = () => {
+  private readonly performLogout = () => {
     this.authService.logout().subscribe({
       next: () => {
         this.isLoggedIn = false;
