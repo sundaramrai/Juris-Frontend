@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject, timer } from 'rxjs';
 import { catchError, map, tap, retry } from 'rxjs/operators';
@@ -11,14 +11,17 @@ const API_URL = environment.apiUrl;
   providedIn: 'root'
 })
 export class ResponseService {
-  private currentChatIdSubject = new BehaviorSubject<string | null>(null);
+  private readonly currentChatIdSubject = new BehaviorSubject<string | null>(null);
   currentChatId$ = this.currentChatIdSubject.asObservable();
-
-  constructor(private http: HttpClient) { }
+  private readonly http = inject(HttpClient);
 
   private getUserId(): string | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user).id : null;
+  }
+
+  private requireAuthenticatedUser(): Observable<never> | null {
+    return this.getUserId() ? null : throwError(() => new Error('User not authenticated'));
   }
 
   setCurrentChatId(chatId: string | null): void {
@@ -30,15 +33,13 @@ export class ResponseService {
   }
 
   getAllChats(page: number = 1): Observable<{ chats: ChatInfo[], pagination: { hasMore: boolean } }> {
-    const userId = this.getUserId();
-    if (!userId) {
-      return throwError(() => new Error('User not authenticated'));
-    }
+    const authError = this.requireAuthenticatedUser();
+    if (authError) return authError;
 
     return this.http.get<{ chats: ChatInfo[], pagination: { hasMore: boolean } }>(`${API_URL}/chat/all?page=${page}`).pipe(
       retry({
         count: 3,
-        delay: (error, retryCount) => {
+        delay: (retryCount) => {
           const delay = retryCount * 1000;
           console.log(`Retrying after ${delay}ms... (attempt ${retryCount})`);
           return timer(delay);
@@ -49,10 +50,8 @@ export class ResponseService {
   }
 
   createNewChat(): Observable<{ chatId: string, title: string }> {
-    const userId = this.getUserId();
-    if (!userId) {
-      return throwError(() => new Error('User not authenticated'));
-    }
+    const authError = this.requireAuthenticatedUser();
+    if (authError) return authError;
 
     return this.http.post<{ chatId: string, title: string }>(`${API_URL}/chat/new`, {}).pipe(
       catchError(error => {
@@ -63,10 +62,8 @@ export class ResponseService {
   }
 
   getChatHistory(chatId: string): Observable<{ messages: Message[], title: string }> {
-    const userId = this.getUserId();
-    if (!userId) {
-      return throwError(() => new Error('User not authenticated'));
-    }
+    const authError = this.requireAuthenticatedUser();
+    if (authError) return authError;
 
     return this.http.get<{ chatId: string, messages: MessageResponse[], title: string }>(
       `${API_URL}/chat/history/${chatId}`
@@ -87,10 +84,8 @@ export class ResponseService {
   }
 
   sendMessage(message: string, chatId?: string): Observable<{ chatId: string, botResponse: string, title: string }> {
-    const userId = this.getUserId();
-    if (!userId) {
-      return throwError(() => new Error('User not authenticated'));
-    }
+    const authError = this.requireAuthenticatedUser();
+    if (authError) return authError;
 
     const body: { message: string; chatId?: string } = { message };
     if (chatId) {
@@ -119,10 +114,8 @@ export class ResponseService {
   }
 
   clearChat(chatId: string): Observable<{ message: string }> {
-    const userId = this.getUserId();
-    if (!userId) {
-      return throwError(() => new Error('User not authenticated'));
-    }
+    const authError = this.requireAuthenticatedUser();
+    if (authError) return authError;
 
     return this.http.delete<{ message: string }>(`${API_URL}/chat/history/${chatId}`).pipe(
       catchError(error => {
@@ -133,10 +126,8 @@ export class ResponseService {
   }
 
   updateChatTitle(chatId: string, title: string): Observable<{ chatId: string, title: string }> {
-    const userId = this.getUserId();
-    if (!userId) {
-      return throwError(() => new Error('User not authenticated'));
-    }
+    const authError = this.requireAuthenticatedUser();
+    if (authError) return authError;
 
     return this.http.patch<{ chatId: string, title: string }>(
       `${API_URL}/chat/title/${chatId}`,
