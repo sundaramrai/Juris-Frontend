@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -42,13 +42,12 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('messagesArea') messagesArea!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
   @ViewChild('titleInput') titleInput!: ElementRef;
+  private readonly responseService = inject(ResponseService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
-  constructor(
-    private responseService: ResponseService,
-    private sanitizer: DomSanitizer,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.initSpeechRecognition();
     this.initSpeechSynthesis();
   }
@@ -346,7 +345,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
     for (const line of lines) {
       const trimmedLine = line.trim();
-      const headerMatch = trimmedLine.match(headerRegex);
+      const headerMatch = headerRegex.exec(trimmedLine);
       if (headerMatch) {
         currentSection = headerMatch[1].trim();
         sections[currentSection] = headerMatch[2].trim();
