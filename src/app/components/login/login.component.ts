@@ -68,10 +68,6 @@ export class LoginComponent implements OnInit {
     this.authService.login(credentials).subscribe({
       next: (response) => {
         console.log("✅ Login successful:", response);
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('loggedInUser', response.user.username);
-        localStorage.setItem('loginTimestamp', Date.now().toString());
-
         this.isLoading = false;
         this.router.navigate(['/assistant']);
       },
