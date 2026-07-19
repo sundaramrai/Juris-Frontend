@@ -4,6 +4,7 @@ import { AuthService } from './services/auth.service';
 import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ export class AppComponent implements OnInit, OnDestroy {
   username: string | undefined;
   private readonly systemThemeMediaQuery: MediaQueryList;
   private mediaQueryListener: ((e: MediaQueryListEvent) => void) | null = null;
-  private routerSubscription: any;
+  private routerSubscription: Subscription | null = null;
+  private authSubscription: Subscription | null = null;
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
@@ -29,12 +31,16 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.username = JSON.parse(localStorage.getItem('user') || '{}').username || undefined;
+    this.authSubscription = this.authService.currentUser$.subscribe(user => {
+      this.username = user?.username;
+      this.isLoggedIn = Boolean(user) && this.authService.isLoggedIn();
+    });
+
     this.routerSubscription = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this.updateRouteState(event.url);
     });
 
-    this.isLoggedIn = !!localStorage.getItem('token');
+    this.isLoggedIn = this.authService.isLoggedIn();
     const savedTheme = localStorage.getItem('theme');
     this.isDarkTheme = savedTheme ? savedTheme === 'dark' : this.systemThemeMediaQuery.matches;
     this.applyTheme();
@@ -54,6 +60,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
+    }
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
     }
   }
 
