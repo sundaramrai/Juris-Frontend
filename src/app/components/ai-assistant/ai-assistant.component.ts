@@ -1,7 +1,6 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { ApplicationRef, Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { ResponseService } from '../../services/response.service';
 import { Message } from '../../Interface';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, NgClass } from '@angular/common';
@@ -43,9 +42,9 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('messageInput') messageInput!: ElementRef;
   @ViewChild('titleInput') titleInput!: ElementRef;
   private readonly responseService = inject(ResponseService);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly appRef = inject(ApplicationRef);
 
   constructor() {
     this.initSpeechRecognition();
@@ -257,12 +256,11 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isListening) {
       this.stopSpeechRecognition();
     }
-    const cleanText = text
+    const cleanText = this.transformMarkdownLinks(text, (label) => label)
       .replaceAll(/\*\*(.+?)\*\*/g, '$1')
       .replaceAll(/\*(.+?)\*/g, '$1')
       .replaceAll(/`(.+?)`/g, '$1')
       .replaceAll(/```[\s\S]*?```/g, '')
-      .replaceAll(/\[([^\]]+)\]\([^)]+\)/g, '$1')
       .replaceAll(/https?:\/\/[^\s]+/g, 'link');
 
     this.speechSynthesisUtterance = new SpeechSynthesisUtterance(cleanText);
@@ -309,7 +307,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     this.confidenceThreshold = Math.max(0, Math.min(1, value));
   }
 
-  parseMessage(text: string): SafeHtml {
+  parseMessage(text: string): string {
     const cleanedText = this.cleanTextLines(text);
     const sectionNames = [
       "Title",
@@ -324,9 +322,9 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     const sections = this.extractSections(cleanedText, sectionNames);
 
     if (Object.keys(sections).length > 0) {
-      return this.sanitizer.bypassSecurityTrustHtml(this.formatSectionsHtml(sections));
+      return this.formatSectionsHtml(sections);
     } else {
-      return this.sanitizer.bypassSecurityTrustHtml(this.formatFallbackHtml(text));
+      return this.formatFallbackHtml(text);
     }
   }
 
@@ -403,10 +401,10 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private formatFallbackHtml(text: string): string {
     let formatted = text;
-    formatted = formatted.replaceAll(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    formatted = this.transformMarkdownLinks(formatted, (label, url) => `<a href="${url}" target="_blank">${label}</a>`);
     formatted = formatted.replaceAll(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replaceAll(/(?<!^)\*(.+?)\*/g, '<em>$1</em>');
-    formatted = formatted.replaceAll(/(https?:\/\/[^\s<]+)(?![^<]*<\/a>)/g, '<a href="$1" target="_blank">$1</a>');
+    formatted = this.linkifyPlainUrls(formatted);
 
     const fallbackLines = formatted.split('\n');
     let result = '';
@@ -435,6 +433,80 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     return result;
   }
 
+  private transformMarkdownLinks(text: string, transform: (label: string, url: string) => string): string {
+    let result = '';
+    let index = 0;
+
+    while (index < text.length) {
+      const startLabel = text.indexOf('[', index);
+      if (startLabel === -1) {
+        result += text.slice(index);
+        break;
+      }
+
+      const endLabel = text.indexOf(']', startLabel + 1);
+      const startUrl = endLabel === -1 ? -1 : text.indexOf('(', endLabel + 1);
+      const endUrl = startUrl === -1 ? -1 : text.indexOf(')', startUrl + 1);
+
+      if (endLabel === -1 || startUrl !== endLabel + 1 || endUrl === -1) {
+        result += text.slice(index, startLabel + 1);
+        index = startLabel + 1;
+        continue;
+      }
+
+      result += text.slice(index, startLabel);
+      const label = text.slice(startLabel + 1, endLabel);
+      const url = text.slice(startUrl + 1, endUrl);
+      result += transform(label, url);
+      index = endUrl + 1;
+    }
+
+    return result;
+  }
+
+  private linkifyPlainUrls(text: string): string {
+    let result = '';
+    let index = 0;
+
+    while (index < text.length) {
+      const httpIndex = text.indexOf('http://', index);
+      const httpsIndex = text.indexOf('https://', index);
+
+      let startIndex = -1;
+      let scheme = '';
+
+      if (httpIndex !== -1 && (httpsIndex === -1 || httpIndex < httpsIndex)) {
+        startIndex = httpIndex;
+        scheme = 'http://';
+      } else if (httpsIndex !== -1) {
+        startIndex = httpsIndex;
+        scheme = 'https://';
+      }
+
+      if (startIndex === -1) {
+        result += text.slice(index);
+        break;
+      }
+
+      result += text.slice(index, startIndex);
+      let endIndex = startIndex + scheme.length;
+
+      while (endIndex < text.length) {
+        const currentChar = text[endIndex];
+        if (/\s/.test(currentChar) || currentChar === '<' || currentChar === '>' || currentChar === '(' || currentChar === ')') {
+          break;
+        }
+        endIndex++;
+      }
+
+      const url = text.slice(startIndex, endIndex);
+      result += `<a href="${url}" target="_blank">${url}</a>`;
+      index = endIndex;
+    }
+
+    return result;
+  }
+
   loadChatHistory(chatId: string): void {
     this.isLoading = true;
     this.chatNotFound = false;
@@ -445,6 +517,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         this.chatTitle = data.title;
         this.scrollToBottom();
         this.isLoading = false;
+        this.appRef.tick();
         if (!this.messages.length) {
           this.router.navigate(['/assistant'], {
             queryParams: {},
@@ -455,6 +528,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (error) => {
         console.error('Error loading chat history:', error);
         this.createNewChat();
+        this.appRef.tick();
       }
     });
   }
@@ -479,6 +553,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
     this.messages.push(userMessage);
     this.scrollToBottom();
     this.isLoading = true;
+    this.appRef.tick();
 
     const messageText = this.userInput;
     const currentChatId = this.chatId;
@@ -518,6 +593,7 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         this.scrollToBottom();
+        this.appRef.tick();
       },
       error: (error) => {
         console.error('Error sending message:', error);
@@ -527,9 +603,11 @@ export class AiAssistantComponent implements OnInit, AfterViewInit, OnDestroy {
           time: new Date().toISOString()
         });
         this.scrollToBottom();
+        this.appRef.tick();
       },
       complete: () => {
         this.isLoading = false;
+        this.appRef.tick();
       }
     });
   }
